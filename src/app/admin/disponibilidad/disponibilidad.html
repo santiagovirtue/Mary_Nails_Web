@@ -1,1 +1,112 @@
-<p>disponibilidad works!</p>
+<section class="availability-page">
+  <div class="availability-header">
+    <div>
+      <span>Disponibilidad</span>
+      <h1>Gestión de horarios disponibles</h1>
+      <p>
+        En esta sección el administrador puede configurar los días y horarios
+        disponibles para que los clientes puedan solicitar sus citas.
+      </p>
+    </div>
+
+    <a routerLink="/admin/cronograma" class="btn-main">Ver cronograma</a>
+  </div>
+
+  <div class="availability-layout">
+    <div class="form-card">
+      <h2>Agregar horario</h2>
+
+      <form>
+        <div class="form-group">
+          <label>Día</label>
+          <select>
+            <option>Selecciona un día</option>
+            <option>Lunes</option>
+            <option>Martes</option>
+            <option>Miércoles</option>
+            <option>Jueves</option>
+            <option>Viernes</option>
+            <option>Sábado</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Hora inicial</label>
+            <input type="time" />
+          </div>
+
+          <div class="form-group">
+            <label>Hora final</label>
+            <input type="time" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Estado</label>
+          <select>
+            <option>Disponible</option>
+            <option>Ocupado</option>
+            <option>No disponible</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Observación</label>
+          <textarea placeholder="Ej: Horario reservado para citas especiales"></textarea>
+        </div>
+
+        <button type="button" class="btn-save">Guardar horario</button>
+      </form>
+    </div>
+
+    <div class="list-card">
+      <div class="table-header">
+        <h2>Horarios registrados</h2>
+        <p>Control semanal de disponibilidad</p>
+      </div>
+
+      <div class="schedule-list">
+        <div class="schedule-item available">
+          <div>
+            <strong>Lunes</strong>
+            <span>09:00 a.m. - 12:00 p.m.</span>
+          </div>
+          <p>Disponible</p>
+        </div>
+
+        <div class="schedule-item available">
+          <div>
+            <strong>Miércoles</strong>
+            <span>02:00 p.m. - 05:00 p.m.</span>
+          </div>
+          <p>Disponible</p>
+        </div>
+
+        <div class="schedule-item busy">
+          <div>
+            <strong>Viernes</strong>
+            <span>10:00 a.m. - 01:00 p.m.</span>
+          </div>
+          <p>Ocupado</p>
+        </div>
+
+        <div class="schedule-item available">
+          <div>
+            <strong>Sábado</strong>
+            <span>08:00 a.m. - 11:00 a.m.</span>
+          </div>
+          <p>Disponible</p>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <h3>Nota administrativa</h3>
+        <p>
+          Los horarios configurados aquí serán usados como base para que el cliente
+          consulte disponibilidad al momento de realizar una reserva.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

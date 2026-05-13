@@ -1,1 +1,111 @@
-<p>cronograma works!</p>
+<section class="schedule-page">
+  <div class="schedule-header">
+    <div>
+      <span>Cronograma administrativo</span>
+      <h1>Control de citas programadas</h1>
+      <p>
+        En esta sección el administrador puede revisar las citas solicitadas,
+        validar horarios, cambiar estados y controlar la agenda de Mary Nails.
+      </p>
+    </div>
+
+    <a routerLink="/admin/disponibilidad" class="btn-main">Gestionar disponibilidad</a>
+  </div>
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <h3>Pendientes</h3>
+      <strong>3</strong>
+      <p>Citas por confirmar</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Confirmadas</h3>
+      <strong>5</strong>
+      <p>Citas aprobadas</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Completadas</h3>
+      <strong>8</strong>
+      <p>Servicios realizados</p>
+    </article>
+  </div>
+
+  <div class="schedule-table-card">
+    <div class="table-header">
+      <h2>Agenda semanal</h2>
+      <button>Agregar cita</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Cliente</th>
+            <th>Servicio</th>
+            <th>Método de pago</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>14/05/2026</td>
+            <td>09:00 a.m.</td>
+            <td>Laura Martínez</td>
+            <td>Manicure profesional</td>
+            <td>Nequi</td>
+            <td><span class="status confirmed">Confirmada</span></td>
+            <td>
+              <button class="action edit">Editar</button>
+              <button class="action cancel">Cancelar</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>14/05/2026</td>
+            <td>10:30 a.m.</td>
+            <td>Camila Torres</td>
+            <td>Uñas acrílicas</td>
+            <td>Efectivo</td>
+            <td><span class="status pending">Pendiente</span></td>
+            <td>
+              <button class="action edit">Editar</button>
+              <button class="action approve">Confirmar</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>15/05/2026</td>
+            <td>02:00 p.m.</td>
+            <td>Sofía Ramírez</td>
+            <td>Pedicure</td>
+            <td>Daviplata</td>
+            <td><span class="status completed">Completada</span></td>
+            <td>
+              <button class="action edit">Ver</button>
+              <button class="action cancel">Eliminar</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>16/05/2026</td>
+            <td>04:00 p.m.</td>
+            <td>Daniela Gómez</td>
+            <td>Diseño personalizado</td>
+            <td>Pago en local</td>
+            <td><span class="status pending">Pendiente</span></td>
+            <td>
+              <button class="action edit">Editar</button>
+              <button class="action approve">Confirmar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

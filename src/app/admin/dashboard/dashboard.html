@@ -1,1 +1,83 @@
-<p>dashboard works!</p>
+<section class="dashboard-page">
+  <div class="dashboard-header">
+    <div>
+      <span>Panel administrativo</span>
+      <h1>Bienvenido al panel de Mary Nails</h1>
+      <p>
+        Desde este espacio puedes revisar citas, gestionar horarios,
+        controlar servicios y administrar la disponibilidad del negocio.
+      </p>
+    </div>
+
+    <a routerLink="/admin/cronograma" class="btn-main">Ver cronograma</a>
+  </div>
+
+  <div class="stats-grid">
+    <article class="stat-card">
+      <h3>Citas de hoy</h3>
+      <strong>6</strong>
+      <p>Reservas programadas para el día actual.</p>
+    </article>
+
+    <article class="stat-card">
+      <h3>Clientes registrados</h3>
+      <strong>18</strong>
+      <p>Clientes agregados al sistema.</p>
+    </article>
+
+    <article class="stat-card">
+      <h3>Servicios activos</h3>
+      <strong>4</strong>
+      <p>Servicios disponibles para reservar.</p>
+    </article>
+
+    <article class="stat-card">
+      <h3>Pagos pendientes</h3>
+      <strong>3</strong>
+      <p>Reservas pendientes por validar pago.</p>
+    </article>
+  </div>
+
+  <div class="dashboard-layout">
+    <div class="panel-card">
+      <h2>Próximas citas</h2>
+
+      <div class="appointment-list">
+        <div class="appointment-item">
+          <div>
+            <strong>Laura Martínez</strong>
+            <span>Manicure profesional</span>
+          </div>
+          <p>09:00 a.m.</p>
+        </div>
+
+        <div class="appointment-item">
+          <div>
+            <strong>Camila Torres</strong>
+            <span>Uñas acrílicas</span>
+          </div>
+          <p>10:30 a.m.</p>
+        </div>
+
+        <div class="appointment-item">
+          <div>
+            <strong>Sofía Ramírez</strong>
+            <span>Pedicure</span>
+          </div>
+          <p>02:00 p.m.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Acciones rápidas</h2>
+
+      <div class="quick-actions">
+        <a routerLink="/admin/cronograma">Gestionar cronograma</a>
+        <a routerLink="/admin/disponibilidad">Gestionar disponibilidad</a>
+        <a routerLink="/servicios">Ver servicios publicados</a>
+        <a routerLink="/reservas">Ver formulario de reserva</a>
+      </div>
+    </div>
+  </div>
+</section>
