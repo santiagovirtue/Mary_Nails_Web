@@ -1,0 +1,119 @@
+.rating-page {
+  min-height: 100vh;
+  padding: 80px 8%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #fff7fb, #ffe8f2);
+}
+
+.rating-card {
+  width: 100%;
+  max-width: 560px;
+  background: white;
+  border-radius: 26px;
+  padding: 42px;
+  border: 1px solid #f3d6e4;
+  box-shadow: 0 12px 32px rgba(194, 24, 91, 0.15);
+}
+
+.rating-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.rating-header span {
+  display: inline-block;
+  background: #f8cfe0;
+  color: #9b1247;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.rating-header h1 {
+  color: #c2185b;
+  font-size: 38px;
+  margin: 0 0 14px;
+}
+
+.rating-header p {
+  color: #555;
+  line-height: 1.6;
+}
+
+.rating-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 700;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.form-group select,
+.form-group textarea {
+  padding: 14px 16px;
+  border: 1px solid #efc7d8;
+  border-radius: 14px;
+  background: #fffafc;
+  font-size: 15px;
+  outline: none;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #c2185b;
+}
+
+.stars {
+  display: flex;
+  gap: 10px;
+  font-size: 38px;
+  color: #c2185b;
+  cursor: pointer;
+}
+
+.btn-rating {
+  border: none;
+  background: #c2185b;
+  color: white;
+  padding: 15px;
+  border-radius: 28px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-rating:hover {
+  background: #a4144c;
+}
+
+@media (max-width: 600px) {
+  .rating-page {
+    padding: 60px 6%;
+  }
+
+  .rating-card {
+    padding: 32px 24px;
+  }
+
+  .rating-header h1 {
+    font-size: 30px;
+  }
+}
