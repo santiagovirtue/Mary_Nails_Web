@@ -1,1 +1,32 @@
-<p>login works!</p>
+<section class="client-login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <span>Cliente</span>
+      <h1>Ingreso de cliente</h1>
+      <p>
+        Accede para consultar tus citas, revisar el estado de tus reservas
+        y mantener actualizada tu información.
+      </p>
+    </div>
+
+    <form class="login-form">
+      <div class="form-group">
+        <label>Correo o teléfono</label>
+        <input type="text" placeholder="Ej: cliente@email.com" />
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" placeholder="Ingresa tu contraseña" />
+      </div>
+
+      <a routerLink="/cliente/mis-citas" class="btn-login">Ingresar</a>
+    </form>
+
+    <div class="register-box">
+      <h3>¿Aún no tienes cuenta?</h3>
+      <p>Regístrate para consultar tus reservas y recibir confirmaciones.</p>
+      <button type="button">Crear cuenta</button>
+    </div>
+  </div>
+</section>
