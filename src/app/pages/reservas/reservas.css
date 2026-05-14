@@ -208,3 +208,70 @@
     grid-template-columns: 1fr;
   }
 }
+.whatsapp-select {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.whatsapp-select label {
+  font-weight: 700;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.whatsapp-select select {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid #efc7d8;
+  border-radius: 14px;
+  font-size: 15px;
+  outline: none;
+  background: #fffafc;
+}
+
+.whatsapp-select select:focus {
+  border-color: #c2185b;
+}
+.confirmation-message {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #e6f7ee;
+  color: #168a45;
+  font-weight: 700;
+  line-height: 1.5;
+  border: 1px solid #b9e7ce;
+}
+.schedule-item {
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.schedule-item.clickable {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.schedule-item.clickable:hover {
+  transform: translateY(-4px);
+  border-color: #c2185b;
+  box-shadow: 0 8px 22px rgba(194, 24, 91, 0.12);
+}
+
+.schedule-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.selected-schedule-message {
+  margin-top: 18px;
+  padding: 15px;
+  border-radius: 16px;
+  background: #fff4d8;
+  color: #8a5a00;
+  font-weight: 700;
+  line-height: 1.5;
+  border: 1px solid #f3d89b;
+}

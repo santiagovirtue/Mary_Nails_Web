@@ -212,3 +212,32 @@
     align-items: flex-start;
   }
 }
+.empty-message {
+  padding: 18px;
+  background: #fff0f6;
+  border: 1px solid #f3d6e4;
+  border-radius: 16px;
+  color: #555;
+  font-weight: 700;
+}
+
+.appointment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.btn-rate {
+  text-decoration: none;
+  background: #c2185b;
+  color: white;
+  padding: 9px 16px;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.btn-rate:hover {
+  background: #a4144c;
+}

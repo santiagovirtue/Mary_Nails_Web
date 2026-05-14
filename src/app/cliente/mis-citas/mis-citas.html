@@ -15,19 +15,19 @@
   <div class="client-summary">
     <article>
       <h3>Reservas activas</h3>
-      <strong>2</strong>
+      <strong>{{ contarActivas() }}</strong>
       <p>Citas pendientes o confirmadas.</p>
     </article>
 
     <article>
       <h3>Completadas</h3>
-      <strong>1</strong>
+      <strong>{{ contarCompletadas() }}</strong>
       <p>Servicios ya realizados.</p>
     </article>
 
     <article>
       <h3>Pendientes</h3>
-      <strong>1</strong>
+      <strong>{{ contarPendientes() }}</strong>
       <p>Reservas por confirmar.</p>
     </article>
   </div>
@@ -35,52 +35,42 @@
   <div class="appointments-card">
     <h2>Historial de citas</h2>
 
-    <div class="appointment-list">
-      <div class="appointment-item">
+    <p class="empty-message" *ngIf="reservas.length === 0">
+      Aún no tienes citas registradas. Realiza una reserva para verla aquí.
+    </p>
+
+    <div class="appointment-list" *ngIf="reservas.length > 0">
+      <div class="appointment-item" *ngFor="let reserva of reservas">
         <div class="date-box">
-          <strong>14</strong>
-          <span>MAY</span>
+          <strong>{{ reserva.fecha.slice(8, 10) || '--' }}</strong>
+          <span>{{ reserva.fecha.slice(5, 7) || '--' }}</span>
         </div>
 
         <div class="appointment-info">
-          <h3>Manicure profesional</h3>
-          <p>Hora: 09:00 a.m.</p>
-          <p>Método de pago: Nequi</p>
-        </div>
-
-        <span class="status confirmed">Confirmada</span>
-      </div>
-
-      <div class="appointment-item">
-        <div class="date-box">
-          <strong>16</strong>
-          <span>MAY</span>
-        </div>
-
-        <div class="appointment-info">
-          <h3>Diseño personalizado</h3>
-          <p>Hora: 04:00 p.m.</p>
-          <p>Método de pago: Pago en local</p>
-        </div>
-
-        <span class="status pending">Pendiente</span>
-      </div>
-
-      <div class="appointment-item">
-        <div class="date-box">
-          <strong>10</strong>
-          <span>MAY</span>
-        </div>
-
-        <div class="appointment-info">
-          <h3>Pedicure</h3>
-          <p>Hora: 02:00 p.m.</p>
-          <p>Método de pago: Daviplata</p>
+          <h3>{{ reserva.servicio }}</h3>
+          <p>Fecha: {{ reserva.fecha }}</p>
+          <p>Hora: {{ reserva.hora }}</p>
+          <p>Método de pago: {{ reserva.metodoPago }}</p>
+          <p *ngIf="reserva.comentarios">Comentario: {{ reserva.comentarios }}</p>
         </div>
 
         <div class="appointment-actions">
-          <span class="status completed">Completada</span>
-          <a routerLink="/cliente/calificar-servicio" class="btn-rate">Calificar</a>
+          <span
+            class="status"
+            [class.pending]="reserva.estado === 'Pendiente'"
+            [class.confirmed]="reserva.estado === 'Confirmada'"
+            [class.completed]="reserva.estado === 'Completada'"
+          >
+            {{ reserva.estado }}
+          </span>
+
+          <a
+            *ngIf="reserva.estado === 'Completada'"
+            routerLink="/cliente/calificar-servicio"
+            class="btn-rate"
+          >
+            Calificar
+          </a>
         </div>
       </div>
     </div>

@@ -15,107 +15,172 @@
       <form>
         <div class="form-group">
           <label>Nombre completo</label>
-          <input type="text" placeholder="Ej: María González" />
+          <input
+            type="text"
+            name="nombre"
+            placeholder="Ej: María González"
+            [(ngModel)]="reserva.nombre"
+          />
         </div>
 
         <div class="form-group">
           <label>Teléfono</label>
-          <input type="tel" placeholder="Ej: 300 123 4567" />
+          <input
+            type="tel"
+            name="telefono"
+            placeholder="Ej: 300 123 4567"
+            [(ngModel)]="reserva.telefono"
+          />
         </div>
 
         <div class="form-group">
           <label>Servicio</label>
-          <select>
-            <option>Selecciona un servicio</option>
-            <option>Manicure profesional</option>
-            <option>Pedicure</option>
-            <option>Uñas acrílicas</option>
-            <option>Diseño personalizado</option>
+          <select name="servicio" [(ngModel)]="reserva.servicio">
+            <option value="">Selecciona un servicio</option>
+            <option value="Manicure profesional">Manicure profesional</option>
+            <option value="Pedicure">Pedicure</option>
+            <option value="Uñas acrílicas">Uñas acrílicas</option>
+            <option value="Diseño personalizado">Diseño personalizado</option>
           </select>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Fecha</label>
-            <input type="date" />
+            <input
+              type="date"
+              name="fecha"
+              [(ngModel)]="reserva.fecha"
+            />
           </div>
 
           <div class="form-group">
             <label>Hora</label>
-            <select>
-              <option>Selecciona hora</option>
-              <option>09:00 a.m.</option>
-              <option>10:30 a.m.</option>
-              <option>02:00 p.m.</option>
-              <option>04:00 p.m.</option>
+            <select name="hora" [(ngModel)]="reserva.hora">
+              <option value="">Selecciona hora</option>
+              <option value="09:00 a.m.">09:00 a.m.</option>
+              <option value="10:30 a.m.">10:30 a.m.</option>
+              <option value="02:00 p.m.">02:00 p.m.</option>
+              <option value="04:00 p.m.">04:00 p.m.</option>
             </select>
           </div>
         </div>
 
         <div class="form-group">
           <label>Método de pago</label>
-          <select>
-            <option>Selecciona método de pago</option>
-            <option>Efectivo</option>
-            <option>Nequi</option>
-            <option>Daviplata</option>
-            <option>Pago en el local</option>
+          <select name="metodoPago" [(ngModel)]="reserva.metodoPago">
+            <option value="">Selecciona método de pago</option>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Nequi">Nequi</option>
+            <option value="Daviplata">Daviplata</option>
+            <option value="Pago en el local">Pago en el local</option>
           </select>
         </div>
 
         <div class="form-group">
           <label>Comentarios adicionales</label>
-          <textarea placeholder="Escribe detalles sobre el diseño, color o estilo que deseas"></textarea>
+          <textarea
+            name="comentarios"
+            placeholder="Escribe detalles sobre el diseño, color o estilo que deseas"
+            [(ngModel)]="reserva.comentarios"
+          ></textarea>
         </div>
 
-        <button type="button" class="btn-submit">Confirmar solicitud</button>
+        <button
+          type="button"
+          class="btn-submit"
+          (click)="confirmarSolicitud()"
+        >
+          Confirmar solicitud
+        </button>
+
+        <p class="confirmation-message" *ngIf="mensajeConfirmacion">
+          {{ mensajeConfirmacion }}
+        </p>
       </form>
     </div>
 
     <div class="availability-card">
       <h2>Disponibilidad</h2>
+
       <p class="availability-text">
         Estos son algunos horarios disponibles para reservar durante la semana.
       </p>
 
       <div class="schedule-list">
-        <div class="schedule-item available">
+        <button
+          type="button"
+          class="schedule-item available clickable"
+          (click)="seleccionarDisponibilidad('Lunes', '09:00 a.m.', '09:00 a.m. - 12:00 p.m.', true)"
+        >
           <div>
             <strong>Lunes</strong>
             <span>09:00 a.m. - 12:00 p.m.</span>
           </div>
           <p>Disponible</p>
-        </div>
+        </button>
 
-        <div class="schedule-item available">
+        <button
+          type="button"
+          class="schedule-item available clickable"
+          (click)="seleccionarDisponibilidad('Miércoles', '02:00 p.m.', '02:00 p.m. - 05:00 p.m.', true)"
+        >
           <div>
             <strong>Miércoles</strong>
             <span>02:00 p.m. - 05:00 p.m.</span>
           </div>
           <p>Disponible</p>
-        </div>
+        </button>
 
-        <div class="schedule-item busy">
+        <button
+          type="button"
+          class="schedule-item busy disabled"
+          (click)="seleccionarDisponibilidad('Viernes', '10:00 a.m.', '10:00 a.m. - 01:00 p.m.', false)"
+        >
           <div>
             <strong>Viernes</strong>
             <span>10:00 a.m. - 01:00 p.m.</span>
           </div>
           <p>Ocupado</p>
-        </div>
+        </button>
 
-        <div class="schedule-item available">
+        <button
+          type="button"
+          class="schedule-item available clickable"
+          (click)="seleccionarDisponibilidad('Sábado', '08:00 a.m.', '08:00 a.m. - 11:00 a.m.', true)"
+        >
           <div>
             <strong>Sábado</strong>
             <span>08:00 a.m. - 11:00 a.m.</span>
           </div>
           <p>Disponible</p>
-        </div>
+        </button>
       </div>
+
+      <p class="selected-schedule-message" *ngIf="horarioSeleccionado">
+        {{ horarioSeleccionado }}
+      </p>
 
       <div class="whatsapp-box">
         <h3>¿Tienes dudas?</h3>
-        <p>También puedes comunicarte por WhatsApp para confirmar información.</p>
-        <a href="https://wa.me/573001234567" target="_blank">Enviar mensaje</a>
+        <p>Selecciona el motivo de tu consulta y comunícate por WhatsApp.</p>
+
+        <div class="whatsapp-select">
+          <label>Motivo del mensaje</label>
+          <select (change)="seleccionarMotivo($event)">
+            <option value="reserva">Reservar cita</option>
+            <option value="disponibilidad">Consultar disponibilidad</option>
+            <option value="cambio">Cambiar cita</option>
+            <option value="cancelacion">Cancelar cita</option>
+            <option value="pago">Problema o duda con pago</option>
+            <option value="servicio">Consultar servicio</option>
+            <option value="otro">Otro motivo</option>
+          </select>
+        </div>
+
+        <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
+          Enviar mensaje
+        </a>
       </div>
     </div>
   </div>
