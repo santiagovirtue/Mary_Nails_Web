@@ -58,10 +58,17 @@
             <label>Hora</label>
             <select name="hora" [(ngModel)]="reserva.hora">
               <option value="">Selecciona hora</option>
-              <option value="09:00 a.m.">09:00 a.m.</option>
-              <option value="10:30 a.m.">10:30 a.m.</option>
-              <option value="02:00 p.m.">02:00 p.m.</option>
-              <option value="04:00 p.m.">04:00 p.m.</option>
+
+              <option
+                *ngFor="let horario of horarios"
+                [value]="formatearHora(horario.horaInicio) + ' - ' + formatearHora(horario.horaFinal)"
+                [disabled]="horario.estado !== 'Disponible'"
+              >
+                {{ horario.dia }}:
+                {{ formatearHora(horario.horaInicio) }} -
+                {{ formatearHora(horario.horaFinal) }}
+                / {{ horario.estado }}
+              </option>
             </select>
           </div>
         </div>
@@ -104,56 +111,30 @@
       <h2>Disponibilidad</h2>
 
       <p class="availability-text">
-        Estos son algunos horarios disponibles para reservar durante la semana.
+        Estos horarios vienen desde la gestión de disponibilidad del administrador.
       </p>
 
       <div class="schedule-list">
         <button
           type="button"
-          class="schedule-item available clickable"
-          (click)="seleccionarDisponibilidad('Lunes', '09:00 a.m.', '09:00 a.m. - 12:00 p.m.', true)"
+          class="schedule-item"
+          *ngFor="let horario of horarios"
+          [class.available]="horario.estado === 'Disponible'"
+          [class.busy]="horario.estado === 'Ocupado'"
+          [class.clickable]="horario.estado === 'Disponible'"
+          [class.disabled]="horario.estado !== 'Disponible'"
+          (click)="seleccionarDisponibilidad(horario)"
         >
           <div>
-            <strong>Lunes</strong>
-            <span>09:00 a.m. - 12:00 p.m.</span>
+            <strong>{{ horario.dia }}</strong>
+            <span>
+              {{ formatearHora(horario.horaInicio) }} -
+              {{ formatearHora(horario.horaFinal) }}
+            </span>
+            <small>{{ horario.observacion }}</small>
           </div>
-          <p>Disponible</p>
-        </button>
 
-        <button
-          type="button"
-          class="schedule-item available clickable"
-          (click)="seleccionarDisponibilidad('Miércoles', '02:00 p.m.', '02:00 p.m. - 05:00 p.m.', true)"
-        >
-          <div>
-            <strong>Miércoles</strong>
-            <span>02:00 p.m. - 05:00 p.m.</span>
-          </div>
-          <p>Disponible</p>
-        </button>
-
-        <button
-          type="button"
-          class="schedule-item busy disabled"
-          (click)="seleccionarDisponibilidad('Viernes', '10:00 a.m.', '10:00 a.m. - 01:00 p.m.', false)"
-        >
-          <div>
-            <strong>Viernes</strong>
-            <span>10:00 a.m. - 01:00 p.m.</span>
-          </div>
-          <p>Ocupado</p>
-        </button>
-
-        <button
-          type="button"
-          class="schedule-item available clickable"
-          (click)="seleccionarDisponibilidad('Sábado', '08:00 a.m.', '08:00 a.m. - 11:00 a.m.', true)"
-        >
-          <div>
-            <strong>Sábado</strong>
-            <span>08:00 a.m. - 11:00 a.m.</span>
-          </div>
-          <p>Disponible</p>
+          <p>{{ horario.estado }}</p>
         </button>
       </div>
 

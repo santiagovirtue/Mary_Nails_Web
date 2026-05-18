@@ -9,98 +9,116 @@
       </p>
     </div>
 
-    <a routerLink="/admin/cronograma" class="btn-main">Ver cronograma</a>
+    <a routerLink="/admin/cronograma" class="btn-main">
+      Ver cronograma
+    </a>
   </div>
 
   <div class="availability-layout">
-    <div class="form-card">
+    <div class="availability-form">
       <h2>Agregar horario</h2>
 
       <form>
         <div class="form-group">
           <label>Día</label>
-          <select>
-            <option>Selecciona un día</option>
-            <option>Lunes</option>
-            <option>Martes</option>
-            <option>Miércoles</option>
-            <option>Jueves</option>
-            <option>Viernes</option>
-            <option>Sábado</option>
+          <select name="dia" [(ngModel)]="horario.dia">
+            <option value="">Selecciona un día</option>
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+            <option value="Sábado">Sábado</option>
+            <option value="Domingo">Domingo</option>
           </select>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Hora inicial</label>
-            <input type="time" />
+            <input
+              type="time"
+              name="horaInicio"
+              [(ngModel)]="horario.horaInicio"
+            />
           </div>
 
           <div class="form-group">
             <label>Hora final</label>
-            <input type="time" />
+            <input
+              type="time"
+              name="horaFinal"
+              [(ngModel)]="horario.horaFinal"
+            />
           </div>
         </div>
 
         <div class="form-group">
           <label>Estado</label>
-          <select>
-            <option>Disponible</option>
-            <option>Ocupado</option>
-            <option>No disponible</option>
+          <select name="estado" [(ngModel)]="horario.estado">
+            <option value="Disponible">Disponible</option>
+            <option value="Ocupado">Ocupado</option>
           </select>
         </div>
 
         <div class="form-group">
           <label>Observación</label>
-          <textarea placeholder="Ej: Horario reservado para citas especiales"></textarea>
+          <textarea
+            name="observacion"
+            placeholder="Ej: Horario reservado para citas especiales"
+            [(ngModel)]="horario.observacion"
+          ></textarea>
         </div>
 
-        <button type="button" class="btn-save">Guardar horario</button>
+        <button type="button" class="btn-submit" (click)="agregarHorario()">
+          Guardar horario
+        </button>
+
+        <p class="success-message" *ngIf="mensaje">
+          {{ mensaje }}
+        </p>
       </form>
     </div>
 
-    <div class="list-card">
-      <div class="table-header">
-        <h2>Horarios registrados</h2>
-        <p>Control semanal de disponibilidad</p>
-      </div>
+    <div class="availability-card">
+      <h2>Horarios registrados</h2>
+
+      <p class="availability-text">
+        Control semanal de disponibilidad. Estos horarios se muestran también
+        en el formulario de reservas del cliente.
+      </p>
 
       <div class="schedule-list">
-        <div class="schedule-item available">
+        <div
+          class="schedule-item"
+          *ngFor="let item of horarios"
+          [class.available]="item.estado === 'Disponible'"
+          [class.busy]="item.estado === 'Ocupado'"
+        >
           <div>
-            <strong>Lunes</strong>
-            <span>09:00 a.m. - 12:00 p.m.</span>
+            <strong>{{ item.dia }}</strong>
+            <span>
+              {{ formatearHora(item.horaInicio) }} -
+              {{ formatearHora(item.horaFinal) }}
+            </span>
+            <small>{{ item.observacion }}</small>
           </div>
-          <p>Disponible</p>
-        </div>
 
-        <div class="schedule-item available">
-          <div>
-            <strong>Miércoles</strong>
-            <span>02:00 p.m. - 05:00 p.m.</span>
-          </div>
-          <p>Disponible</p>
-        </div>
+          <p>{{ item.estado }}</p>
 
-        <div class="schedule-item busy">
-          <div>
-            <strong>Viernes</strong>
-            <span>10:00 a.m. - 01:00 p.m.</span>
-          </div>
-          <p>Ocupado</p>
-        </div>
+          <div class="schedule-actions">
+            <button type="button" (click)="cambiarEstado(item.id)">
+              Cambiar estado
+            </button>
 
-        <div class="schedule-item available">
-          <div>
-            <strong>Sábado</strong>
-            <span>08:00 a.m. - 11:00 a.m.</span>
+            <button type="button" class="delete-btn" (click)="eliminarHorario(item.id)">
+              Eliminar
+            </button>
           </div>
-          <p>Disponible</p>
         </div>
       </div>
 
-      <div class="note-card">
+      <div class="admin-note">
         <h3>Nota administrativa</h3>
         <p>
           Los horarios configurados aquí serán usados como base para que el cliente

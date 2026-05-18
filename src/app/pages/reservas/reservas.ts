@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 interface Reserva {
@@ -14,14 +14,25 @@ interface Reserva {
   estado: string;
 }
 
+interface Horario {
+  id: number;
+  dia: string;
+  horaInicio: string;
+  horaFinal: string;
+  estado: string;
+  observacion: string;
+}
+
 @Component({
   selector: 'app-reservas',
-  imports: [FormsModule, NgIf],
+  imports: [FormsModule, NgIf, NgFor],
   templateUrl: './reservas.html',
   styleUrl: './reservas.css',
 })
-export class Reservas {
+export class Reservas implements OnInit {
   private readonly telefonoWhatsapp = '573132146285';
+
+  horarios: Horario[] = [];
 
   reserva = {
     nombre: '',
@@ -36,6 +47,54 @@ export class Reservas {
   mensajeConfirmacion = '';
   horarioSeleccionado = '';
   mensajeWhatsapp = 'Hola, quiero reservar una cita en Mary Nails.';
+
+  ngOnInit(): void {
+    this.cargarHorarios();
+  }
+
+  cargarHorarios(): void {
+    const horariosGuardados = localStorage.getItem('maryNailsDisponibilidad');
+
+    if (horariosGuardados) {
+      this.horarios = JSON.parse(horariosGuardados);
+      return;
+    }
+
+    this.horarios = [
+      {
+        id: 1,
+        dia: 'Lunes',
+        horaInicio: '09:00',
+        horaFinal: '12:00',
+        estado: 'Disponible',
+        observacion: 'Horario disponible para reservas.',
+      },
+      {
+        id: 2,
+        dia: 'Miércoles',
+        horaInicio: '14:00',
+        horaFinal: '17:00',
+        estado: 'Disponible',
+        observacion: 'Horario disponible para reservas.',
+      },
+      {
+        id: 3,
+        dia: 'Viernes',
+        horaInicio: '10:00',
+        horaFinal: '13:00',
+        estado: 'Ocupado',
+        observacion: 'Horario reservado.',
+      },
+      {
+        id: 4,
+        dia: 'Sábado',
+        horaInicio: '08:00',
+        horaFinal: '11:00',
+        estado: 'Disponible',
+        observacion: 'Horario disponible para reservas.',
+      },
+    ];
+  }
 
   seleccionarMotivo(event: Event): void {
     const motivo = (event.target as HTMLSelectElement).value;
@@ -57,21 +116,16 @@ export class Reservas {
     return `https://api.whatsapp.com/send?phone=${this.telefonoWhatsapp}&text=${encodeURIComponent(this.mensajeWhatsapp)}`;
   }
 
-  seleccionarDisponibilidad(
-    dia: string,
-    hora: string,
-    rango: string,
-    disponible: boolean
-  ): void {
-    if (!disponible) {
+  seleccionarDisponibilidad(horario: Horario): void {
+    if (horario.estado !== 'Disponible') {
       this.horarioSeleccionado =
         'Este horario está ocupado. Selecciona otro horario disponible.';
       return;
     }
 
-    this.reserva.hora = hora;
+    this.reserva.hora = `${this.formatearHora(horario.horaInicio)} - ${this.formatearHora(horario.horaFinal)}`;
 
-    this.horarioSeleccionado = `Seleccionaste el horario del día ${dia}: ${rango}. Ahora elige la fecha correspondiente en el formulario.`;
+    this.horarioSeleccionado = `Seleccionaste el horario del día ${horario.dia}: ${this.reserva.hora}. Ahora elige la fecha correspondiente en el formulario.`;
   }
 
   confirmarSolicitud(): void {
@@ -122,5 +176,18 @@ export class Reservas {
     };
 
     this.horarioSeleccionado = '';
+  }
+
+  formatearHora(hora: string): string {
+    if (!hora) {
+      return '';
+    }
+
+    const [horas, minutos] = hora.split(':');
+    const horasNumero = Number(horas);
+    const periodo = horasNumero >= 12 ? 'p.m.' : 'a.m.';
+    const horaFormato12 = horasNumero % 12 || 12;
+
+    return `${horaFormato12.toString().padStart(2, '0')}:${minutos} ${periodo}`;
   }
 }

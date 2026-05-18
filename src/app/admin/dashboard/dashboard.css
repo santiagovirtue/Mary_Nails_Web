@@ -186,3 +186,16 @@
     grid-template-columns: 1fr;
   }
 }
+.empty-message {
+  padding: 16px;
+  border-radius: 14px;
+  background: #fff0f6;
+  border: 1px solid #f3bfd5;
+  color: #555;
+  font-weight: 700;
+}
+
+.appointment-item span {
+  font-weight: 800;
+  color: #c2185b;
+}

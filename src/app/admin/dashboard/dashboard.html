@@ -4,72 +4,64 @@
       <span>Panel administrativo</span>
       <h1>Bienvenido al panel de Mary Nails</h1>
       <p>
-        Desde este espacio puedes revisar citas, gestionar horarios,
-        controlar servicios y administrar la disponibilidad del negocio.
+        Desde este espacio puedes revisar citas, gestionar horarios, controlar
+        servicios y administrar la disponibilidad del negocio.
       </p>
     </div>
 
-    <a routerLink="/admin/cronograma" class="btn-main">Ver cronograma</a>
+    <a routerLink="/admin/cronograma" class="btn-main">
+      Ver cronograma
+    </a>
   </div>
 
   <div class="stats-grid">
     <article class="stat-card">
       <h3>Citas de hoy</h3>
-      <strong>6</strong>
+      <strong>{{ contarCitasHoy() }}</strong>
       <p>Reservas programadas para el día actual.</p>
     </article>
 
     <article class="stat-card">
       <h3>Clientes registrados</h3>
-      <strong>18</strong>
+      <strong>{{ contarClientes() }}</strong>
       <p>Clientes agregados al sistema.</p>
     </article>
 
     <article class="stat-card">
       <h3>Servicios activos</h3>
-      <strong>4</strong>
-      <p>Servicios disponibles para reservar.</p>
+      <strong>{{ contarServiciosActivos() }}</strong>
+      <p>Servicios reservados por los clientes.</p>
     </article>
 
     <article class="stat-card">
       <h3>Pagos pendientes</h3>
-      <strong>3</strong>
+      <strong>{{ contarPagosPendientes() }}</strong>
       <p>Reservas pendientes por validar pago.</p>
     </article>
   </div>
 
-  <div class="dashboard-layout">
-    <div class="panel-card">
+  <div class="dashboard-content">
+    <div class="dashboard-card">
       <h2>Próximas citas</h2>
 
-      <div class="appointment-list">
-        <div class="appointment-item">
-          <div>
-            <strong>Laura Martínez</strong>
-            <span>Manicure profesional</span>
-          </div>
-          <p>09:00 a.m.</p>
-        </div>
+      <p class="empty-message" *ngIf="obtenerProximasCitas().length === 0">
+        Todavía no hay citas registradas.
+      </p>
 
-        <div class="appointment-item">
+      <div class="appointment-list" *ngIf="obtenerProximasCitas().length > 0">
+        <div class="appointment-item" *ngFor="let reserva of obtenerProximasCitas()">
           <div>
-            <strong>Camila Torres</strong>
-            <span>Uñas acrílicas</span>
+            <strong>{{ reserva.nombre }}</strong>
+            <p>{{ reserva.servicio }}</p>
+            <p>{{ reserva.fecha }} - {{ reserva.hora }}</p>
           </div>
-          <p>10:30 a.m.</p>
-        </div>
 
-        <div class="appointment-item">
-          <div>
-            <strong>Sofía Ramírez</strong>
-            <span>Pedicure</span>
-          </div>
-          <p>02:00 p.m.</p>
+          <span>{{ reserva.estado }}</span>
         </div>
       </div>
     </div>
 
-    <div class="panel-card">
+    <div class="dashboard-card">
       <h2>Acciones rápidas</h2>
 
       <div class="quick-actions">

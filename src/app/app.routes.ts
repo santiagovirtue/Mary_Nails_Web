@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 
+import { clienteGuard } from './guards/cliente.guard';
+import { adminGuard } from './guards/admin.guard';
+
 import { Home } from './pages/home/home';
 import { Servicios } from './pages/servicios/servicios';
 import { Galeria } from './pages/galeria/galeria';
@@ -15,20 +18,68 @@ import { Cronograma } from './admin/cronograma/cronograma';
 import { Disponibilidad } from './admin/disponibilidad/disponibilidad';
 
 export const routes: Routes = [
-  { path: '', component: Home },
+  {
+    path: '',
+    component: Home,
+  },
 
-  { path: 'servicios', component: Servicios },
-  { path: 'galeria', component: Galeria },
-  { path: 'reservas', component: Reservas },
-  { path: 'login', component: Login },
+  {
+    path: 'servicios',
+    component: Servicios,
+  },
 
-  { path: 'cliente/mis-citas', component: MisCitas },
-  { path: 'cliente/calificar-servicio', component: CalificarServicio },
+  {
+    path: 'galeria',
+    component: Galeria,
+  },
 
-  { path: 'admin/login', component: LoginAdmin },
-  { path: 'admin/dashboard', component: Dashboard },
-  { path: 'admin/cronograma', component: Cronograma },
-  { path: 'admin/disponibilidad', component: Disponibilidad },
+  {
+    path: 'reservas',
+    component: Reservas,
+  },
 
-  { path: '**', redirectTo: '' }
+  {
+    path: 'login',
+    component: Login,
+  },
+
+  {
+    path: 'cliente/mis-citas',
+    component: MisCitas,
+    canActivate: [clienteGuard],
+  },
+
+  {
+    path: 'cliente/calificar-servicio',
+    component: CalificarServicio,
+    canActivate: [clienteGuard],
+  },
+
+  {
+    path: 'admin/login',
+    component: LoginAdmin,
+  },
+
+  {
+    path: 'admin/dashboard',
+    component: Dashboard,
+    canActivate: [adminGuard],
+  },
+
+  {
+    path: 'admin/cronograma',
+    component: Cronograma,
+    canActivate: [adminGuard],
+  },
+
+  {
+    path: 'admin/disponibilidad',
+    component: Disponibilidad,
+    canActivate: [adminGuard],
+  },
+
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];
