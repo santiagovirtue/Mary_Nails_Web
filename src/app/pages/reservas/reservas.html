@@ -1,10 +1,13 @@
 <section class="reservation-page">
   <div class="section-header">
-    <span>Reserva tu cita</span>
-    <h1>Agenda tu servicio en Mary Nails</h1>
+    <span>Reservas</span>
+
+    <h1>Agenda tu cita en Mary Nails</h1>
+
     <p>
-      Consulta la disponibilidad, selecciona un servicio y envía tu solicitud de reserva.
-      El administrador revisará la información y confirmará la cita.
+      Completa tus datos, selecciona un servicio, revisa la disponibilidad y
+      envía tu solicitud de reserva. El administrador revisará la información y
+      confirmará la cita.
     </p>
   </div>
 
@@ -37,10 +40,13 @@
           <label>Servicio</label>
           <select name="servicio" [(ngModel)]="reserva.servicio">
             <option value="">Selecciona un servicio</option>
-            <option value="Manicure profesional">Manicure profesional</option>
-            <option value="Pedicure">Pedicure</option>
-            <option value="Uñas acrílicas">Uñas acrílicas</option>
-            <option value="Diseño personalizado">Diseño personalizado</option>
+
+            <option
+              *ngFor="let servicio of serviciosActivos"
+              [value]="servicio.nombre"
+            >
+              {{ servicio.nombre }}
+            </option>
           </select>
         </div>
 
@@ -65,10 +71,10 @@
                 [value]="formatearHora(horario.horaInicio) + ' - ' + formatearHora(horario.horaFinal)"
                 [disabled]="horario.estado !== 'Disponible'"
               >
-                {{ horario.dia }}:
+                {{ horario.dia }} -
                 {{ formatearHora(horario.horaInicio) }} -
                 {{ formatearHora(horario.horaFinal) }}
-                / {{ horario.estado }}
+                {{ horario.estado !== 'Disponible' ? '(Ocupado)' : '' }}
               </option>
             </select>
           </div>
@@ -81,7 +87,7 @@
             <option value="Efectivo">Efectivo</option>
             <option value="Nequi">Nequi</option>
             <option value="Daviplata">Daviplata</option>
-            <option value="Pago en el local">Pago en el local</option>
+            <option value="Pago en local">Pago en local</option>
           </select>
         </div>
 
@@ -103,9 +109,9 @@
         </button>
 
         <p class="error-message" *ngIf="mensajeError">
-         {{ mensajeError }}
-         </p>
-         
+          {{ mensajeError }}
+        </p>
+
         <p class="confirmation-message" *ngIf="mensajeConfirmacion">
           {{ mensajeConfirmacion }}
         </p>
@@ -116,7 +122,9 @@
       <h2>Disponibilidad</h2>
 
       <p class="availability-text">
-        Estos horarios vienen desde la gestión de disponibilidad del administrador.
+        Estos horarios vienen desde la gestión de disponibilidad del
+        administrador. Selecciona un horario disponible y luego elige una fecha
+        que coincida con ese día.
       </p>
 
       <div class="schedule-list">
@@ -125,18 +133,22 @@
           class="schedule-item"
           *ngFor="let horario of horarios"
           [class.available]="horario.estado === 'Disponible'"
-          [class.busy]="horario.estado === 'Ocupado'"
+          [class.busy]="horario.estado !== 'Disponible'"
           [class.clickable]="horario.estado === 'Disponible'"
           [class.disabled]="horario.estado !== 'Disponible'"
           (click)="seleccionarDisponibilidad(horario)"
         >
           <div>
             <strong>{{ horario.dia }}</strong>
+
             <span>
               {{ formatearHora(horario.horaInicio) }} -
               {{ formatearHora(horario.horaFinal) }}
             </span>
-            <small>{{ horario.observacion }}</small>
+
+            <small>
+              {{ horario.observacion }}
+            </small>
           </div>
 
           <p>{{ horario.estado }}</p>
@@ -149,22 +161,26 @@
 
       <div class="whatsapp-box">
         <h3>¿Tienes dudas?</h3>
-        <p>Selecciona el motivo de tu consulta y comunícate por WhatsApp.</p>
+
+        <p>
+          Selecciona el motivo de tu consulta y comunícate por WhatsApp.
+        </p>
 
         <div class="whatsapp-select">
           <label>Motivo del mensaje</label>
+
           <select (change)="seleccionarMotivo($event)">
             <option value="reserva">Reservar cita</option>
             <option value="disponibilidad">Consultar disponibilidad</option>
             <option value="cambio">Cambiar cita</option>
             <option value="cancelacion">Cancelar cita</option>
-            <option value="pago">Problema o duda con pago</option>
-            <option value="servicio">Consultar servicio</option>
+            <option value="pago">Duda sobre pago</option>
+            <option value="servicio">Información de servicios</option>
             <option value="otro">Otro motivo</option>
           </select>
         </div>
 
-        <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
+        <a [href]="whatsappUrl" target="_blank">
           Enviar mensaje
         </a>
       </div>

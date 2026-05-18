@@ -24,6 +24,16 @@ interface Horario {
   observacion: string;
 }
 
+interface Servicio {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  duracion: string;
+  precio: string;
+  icono: string;
+  estado: string;
+}
+
 @Component({
   selector: 'app-reservas',
   imports: [FormsModule, NgIf, NgFor],
@@ -34,7 +44,7 @@ export class Reservas implements OnInit {
   private readonly telefonoWhatsapp = '573132146285';
 
   horarios: Horario[] = [];
-
+  serviciosActivos: Servicio[] = [];
   reserva = {
     nombre: '',
     telefono: '',
@@ -57,6 +67,7 @@ export class Reservas implements OnInit {
   ngOnInit(): void {
     this.fechaMinima = this.obtenerFechaActual();
     this.cargarHorarios();
+    this.cargarServicios();
 
     this.route.queryParams.subscribe((params) => {
       const servicioSeleccionado = params['servicio'];
@@ -119,6 +130,57 @@ export class Reservas implements OnInit {
       JSON.stringify(this.horarios)
     );
   }
+
+  cargarServicios(): void {
+  const serviciosGuardados = localStorage.getItem('maryNailsServicios');
+
+  if (serviciosGuardados) {
+    const servicios: Servicio[] = JSON.parse(serviciosGuardados);
+    this.serviciosActivos = servicios.filter(
+      (servicio) => servicio.estado === 'Activo'
+    );
+    return;
+  }
+
+  this.serviciosActivos = [
+    {
+      id: 1,
+      nombre: 'Manicure profesional',
+      descripcion: '',
+      duracion: '45 min',
+      precio: '$25.000',
+      icono: '💅',
+      estado: 'Activo',
+    },
+    {
+      id: 2,
+      nombre: 'Pedicure',
+      descripcion: '',
+      duracion: '60 min',
+      precio: '$30.000',
+      icono: '✨',
+      estado: 'Activo',
+    },
+    {
+      id: 3,
+      nombre: 'Uñas acrílicas',
+      descripcion: '',
+      duracion: '90 min',
+      precio: '$60.000',
+      icono: '🌸',
+      estado: 'Activo',
+    },
+    {
+      id: 4,
+      nombre: 'Diseño personalizado',
+      descripcion: '',
+      duracion: 'Variable',
+      precio: 'Desde $15.000',
+      icono: '🎨',
+      estado: 'Activo',
+    },
+  ];
+}
 
   seleccionarMotivo(event: Event): void {
     const motivo = (event.target as HTMLSelectElement).value;

@@ -16,10 +16,24 @@ interface Reserva {
 
 interface Calificacion {
   id: number;
+  idCita?: number;
+  cliente?: string;
   servicio: string;
+  fechaCita?: string;
+  horaCita?: string;
   puntuacion: number;
   comentario: string;
   fecha: string;
+}
+
+interface Servicio {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  duracion: string;
+  precio: string;
+  icono: string;
+  estado: string;
 }
 
 @Component({
@@ -31,10 +45,12 @@ interface Calificacion {
 export class Dashboard implements OnInit {
   reservas: Reserva[] = [];
   calificaciones: Calificacion[] = [];
+  servicios: Servicio[] = [];
 
   ngOnInit(): void {
     this.cargarReservas();
     this.cargarCalificaciones();
+    this.cargarServicios();
   }
 
   cargarReservas(): void {
@@ -49,13 +65,26 @@ export class Dashboard implements OnInit {
       : [];
   }
 
+  cargarServicios(): void {
+    const serviciosGuardados = localStorage.getItem('maryNailsServicios');
+    this.servicios = serviciosGuardados ? JSON.parse(serviciosGuardados) : [];
+  }
+
   obtenerFechaHoy(): string {
-    return new Date().toISOString().slice(0, 10);
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const month = String(hoy.getMonth() + 1).padStart(2, '0');
+    const day = String(hoy.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   contarCitasHoy(): number {
     const hoy = this.obtenerFechaHoy();
-    return this.reservas.filter((reserva) => reserva.fecha === hoy).length;
+
+    return this.reservas.filter(
+      (reserva) => reserva.fecha === hoy && reserva.estado !== 'Cancelada'
+    ).length;
   }
 
   contarClientes(): number {
@@ -69,13 +98,7 @@ export class Dashboard implements OnInit {
   }
 
   contarServiciosActivos(): number {
-    const serviciosUnicos = new Set(
-      this.reservas
-        .map((reserva) => reserva.servicio)
-        .filter((servicio) => servicio.trim() !== '')
-    );
-
-    return serviciosUnicos.size;
+    return this.servicios.filter((servicio) => servicio.estado === 'Activo').length;
   }
 
   contarPagosPendientes(): number {
@@ -101,7 +124,10 @@ export class Dashboard implements OnInit {
 
   obtenerProximasCitas(): Reserva[] {
     return [...this.reservas]
-      .filter((reserva) => reserva.estado !== 'Cancelada')
+      .filter(
+        (reserva) =>
+          reserva.estado !== 'Cancelada' && reserva.estado !== 'Completada'
+      )
       .sort((a, b) => {
         const fechaA = `${a.fecha} ${a.hora}`;
         const fechaB = `${b.fecha} ${b.hora}`;

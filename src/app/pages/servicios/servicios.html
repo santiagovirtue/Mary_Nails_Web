@@ -5,102 +5,35 @@
     <h1>Elige el servicio ideal para ti</h1>
 
     <p>
-      En Mary Nails ofrecemos servicios de cuidado y diseño de uñas pensados
-      para resaltar tu estilo y brindarte una experiencia cómoda y personalizada.
+      En Mary Nails ofrecemos servicios de cuidado y diseño pensados para
+      resaltar tu estilo y brindarte una experiencia cómoda y personalizada.
     </p>
   </div>
 
-  <div class="services-grid">
-    <article class="service-card">
-      <div class="service-icon">💅</div>
+  <p class="empty-message" *ngIf="servicios.length === 0">
+    Actualmente no hay servicios activos disponibles.
+  </p>
 
-      <h2>Manicure profesional</h2>
+  <div class="services-grid" *ngIf="servicios.length > 0">
+    <article class="service-card" *ngFor="let servicio of servicios">
+      <div class="service-icon">
+        {{ servicio.icono }}
+      </div>
+
+      <h2>{{ servicio.nombre }}</h2>
 
       <p>
-        Limpieza, cuidado de cutícula, limado y esmaltado para mantener tus
-        manos impecables.
+        {{ servicio.descripcion }}
       </p>
 
       <div class="service-info">
-        <span>Duración: 45 min</span>
-        <strong>$25.000</strong>
+        <span>Duración: {{ servicio.duracion }}</span>
+        <strong>{{ servicio.precio }}</strong>
       </div>
 
       <a
         routerLink="/reservas"
-        [queryParams]="{ servicio: 'Manicure profesional' }"
-        class="btn-service"
-      >
-        Reservar
-      </a>
-    </article>
-
-    <article class="service-card">
-      <div class="service-icon">✨</div>
-
-      <h2>Pedicure</h2>
-
-      <p>
-        Cuidado completo de pies, limpieza, hidratación y esmaltado con acabado
-        profesional.
-      </p>
-
-      <div class="service-info">
-        <span>Duración: 60 min</span>
-        <strong>$30.000</strong>
-      </div>
-
-      <a
-        routerLink="/reservas"
-        [queryParams]="{ servicio: 'Pedicure' }"
-        class="btn-service"
-      >
-        Reservar
-      </a>
-    </article>
-
-    <article class="service-card">
-      <div class="service-icon">🌸</div>
-
-      <h2>Uñas acrílicas</h2>
-
-      <p>
-        Extensión y diseño de uñas acrílicas con diferentes estilos, formas y
-        colores.
-      </p>
-
-      <div class="service-info">
-        <span>Duración: 90 min</span>
-        <strong>$60.000</strong>
-      </div>
-
-      <a
-        routerLink="/reservas"
-        [queryParams]="{ servicio: 'Uñas acrílicas' }"
-        class="btn-service"
-      >
-        Reservar
-      </a>
-    </article>
-
-    <article class="service-card">
-      <div class="service-icon">🎨</div>
-
-      <h2>Diseño personalizado</h2>
-
-      <p>
-        Decoración artística según el gusto del cliente: colores, detalles,
-        brillos y tendencias.
-      </p>
-
-      <div class="service-info">
-        <span>Duración: variable</span>
-        <strong>Desde $15.000</strong>
-      </div>
-
-      <a
-        routerLink="/reservas"
-        [queryParams]="{ servicio: 'Diseño personalizado' }"
+        [queryParams]="{ servicio: servicio.nombre }"
         class="btn-service"
       >
         Reservar

@@ -2,7 +2,9 @@
   <div class="dashboard-header">
     <div>
       <span>Panel administrativo</span>
+
       <h1>Bienvenido al panel de Mary Nails</h1>
+
       <p>
         Desde este espacio puedes revisar citas, gestionar horarios, controlar
         servicios y administrar la disponibilidad del negocio.
@@ -30,7 +32,7 @@
     <article class="stat-card">
       <h3>Servicios activos</h3>
       <strong>{{ contarServiciosActivos() }}</strong>
-      <p>Servicios reservados por los clientes.</p>
+      <p>Servicios disponibles para reservar.</p>
     </article>
 
     <article class="stat-card">
@@ -61,7 +63,10 @@
       </p>
 
       <div class="appointment-list" *ngIf="obtenerProximasCitas().length > 0">
-        <div class="appointment-item" *ngFor="let reserva of obtenerProximasCitas()">
+        <div
+          class="appointment-item"
+          *ngFor="let reserva of obtenerProximasCitas()"
+        >
           <div>
             <strong>{{ reserva.nombre }}</strong>
             <p>{{ reserva.servicio }}</p>
@@ -76,12 +81,21 @@
     <div class="dashboard-card">
       <h2>Últimas calificaciones</h2>
 
-      <p class="empty-message" *ngIf="obtenerUltimasCalificaciones().length === 0">
+      <p
+        class="empty-message"
+        *ngIf="obtenerUltimasCalificaciones().length === 0"
+      >
         Todavía no hay calificaciones registradas.
       </p>
 
-      <div class="rating-list" *ngIf="obtenerUltimasCalificaciones().length > 0">
-        <div class="rating-item" *ngFor="let calificacion of obtenerUltimasCalificaciones()">
+      <div
+        class="rating-list"
+        *ngIf="obtenerUltimasCalificaciones().length > 0"
+      >
+        <div
+          class="rating-item"
+          *ngFor="let calificacion of obtenerUltimasCalificaciones()"
+        >
           <div>
             <strong>{{ calificacion.servicio }}</strong>
             <p>{{ calificacion.comentario }}</p>
@@ -99,6 +113,8 @@
       <div class="quick-actions">
         <a routerLink="/admin/cronograma">Gestionar cronograma</a>
         <a routerLink="/admin/disponibilidad">Gestionar disponibilidad</a>
+        <a routerLink="/admin/servicios">Gestionar servicios</a>
+        <a routerLink="/admin/calificaciones">Ver calificaciones</a>
         <a routerLink="/servicios">Ver servicios publicados</a>
         <a routerLink="/reservas">Ver formulario de reserva</a>
       </div>
