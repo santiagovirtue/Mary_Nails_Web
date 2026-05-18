@@ -16,7 +16,11 @@ interface Reserva {
 
 interface Calificacion {
   id: number;
+  idCita: number;
+  cliente: string;
   servicio: string;
+  fechaCita: string;
+  horaCita: string;
   puntuacion: number;
   comentario: string;
   fecha: string;
@@ -31,17 +35,11 @@ interface Calificacion {
 export class CalificarServicio implements OnInit {
   estrellas = [1, 2, 3, 4, 5];
 
-  serviciosBase = [
-    'Manicure profesional',
-    'Pedicure',
-    'Uñas acrílicas',
-    'Diseño personalizado',
-  ];
-
   reservasCompletadas: Reserva[] = [];
+  calificaciones: Calificacion[] = [];
 
   calificacion = {
-    servicio: '',
+    idCita: 0,
     puntuacion: 0,
     comentario: '',
   };
@@ -50,24 +48,37 @@ export class CalificarServicio implements OnInit {
   mensajeError = '';
 
   ngOnInit(): void {
-    this.cargarReservasCompletadas();
+    this.cargarDatos();
   }
 
-  cargarReservasCompletadas(): void {
+  cargarDatos(): void {
     const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    const reservas: Reserva[] = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
+    const calificacionesGuardadas = localStorage.getItem('maryNailsCalificaciones');
+
+    const reservas: Reserva[] = reservasGuardadas
+      ? JSON.parse(reservasGuardadas)
+      : [];
+
+    this.calificaciones = calificacionesGuardadas
+      ? JSON.parse(calificacionesGuardadas)
+      : [];
 
     this.reservasCompletadas = reservas.filter(
-      (reserva) => reserva.estado === 'Completada'
+      (reserva) =>
+        reserva.estado === 'Completada' && !this.yaFueCalificada(reserva.id)
     );
   }
 
-  obtenerServiciosDisponibles(): string[] {
-    const serviciosCompletados = this.reservasCompletadas.map(
-      (reserva) => reserva.servicio
+  yaFueCalificada(idCita: number): boolean {
+    return this.calificaciones.some(
+      (calificacion) => calificacion.idCita === idCita
     );
+  }
 
-    return Array.from(new Set([...serviciosCompletados, ...this.serviciosBase]));
+  obtenerReservaSeleccionada(): Reserva | undefined {
+    return this.reservasCompletadas.find(
+      (reserva) => reserva.id === Number(this.calificacion.idCita)
+    );
   }
 
   seleccionarPuntuacion(valor: number): void {
@@ -91,8 +102,10 @@ export class CalificarServicio implements OnInit {
     this.mensajeExito = '';
     this.mensajeError = '';
 
-    if (!this.calificacion.servicio) {
-      this.mensajeError = 'Selecciona el servicio que deseas calificar.';
+    const reservaSeleccionada = this.obtenerReservaSeleccionada();
+
+    if (!reservaSeleccionada) {
+      this.mensajeError = 'Selecciona una cita completada para calificar.';
       return;
     }
 
@@ -108,31 +121,32 @@ export class CalificarServicio implements OnInit {
 
     const nuevaCalificacion: Calificacion = {
       id: Date.now(),
-      servicio: this.calificacion.servicio,
+      idCita: reservaSeleccionada.id,
+      cliente: reservaSeleccionada.nombre,
+      servicio: reservaSeleccionada.servicio,
+      fechaCita: reservaSeleccionada.fecha,
+      horaCita: reservaSeleccionada.hora,
       puntuacion: this.calificacion.puntuacion,
       comentario: this.calificacion.comentario,
       fecha: new Date().toISOString().slice(0, 10),
     };
 
-    const calificacionesGuardadas = localStorage.getItem('maryNailsCalificaciones');
-    const calificaciones: Calificacion[] = calificacionesGuardadas
-      ? JSON.parse(calificacionesGuardadas)
-      : [];
-
-    calificaciones.push(nuevaCalificacion);
+    this.calificaciones.push(nuevaCalificacion);
 
     localStorage.setItem(
       'maryNailsCalificaciones',
-      JSON.stringify(calificaciones)
+      JSON.stringify(this.calificaciones)
     );
 
     this.mensajeExito =
       'Calificación enviada correctamente. Gracias por compartir tu experiencia.';
 
     this.calificacion = {
-      servicio: '',
+      idCita: 0,
       puntuacion: 0,
       comentario: '',
     };
+
+    this.cargarDatos();
   }
 }

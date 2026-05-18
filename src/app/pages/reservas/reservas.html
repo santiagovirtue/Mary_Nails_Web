@@ -50,6 +50,7 @@
             <input
               type="date"
               name="fecha"
+              [min]="fechaMinima"
               [(ngModel)]="reserva.fecha"
             />
           </div>
@@ -101,6 +102,10 @@
           Confirmar solicitud
         </button>
 
+        <p class="error-message" *ngIf="mensajeError">
+         {{ mensajeError }}
+         </p>
+         
         <p class="confirmation-message" *ngIf="mensajeConfirmacion">
           {{ mensajeConfirmacion }}
         </p>

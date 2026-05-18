@@ -1,0 +1,121 @@
+<section class="ratings-admin-page">
+  <div class="ratings-header">
+    <div>
+      <span>Calificaciones</span>
+      <h1>Opiniones de clientes</h1>
+      <p>
+        En esta sección el administrador puede revisar las calificaciones enviadas
+        por los clientes después de completar una cita.
+      </p>
+    </div>
+
+    <a routerLink="/admin/dashboard" class="btn-main">
+      Volver al dashboard
+    </a>
+  </div>
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <h3>Total</h3>
+      <strong>{{ contarCalificaciones() }}</strong>
+      <p>Calificaciones recibidas</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Promedio</h3>
+      <strong>{{ obtenerPromedio() }}</strong>
+      <p>Promedio general</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>5 estrellas</h3>
+      <strong>{{ contarPorPuntuacion(5) }}</strong>
+      <p>Clientes muy satisfechos</p>
+    </article>
+  </div>
+
+  <div class="filters-card">
+    <div class="filter-group">
+      <label>Buscar opinión</label>
+      <input
+        type="text"
+        name="busqueda"
+        placeholder="Buscar por cliente, servicio o comentario"
+        [(ngModel)]="busqueda"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label>Filtrar por puntuación</label>
+      <select name="filtroPuntuacion" [(ngModel)]="filtroPuntuacion">
+        <option value="Todas">Todas</option>
+        <option value="5">5 estrellas</option>
+        <option value="4">4 estrellas</option>
+        <option value="3">3 estrellas</option>
+        <option value="2">2 estrellas</option>
+        <option value="1">1 estrella</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn-clear" (click)="limpiarFiltros()">
+      Limpiar filtros
+    </button>
+  </div>
+
+  <div class="ratings-card">
+    <h2>Listado de calificaciones</h2>
+
+    <p class="empty-message" *ngIf="calificaciones.length === 0">
+      Todavía no hay calificaciones registradas.
+    </p>
+
+    <p
+      class="empty-message"
+      *ngIf="calificaciones.length > 0 && obtenerCalificacionesFiltradas().length === 0"
+    >
+      No se encontraron calificaciones con los filtros seleccionados.
+    </p>
+
+    <div class="ratings-list" *ngIf="obtenerCalificacionesFiltradas().length > 0">
+      <article
+        class="rating-item"
+        *ngFor="let calificacion of obtenerCalificacionesFiltradas()"
+      >
+        <div class="rating-info">
+          <h3>{{ calificacion.servicio }}</h3>
+
+          <p>
+            <strong>Cliente:</strong>
+            {{ calificacion.cliente || 'Cliente no registrado' }}
+          </p>
+
+          <p>
+            <strong>Cita:</strong>
+            {{ calificacion.fechaCita || 'Sin fecha de cita' }}
+            -
+            {{ calificacion.horaCita || 'Sin hora' }}
+          </p>
+
+          <p>
+            <strong>Comentario:</strong>
+            {{ calificacion.comentario }}
+          </p>
+
+          <small>Registrada el {{ calificacion.fecha }}</small>
+        </div>
+
+        <div class="rating-actions">
+          <span>{{ calificacion.puntuacion }} ★</span>
+
+          <button
+            type="button"
+            class="delete-btn"
+            (click)="eliminarCalificacion(calificacion.id)"
+          >
+            Eliminar
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

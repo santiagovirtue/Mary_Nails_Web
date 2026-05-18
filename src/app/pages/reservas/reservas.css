@@ -308,3 +308,13 @@
     gap: 12px;
   }
 }
+.error-message {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff0f6;
+  border: 1px solid #f3bfd5;
+  color: #c2185b;
+  font-weight: 800;
+  line-height: 1.5;
+}

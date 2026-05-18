@@ -163,3 +163,23 @@
     font-size: 36px;
   }
 }
+.selected-appointment {
+  padding: 18px;
+  border-radius: 18px;
+  background: #fff7fb;
+  border: 1px solid #f3bfd5;
+}
+
+.selected-appointment p {
+  margin-bottom: 8px;
+  color: #444;
+  line-height: 1.5;
+}
+
+.selected-appointment p:last-child {
+  margin-bottom: 0;
+}
+
+.selected-appointment strong {
+  color: #c2185b;
+}

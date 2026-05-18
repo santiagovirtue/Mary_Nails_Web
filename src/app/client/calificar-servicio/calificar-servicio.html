@@ -5,23 +5,54 @@
     <h1>Calificar servicio</h1>
 
     <p>
-      Comparte tu experiencia sobre el servicio recibido. Tu opinión ayuda a
-      mejorar la atención y calidad de Mary Nails.
+      Solo puedes calificar citas que ya fueron marcadas como completadas por el
+      administrador. Tu opinión ayuda a mejorar la atención y calidad de Mary Nails.
     </p>
 
-    <form>
+    <div class="error-message" *ngIf="reservasCompletadas.length === 0">
+      No tienes citas completadas pendientes por calificar.
+    </div>
+
+    <form *ngIf="reservasCompletadas.length > 0">
       <div class="form-group">
-        <label>Servicio realizado</label>
-        <select name="servicio" [(ngModel)]="calificacion.servicio">
-          <option value="">Selecciona un servicio</option>
+        <label>Cita completada</label>
+
+        <select name="idCita" [(ngModel)]="calificacion.idCita">
+          <option [ngValue]="0">Selecciona una cita completada</option>
 
           <option
-            *ngFor="let servicio of obtenerServiciosDisponibles()"
-            [value]="servicio"
+            *ngFor="let reserva of reservasCompletadas"
+            [ngValue]="reserva.id"
           >
-            {{ servicio }}
+            {{ reserva.servicio }} - {{ reserva.fecha }} - {{ reserva.hora }}
           </option>
         </select>
+      </div>
+
+      <div class="form-group" *ngIf="obtenerReservaSeleccionada()">
+        <label>Detalle de la cita</label>
+
+        <div class="selected-appointment">
+          <p>
+            <strong>Cliente:</strong>
+            {{ obtenerReservaSeleccionada()?.nombre }}
+          </p>
+
+          <p>
+            <strong>Servicio:</strong>
+            {{ obtenerReservaSeleccionada()?.servicio }}
+          </p>
+
+          <p>
+            <strong>Fecha:</strong>
+            {{ obtenerReservaSeleccionada()?.fecha }}
+          </p>
+
+          <p>
+            <strong>Hora:</strong>
+            {{ obtenerReservaSeleccionada()?.hora }}
+          </p>
+        </div>
       </div>
 
       <div class="form-group">
@@ -45,6 +76,7 @@
 
       <div class="form-group">
         <label>Comentario</label>
+
         <textarea
           name="comentario"
           placeholder="Escribe tu opinión sobre el servicio recibido"
