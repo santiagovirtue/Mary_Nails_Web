@@ -6,9 +6,23 @@
     <a routerLink="/servicios">Servicios</a>
     <a routerLink="/galeria">Galería</a>
     <a routerLink="/reservas">Reservas</a>
-    <a routerLink="/login">Cliente</a>
+
+    <a routerLink="/login" *ngIf="!clienteLogueado">Cliente</a>
+
     <a routerLink="/cliente/mis-citas">Cronograma cliente</a>
     <a routerLink="/admin/cronograma">Cronograma admin</a>
-    <a routerLink="/admin/login" class="admin-link">Admin</a>
+
+    <a routerLink="/admin/login" class="admin-link" *ngIf="!adminLogueado">
+      Admin
+    </a>
+
+    <button
+      type="button"
+      class="logout-link"
+      *ngIf="haySesionActiva"
+      (click)="cerrarSesion()"
+    >
+      Cerrar sesión
+    </button>
   </nav>
 </header>

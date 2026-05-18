@@ -1,30 +1,46 @@
-<section class="admin-login-page">
-  <div class="login-card">
-    <div class="login-header">
-      <span>Administrador</span>
-      <h1>Ingreso al panel</h1>
-      <p>
-        Accede al panel administrativo para gestionar citas, horarios,
-        servicios y disponibilidad de Mary Nails.
-      </p>
-    </div>
+<section class="login-admin-page">
+  <div class="login-admin-card">
+    <span class="login-badge">Administrador</span>
 
-    <form class="login-form">
+    <h1>Ingreso al panel</h1>
+
+    <p>
+      Accede al panel administrativo para gestionar citas, horarios,
+      servicios y disponibilidad de Mary Nails.
+    </p>
+
+    <form>
       <div class="form-group">
         <label>Correo o usuario</label>
-        <input type="text" placeholder="Ej: admin@marynails.com" />
+        <input
+          type="text"
+          name="usuario"
+          placeholder="Ej: admin@marynails.com"
+          [(ngModel)]="usuario"
+        />
       </div>
 
       <div class="form-group">
         <label>Contraseña</label>
-        <input type="password" placeholder="Ingresa tu contraseña" />
+        <input
+          type="password"
+          name="password"
+          placeholder="Ingresa tu contraseña"
+          [(ngModel)]="password"
+        />
       </div>
 
-      <a routerLink="/admin/dashboard" class="btn-login">Ingresar</a>
+      <button type="button" class="btn-login" (click)="iniciarSesion()">
+        Ingresar
+      </button>
+
+      <p class="error-message" *ngIf="mensajeError">
+        {{ mensajeError }}
+      </p>
     </form>
 
-    <div class="login-footer">
-      <p>Acceso exclusivo para personal autorizado.</p>
-    </div>
+    <p class="admin-note">
+      Acceso exclusivo para personal autorizado.
+    </p>
   </div>
 </section>
