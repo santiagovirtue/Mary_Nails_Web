@@ -116,20 +116,36 @@ export class Cronograma implements OnInit {
     this.mensaje = 'La reserva fue marcada como completada.';
   }
 
-  cancelarReserva(id: number): void {
-    this.reservas = this.reservas.map((reserva) =>
-      reserva.id === id ? { ...reserva, estado: 'Cancelada' } : reserva
-    );
+ cancelarReserva(id: number): void {
+  const confirmar = confirm(
+    '¿Seguro que deseas cancelar esta reserva? El estado cambiará a Cancelada.'
+  );
 
-    this.guardarReservas();
-    this.mensaje = 'La reserva fue cancelada correctamente.';
+  if (!confirmar) {
+    return;
   }
 
-  eliminarReserva(id: number): void {
-    this.reservas = this.reservas.filter((reserva) => reserva.id !== id);
-    this.guardarReservas();
-    this.mensaje = 'La reserva fue eliminada correctamente.';
+  this.reservas = this.reservas.map((reserva) =>
+    reserva.id === id ? { ...reserva, estado: 'Cancelada' } : reserva
+  );
+
+  this.guardarReservas();
+  this.mensaje = 'La reserva fue cancelada correctamente.';
+}
+
+ eliminarReserva(id: number): void {
+  const confirmar = confirm(
+    '¿Seguro que deseas eliminar esta reserva? Esta acción no se puede deshacer.'
+  );
+
+  if (!confirmar) {
+    return;
   }
+
+  this.reservas = this.reservas.filter((reserva) => reserva.id !== id);
+  this.guardarReservas();
+  this.mensaje = 'La reserva fue eliminada correctamente.';
+}
 
   limpiarFiltros(): void {
     this.busqueda = '';

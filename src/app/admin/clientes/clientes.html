@@ -1,0 +1,107 @@
+<section class="clients-page">
+  <div class="clients-header">
+    <div>
+      <span>Clientes</span>
+
+      <h1>Gestión de clientes</h1>
+
+      <p>
+        En esta sección el administrador puede consultar los clientes generados
+        automáticamente a partir de las reservas registradas en Mary Nails.
+      </p>
+    </div>
+
+    <a routerLink="/admin/dashboard" class="btn-main">
+      Volver al dashboard
+    </a>
+  </div>
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <h3>Total clientes</h3>
+      <strong>{{ contarClientes() }}</strong>
+      <p>Clientes únicos registrados por teléfono.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Total reservas</h3>
+      <strong>{{ contarReservasTotales() }}</strong>
+      <p>Reservas asociadas a clientes.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Pagos pendientes</h3>
+      <strong>{{ contarClientesConPagosPendientes() }}</strong>
+      <p>Clientes con pagos por validar.</p>
+    </article>
+  </div>
+
+  <div class="filters-card">
+    <div class="filter-group">
+      <label>Buscar cliente</label>
+
+      <input
+        type="text"
+        name="busqueda"
+        placeholder="Buscar por nombre, teléfono o servicio"
+        [(ngModel)]="busqueda"
+      />
+    </div>
+
+    <button type="button" class="btn-clear" (click)="limpiarBusqueda()">
+      Limpiar búsqueda
+    </button>
+  </div>
+
+  <div class="clients-card">
+    <h2>Listado de clientes</h2>
+
+    <p class="empty-message" *ngIf="clientes.length === 0">
+      Todavía no hay clientes registrados. Cuando se realicen reservas,
+      aparecerán en esta sección.
+    </p>
+
+    <p
+      class="empty-message"
+      *ngIf="clientes.length > 0 && obtenerClientesFiltrados().length === 0"
+    >
+      No se encontraron clientes con la búsqueda ingresada.
+    </p>
+
+    <div class="clients-list" *ngIf="obtenerClientesFiltrados().length > 0">
+      <article class="client-item" *ngFor="let cliente of obtenerClientesFiltrados()">
+        <div class="client-avatar">
+          {{ cliente.nombre.charAt(0).toUpperCase() }}
+        </div>
+
+        <div class="client-info">
+          <h3>{{ cliente.nombre }}</h3>
+
+          <p>
+            <strong>Teléfono:</strong>
+            {{ cliente.telefono }}
+          </p>
+
+          <p>
+            <strong>Última cita:</strong>
+            {{ cliente.ultimaCita }}
+          </p>
+
+          <p>
+            <strong>Servicios solicitados:</strong>
+            {{ cliente.servicios.join(', ') }}
+          </p>
+        </div>
+
+        <div class="client-stats">
+          <span>Total reservas: {{ cliente.totalReservas }}</span>
+          <span>Pendientes: {{ cliente.citasPendientes }}</span>
+          <span>Confirmadas: {{ cliente.citasConfirmadas }}</span>
+          <span>Completadas: {{ cliente.citasCompletadas }}</span>
+          <span>Canceladas: {{ cliente.citasCanceladas }}</span>
+          <span>Pagos pendientes: {{ cliente.pagosPendientes }}</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

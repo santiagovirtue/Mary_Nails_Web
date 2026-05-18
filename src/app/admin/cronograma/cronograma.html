@@ -1,207 +1,90 @@
-<section class="schedule-page">
-  <div class="schedule-header">
-    <div>
-      <span>Cronograma administrativo</span>
-      <h1>Control de citas programadas</h1>
-      <p>
-        En esta sección el administrador puede revisar las citas solicitadas,
-        validar horarios, cambiar estados, controlar pagos y gestionar la agenda
-        de Mary Nails.
-      </p>
-    </div>
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Hora</th>
+      <th>Cliente</th>
+      <th>Teléfono</th>
+      <th>Servicio</th>
+      <th>Método de pago</th>
+      <th>Estado cita</th>
+      <th>Estado pago</th>
+      <th>Comentarios</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
 
-    <div class="header-actions">
-      <a routerLink="/admin/disponibilidad" class="btn-main">
-        Gestionar disponibilidad
-      </a>
+  <tbody>
+    <tr *ngFor="let reserva of obtenerReservasFiltradas()">
+      <td>{{ reserva.fecha }}</td>
+      <td>{{ reserva.hora }}</td>
+      <td>{{ reserva.nombre }}</td>
+      <td>{{ reserva.telefono }}</td>
+      <td>{{ reserva.servicio }}</td>
+      <td>{{ reserva.metodoPago }}</td>
 
-      <a routerLink="/admin/pagos" class="btn-secondary">
-        Ver pagos
-      </a>
-    </div>
-  </div>
+      <td>
+        <span
+          class="status"
+          [class.pending]="reserva.estado === 'Pendiente'"
+          [class.confirmed]="reserva.estado === 'Confirmada'"
+          [class.completed]="reserva.estado === 'Completada'"
+          [class.cancelled]="reserva.estado === 'Cancelada'"
+        >
+          {{ reserva.estado }}
+        </span>
+      </td>
 
-  <div class="stats-grid">
-    <article class="stat-card">
-      <h3>Total</h3>
-      <strong>{{ contarTotal() }}</strong>
-      <p>Citas registradas</p>
-    </article>
+      <td>
+        <span
+          class="payment-status"
+          [class.payment-pending]="reserva.estadoPago !== 'Pagado'"
+          [class.payment-paid]="reserva.estadoPago === 'Pagado'"
+        >
+          {{ reserva.estadoPago || 'Pendiente' }}
+        </span>
+      </td>
 
-    <article class="stat-card">
-      <h3>Pendientes</h3>
-      <strong>{{ contarPendientes() }}</strong>
-      <p>Citas por confirmar</p>
-    </article>
+      <td>{{ reserva.comentarios || 'Sin comentarios' }}</td>
 
-    <article class="stat-card">
-      <h3>Confirmadas</h3>
-      <strong>{{ contarConfirmadas() }}</strong>
-      <p>Citas aprobadas</p>
-    </article>
+      <td>
+        <div class="actions">
+          <button
+            type="button"
+            class="action confirm"
+            *ngIf="reserva.estado === 'Pendiente'"
+            (click)="confirmarReserva(reserva.id)"
+          >
+            Confirmar
+          </button>
 
-    <article class="stat-card">
-      <h3>Completadas</h3>
-      <strong>{{ contarCompletadas() }}</strong>
-      <p>Servicios realizados</p>
-    </article>
+          <button
+            type="button"
+            class="action complete"
+            *ngIf="reserva.estado === 'Confirmada'"
+            (click)="completarReserva(reserva.id)"
+          >
+            Completar
+          </button>
 
-    <article class="stat-card">
-      <h3>Canceladas</h3>
-      <strong>{{ contarCanceladas() }}</strong>
-      <p>Citas canceladas</p>
-    </article>
+          <button
+            type="button"
+            class="action cancel"
+            *ngIf="reserva.estado === 'Pendiente' || reserva.estado === 'Confirmada'"
+            (click)="cancelarReserva(reserva.id)"
+          >
+            Cancelar
+          </button>
 
-    <article class="stat-card">
-      <h3>Pagadas</h3>
-      <strong>{{ contarPagadas() }}</strong>
-      <p>Pagos validados</p>
-    </article>
-  </div>
-
-  <div class="filters-card">
-    <div class="filter-group">
-      <label>Buscar cita</label>
-      <input
-        type="text"
-        name="busqueda"
-        placeholder="Buscar por cliente, teléfono, servicio, pago o estado"
-        [(ngModel)]="busqueda"
-      />
-    </div>
-
-    <div class="filter-group">
-      <label>Filtrar por estado de cita</label>
-      <select name="filtroEstado" [(ngModel)]="filtroEstado">
-        <option value="Todas">Todas</option>
-        <option value="Pendiente">Pendiente</option>
-        <option value="Confirmada">Confirmada</option>
-        <option value="Completada">Completada</option>
-        <option value="Cancelada">Cancelada</option>
-      </select>
-    </div>
-
-    <button type="button" class="btn-clear" (click)="limpiarFiltros()">
-      Limpiar filtros
-    </button>
-  </div>
-
-  <p class="action-message" *ngIf="mensaje">
-    {{ mensaje }}
-  </p>
-
-  <div class="agenda-card">
-    <div class="agenda-header">
-      <h2>Agenda semanal</h2>
-
-      <a routerLink="/reservas" class="btn-main">
-        Agregar cita
-      </a>
-    </div>
-
-    <p class="empty-message" *ngIf="reservas.length === 0">
-      Todavía no hay reservas registradas. Cuando un cliente confirme una
-      solicitud, aparecerá en este cronograma.
-    </p>
-
-    <p
-      class="empty-message"
-      *ngIf="reservas.length > 0 && obtenerReservasFiltradas().length === 0"
-    >
-      No se encontraron citas con los filtros seleccionados.
-    </p>
-
-    <div class="table-wrapper" *ngIf="obtenerReservasFiltradas().length > 0">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Cliente</th>
-            <th>Teléfono</th>
-            <th>Servicio</th>
-            <th>Método de pago</th>
-            <th>Estado cita</th>
-            <th>Estado pago</th>
-            <th>Comentarios</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr *ngFor="let reserva of obtenerReservasFiltradas()">
-            <td>{{ reserva.fecha }}</td>
-            <td>{{ reserva.hora }}</td>
-            <td>{{ reserva.nombre }}</td>
-            <td>{{ reserva.telefono }}</td>
-            <td>{{ reserva.servicio }}</td>
-            <td>{{ reserva.metodoPago }}</td>
-
-            <td>
-              <span
-                class="status"
-                [class.pending]="reserva.estado === 'Pendiente'"
-                [class.confirmed]="reserva.estado === 'Confirmada'"
-                [class.completed]="reserva.estado === 'Completada'"
-                [class.cancelled]="reserva.estado === 'Cancelada'"
-              >
-                {{ reserva.estado }}
-              </span>
-            </td>
-
-            <td>
-              <span
-                class="payment-status"
-                [class.payment-pending]="reserva.estadoPago !== 'Pagado'"
-                [class.payment-paid]="reserva.estadoPago === 'Pagado'"
-              >
-                {{ reserva.estadoPago || 'Pendiente' }}
-              </span>
-            </td>
-
-            <td>{{ reserva.comentarios || 'Sin comentarios' }}</td>
-
-            <td>
-              <div class="actions">
-                <button
-                  type="button"
-                  class="action confirm"
-                  *ngIf="reserva.estado === 'Pendiente'"
-                  (click)="confirmarReserva(reserva.id)"
-                >
-                  Confirmar
-                </button>
-
-                <button
-                  type="button"
-                  class="action complete"
-                  *ngIf="reserva.estado === 'Confirmada'"
-                  (click)="completarReserva(reserva.id)"
-                >
-                  Completar
-                </button>
-
-                <button
-                  type="button"
-                  class="action cancel"
-                  *ngIf="reserva.estado === 'Pendiente' || reserva.estado === 'Confirmada'"
-                  (click)="cancelarReserva(reserva.id)"
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  type="button"
-                  class="action delete"
-                  (click)="eliminarReserva(reserva.id)"
-                >
-                  Eliminar
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
+          <button
+            type="button"
+            class="action delete"
+            (click)="eliminarReserva(reserva.id)"
+          >
+            Eliminar
+          </button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

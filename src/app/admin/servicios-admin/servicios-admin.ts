@@ -173,10 +173,18 @@ export class ServiciosAdmin implements OnInit {
   }
 
   eliminarServicio(id: number): void {
-    this.servicios = this.servicios.filter((servicio) => servicio.id !== id);
-    this.guardarServicios();
-    this.mensaje = 'Servicio eliminado correctamente.';
+  const confirmar = confirm(
+    '¿Seguro que deseas eliminar este servicio? Esta acción no se puede deshacer.'
+  );
+
+  if (!confirmar) {
+    return;
   }
+
+  this.servicios = this.servicios.filter((servicio) => servicio.id !== id);
+  this.guardarServicios();
+  this.mensaje = 'Servicio eliminado correctamente.';
+}
 
   limpiarFormulario(): void {
     this.servicio = {

@@ -99,6 +99,14 @@ export class MisCitas implements OnInit {
 }
 
 cancelarCita(id: number): void {
+  const confirmar = confirm(
+    '¿Seguro que deseas cancelar esta cita? Esta acción cambiará el estado de la reserva a Cancelada.'
+  );
+
+  if (!confirmar) {
+    return;
+  }
+
   this.reservas = this.reservas.map((reserva) =>
     reserva.id === id ? { ...reserva, estado: 'Cancelada' } : reserva
   );

@@ -19,6 +19,7 @@ import { Disponibilidad } from './admin/disponibilidad/disponibilidad';
 import { Calificaciones } from './admin/calificaciones/calificaciones';
 import { ServiciosAdmin } from './admin/servicios-admin/servicios-admin';
 import { Pagos } from './admin/pagos/pagos';
+import { Clientes } from './admin/clientes/clientes';
 
 export const routes: Routes = [
   {
@@ -82,20 +83,26 @@ export const routes: Routes = [
   },
 
   {
-    path: 'admin/calificaciones',
-    component: Calificaciones,
-    canActivate: [adminGuard],
-  },
-
-  {
     path: 'admin/servicios',
     component: ServiciosAdmin,
     canActivate: [adminGuard],
   },
 
   {
+    path: 'admin/calificaciones',
+    component: Calificaciones,
+    canActivate: [adminGuard],
+  },
+
+  {
     path: 'admin/pagos',
     component: Pagos,
+    canActivate: [adminGuard],
+  },
+
+  {
+    path: 'admin/clientes',
+    component: Clientes,
     canActivate: [adminGuard],
   },
 

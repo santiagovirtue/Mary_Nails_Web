@@ -88,14 +88,22 @@ export class Calificaciones implements OnInit {
     this.filtroPuntuacion = 'Todas';
   }
 
-  eliminarCalificacion(id: number): void {
-    this.calificaciones = this.calificaciones.filter(
-      (calificacion) => calificacion.id !== id
-    );
+eliminarCalificacion(id: number): void {
+  const confirmar = confirm(
+    '¿Seguro que deseas eliminar esta calificación? Esta acción no se puede deshacer.'
+  );
 
-    localStorage.setItem(
-      'maryNailsCalificaciones',
-      JSON.stringify(this.calificaciones)
-    );
+  if (!confirmar) {
+    return;
   }
+
+  this.calificaciones = this.calificaciones.filter(
+    (calificacion) => calificacion.id !== id
+  );
+
+  localStorage.setItem(
+    'maryNailsCalificaciones',
+    JSON.stringify(this.calificaciones)
+  );
+}
 }
