@@ -69,37 +69,86 @@
     </p>
 
     <div class="clients-list" *ngIf="obtenerClientesFiltrados().length > 0">
-      <article class="client-item" *ngFor="let cliente of obtenerClientesFiltrados()">
-        <div class="client-avatar">
-          {{ cliente.nombre.charAt(0).toUpperCase() }}
+      <article
+        class="client-item"
+        *ngFor="let cliente of obtenerClientesFiltrados()"
+      >
+        <div class="client-main">
+          <div class="client-avatar">
+            {{ cliente.nombre.charAt(0).toUpperCase() }}
+          </div>
+
+          <div class="client-info">
+            <h3>{{ cliente.nombre }}</h3>
+
+            <p>
+              <strong>Teléfono:</strong>
+              {{ cliente.telefono }}
+            </p>
+
+            <p>
+              <strong>Última cita:</strong>
+              {{ cliente.ultimaCita }}
+            </p>
+
+            <p>
+              <strong>Servicios solicitados:</strong>
+              {{ cliente.servicios.join(', ') }}
+            </p>
+          </div>
+
+          <div class="client-stats">
+            <span>Total reservas: {{ cliente.totalReservas }}</span>
+            <span>Pendientes: {{ cliente.citasPendientes }}</span>
+            <span>Confirmadas: {{ cliente.citasConfirmadas }}</span>
+            <span>Completadas: {{ cliente.citasCompletadas }}</span>
+            <span>Canceladas: {{ cliente.citasCanceladas }}</span>
+            <span>Pagos pendientes: {{ cliente.pagosPendientes }}</span>
+
+            <button
+              type="button"
+              class="history-btn"
+              (click)="alternarHistorial(cliente.telefono)"
+            >
+              {{ historialVisible(cliente.telefono) ? 'Ocultar historial' : 'Ver historial' }}
+            </button>
+          </div>
         </div>
 
-        <div class="client-info">
-          <h3>{{ cliente.nombre }}</h3>
+        <div class="client-history" *ngIf="historialVisible(cliente.telefono)">
+          <h4>Historial de reservas</h4>
 
-          <p>
-            <strong>Teléfono:</strong>
-            {{ cliente.telefono }}
-          </p>
+          <div
+            class="history-item"
+            *ngFor="let reserva of obtenerReservasCliente(cliente.telefono)"
+          >
+            <div>
+              <strong>{{ reserva.servicio }}</strong>
+              <p>{{ reserva.fecha }} - {{ reserva.hora }}</p>
+              <p>Método de pago: {{ reserva.metodoPago }}</p>
+              <p>Comentario: {{ reserva.comentarios || 'Sin comentarios' }}</p>
+            </div>
 
-          <p>
-            <strong>Última cita:</strong>
-            {{ cliente.ultimaCita }}
-          </p>
+            <div class="history-status">
+              <span
+                class="status"
+                [class.pending]="reserva.estado === 'Pendiente'"
+                [class.confirmed]="reserva.estado === 'Confirmada'"
+                [class.completed]="reserva.estado === 'Completada'"
+                [class.cancelled]="reserva.estado === 'Cancelada'"
+              >
+                Cita: {{ reserva.estado }}
+              </span>
 
-          <p>
-            <strong>Servicios solicitados:</strong>
-            {{ cliente.servicios.join(', ') }}
-          </p>
-        </div>
-
-        <div class="client-stats">
-          <span>Total reservas: {{ cliente.totalReservas }}</span>
-          <span>Pendientes: {{ cliente.citasPendientes }}</span>
-          <span>Confirmadas: {{ cliente.citasConfirmadas }}</span>
-          <span>Completadas: {{ cliente.citasCompletadas }}</span>
-          <span>Canceladas: {{ cliente.citasCanceladas }}</span>
-          <span>Pagos pendientes: {{ cliente.pagosPendientes }}</span>
+              <span
+                class="payment-status"
+                [class.payment-pending]="reserva.estadoPago !== 'Pagado'"
+                [class.payment-paid]="reserva.estadoPago === 'Pagado'"
+              >
+                Pago: {{ reserva.estadoPago || 'Pendiente' }}
+              </span>
+            </div>
+          </div>
         </div>
       </article>
     </div>

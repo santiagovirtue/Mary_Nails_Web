@@ -40,6 +40,7 @@ export class Clientes implements OnInit {
   clientes: Cliente[] = [];
 
   busqueda = '';
+  clienteExpandido = '';
 
   ngOnInit(): void {
     this.cargarReservas();
@@ -48,7 +49,12 @@ export class Clientes implements OnInit {
 
   cargarReservas(): void {
     const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    this.reservas = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
+    const reservas: Reserva[] = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
+
+    this.reservas = reservas.map((reserva) => ({
+      ...reserva,
+      estadoPago: reserva.estadoPago || 'Pendiente',
+    }));
   }
 
   generarClientes(): void {
@@ -112,6 +118,21 @@ export class Clientes implements OnInit {
         serviciosTexto.includes(texto)
       );
     });
+  }
+
+  obtenerReservasCliente(telefono: string): Reserva[] {
+    return this.reservas
+      .filter((reserva) => reserva.telefono.trim() === telefono)
+      .sort((a, b) => b.fecha.localeCompare(a.fecha));
+  }
+
+  alternarHistorial(telefono: string): void {
+    this.clienteExpandido =
+      this.clienteExpandido === telefono ? '' : telefono;
+  }
+
+  historialVisible(telefono: string): boolean {
+    return this.clienteExpandido === telefono;
   }
 
   contarClientes(): number {
