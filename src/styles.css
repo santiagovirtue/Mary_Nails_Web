@@ -12,3 +12,133 @@ html, body {
   background: #fff;
   color: #333;
 }
+@media print {
+  app-navbar,
+  app-navbar *,
+  header.navbar,
+  .navbar,
+  .nav-links,
+  .logout-link,
+  .admin-link,
+  .header-actions,
+  .filters-card,
+  .btn-main,
+  .btn-secondary {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  html,
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .reports-page {
+    padding: 20px !important;
+    background: white !important;
+    min-height: auto !important;
+  }
+
+  .reports-header {
+    margin-bottom: 20px !important;
+  }
+
+  .reports-header span {
+    margin-bottom: 10px !important;
+  }
+
+  .reports-header h1 {
+    font-size: 28px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .reports-header p {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+  }
+
+  .range-message,
+  .error-message {
+    margin-bottom: 16px !important;
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .summary-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .summary-card {
+    padding: 14px !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .summary-card h3 {
+    font-size: 13px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .summary-card strong {
+    font-size: 26px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .summary-card p {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+
+  .reports-layout {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  .report-card {
+    padding: 16px !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .report-card h2 {
+    font-size: 18px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .report-list {
+    gap: 8px !important;
+  }
+
+  .report-item {
+    padding: 9px 10px !important;
+    border-radius: 10px !important;
+  }
+
+  .report-item span {
+    font-size: 11px !important;
+  }
+
+  .report-item strong {
+    font-size: 18px !important;
+  }
+}
+
+@page {
+  size: A4 portrait;
+  margin: 12mm;
+}

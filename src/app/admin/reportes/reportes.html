@@ -1,0 +1,182 @@
+<section class="reports-page">
+  <div class="reports-header">
+    <div>
+      <span>Reportes</span>
+
+      <h1>Reportes administrativos</h1>
+
+      <p>
+        En esta sección se resume la información principal del negocio a partir
+        de las reservas, clientes, pagos, servicios y calificaciones registradas.
+      </p>
+    </div>
+
+     <div class="header-actions">
+     <button type="button" class="btn-secondary" (click)="imprimirReporte()">
+     Imprimir reporte
+     </button>
+
+     <a routerLink="/admin/dashboard" class="btn-main">
+  volver al dashboard
+     </a>
+</div>
+  </div>
+
+  <div class="filters-card">
+    <div class="filter-group">
+      <label>Fecha inicial</label>
+      <input type="date" name="fechaInicio" [(ngModel)]="fechaInicio" />
+    </div>
+
+    <div class="filter-group">
+      <label>Fecha final</label>
+      <input type="date" name="fechaFin" [(ngModel)]="fechaFin" />
+    </div>
+
+    <button type="button" class="btn-clear" (click)="limpiarFiltros()">
+      Limpiar filtros
+    </button>
+  </div>
+
+  <p class="range-message" *ngIf="hayFiltroActivo()">
+    Reporte filtrado desde
+    <strong>{{ fechaInicio || 'inicio' }}</strong>
+    hasta
+    <strong>{{ fechaFin || 'actualidad' }}</strong>.
+  </p>
+
+   <p class="error-message" *ngIf="!rangoFechasValido()">
+   La fecha inicial no puede ser mayor que la fecha final.
+  </p>
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <h3>Total reservas</h3>
+      <strong>{{ contarReservas() }}</strong>
+      <p>Reservas registradas en el periodo consultado.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Clientes</h3>
+      <strong>{{ contarClientes() }}</strong>
+      <p>Clientes únicos registrados por teléfono.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Pagos pendientes</h3>
+      <strong>{{ contarPagosPendientes() }}</strong>
+      <p>Reservas pendientes por validar pago.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Pagos realizados</h3>
+      <strong>{{ contarPagosRealizados() }}</strong>
+      <p>Reservas marcadas como pagadas.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Servicios activos</h3>
+      <strong>{{ contarServiciosActivos() }}</strong>
+      <p>Servicios visibles para clientes.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Promedio</h3>
+      <strong>{{ obtenerPromedioCalificaciones() }}</strong>
+      <p>Promedio general de calificaciones.</p>
+    </article>
+  </div>
+
+  <div class="reports-layout">
+    <div class="report-card">
+      <h2>Estado de reservas</h2>
+
+      <div class="report-list">
+        <div class="report-item">
+          <span>Pendientes</span>
+          <strong>{{ contarPorEstado('Pendiente') }}</strong>
+        </div>
+
+        <div class="report-item">
+          <span>Confirmadas</span>
+          <strong>{{ contarPorEstado('Confirmada') }}</strong>
+        </div>
+
+        <div class="report-item">
+          <span>Completadas</span>
+          <strong>{{ contarPorEstado('Completada') }}</strong>
+        </div>
+
+        <div class="report-item">
+          <span>Canceladas</span>
+          <strong>{{ contarPorEstado('Cancelada') }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card">
+      <h2>Servicios más reservados</h2>
+
+      <p
+        class="empty-message"
+        *ngIf="obtenerServiciosMasReservados().length === 0"
+      >
+        Todavía no hay reservas registradas en este periodo.
+      </p>
+
+      <div
+        class="report-list"
+        *ngIf="obtenerServiciosMasReservados().length > 0"
+      >
+        <div
+          class="report-item"
+          *ngFor="let item of obtenerServiciosMasReservados()"
+        >
+          <span>{{ item.servicio }}</span>
+          <strong>{{ item.total }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card">
+      <h2>Métodos de pago usados</h2>
+
+      <p class="empty-message" *ngIf="obtenerMetodosPago().length === 0">
+        Todavía no hay métodos de pago registrados en este periodo.
+      </p>
+
+      <div class="report-list" *ngIf="obtenerMetodosPago().length > 0">
+        <div class="report-item" *ngFor="let item of obtenerMetodosPago()">
+          <span>{{ item.metodo }}</span>
+          <strong>{{ item.total }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card">
+      <h2>Resumen general</h2>
+
+      <div class="report-list">
+        <div class="report-item">
+          <span>Servicios inactivos</span>
+          <strong>{{ contarServiciosInactivos() }}</strong>
+        </div>
+
+        <div class="report-item">
+          <span>Calificaciones recibidas</span>
+          <strong>{{ contarCalificaciones() }}</strong>
+        </div>
+
+        <div class="report-item">
+          <span>Reservas completadas</span>
+          <strong>{{ contarPorEstado('Completada') }}</strong>
+        </div>
+
+        <div class="report-item">
+          <span>Reservas canceladas</span>
+          <strong>{{ contarPorEstado('Cancelada') }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

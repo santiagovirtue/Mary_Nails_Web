@@ -20,6 +20,7 @@ import { Calificaciones } from './admin/calificaciones/calificaciones';
 import { ServiciosAdmin } from './admin/servicios-admin/servicios-admin';
 import { Pagos } from './admin/pagos/pagos';
 import { Clientes } from './admin/clientes/clientes';
+import { Reportes } from './admin/reportes/reportes';
 
 export const routes: Routes = [
   {
@@ -89,8 +90,8 @@ export const routes: Routes = [
   },
 
   {
-    path: 'admin/calificaciones',
-    component: Calificaciones,
+    path: 'admin/clientes',
+    component: Clientes,
     canActivate: [adminGuard],
   },
 
@@ -101,8 +102,14 @@ export const routes: Routes = [
   },
 
   {
-    path: 'admin/clientes',
-    component: Clientes,
+    path: 'admin/calificaciones',
+    component: Calificaciones,
+    canActivate: [adminGuard],
+  },
+
+  {
+    path: 'admin/reportes',
+    component: Reportes,
     canActivate: [adminGuard],
   },
 
