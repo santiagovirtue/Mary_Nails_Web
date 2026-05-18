@@ -4,8 +4,8 @@
       <span>Cronograma del cliente</span>
       <h1>Mis citas reservadas</h1>
       <p>
-        Consulta tus reservas, revisa el estado de cada cita y verifica la
-        fecha, hora, servicio y método de pago seleccionado.
+        Consulta tus reservas, revisa el estado de cada cita, verifica la fecha,
+        hora, servicio, método de pago y estado del pago.
       </p>
     </div>
 
@@ -30,6 +30,12 @@
       <strong>{{ contarPendientes() }}</strong>
       <p>Reservas por confirmar.</p>
     </article>
+
+    <article class="stat-card">
+      <h3>Pagadas</h3>
+      <strong>{{ contarPagadas() }}</strong>
+      <p>Reservas con pago validado.</p>
+    </article>
   </div>
 
   <div class="filters-card">
@@ -38,13 +44,13 @@
       <input
         type="text"
         name="busqueda"
-        placeholder="Buscar por servicio, fecha, hora o pago"
+        placeholder="Buscar por servicio, fecha, hora, pago o estado de pago"
         [(ngModel)]="busqueda"
       />
     </div>
 
     <div class="filter-group">
-      <label>Filtrar por estado</label>
+      <label>Filtrar por estado de cita</label>
       <select name="filtroEstado" [(ngModel)]="filtroEstado">
         <option value="Todas">Todas</option>
         <option value="Pendiente">Pendiente</option>
@@ -84,9 +90,21 @@
 
         <div class="appointment-info">
           <h3>{{ reserva.servicio }}</h3>
-          <p><strong>Hora:</strong> {{ reserva.hora }}</p>
-          <p><strong>Método de pago:</strong> {{ reserva.metodoPago }}</p>
-          <p><strong>Comentarios:</strong> {{ reserva.comentarios || 'Sin comentarios' }}</p>
+
+          <p>
+            <strong>Hora:</strong>
+            {{ reserva.hora }}
+          </p>
+
+          <p>
+            <strong>Método de pago:</strong>
+            {{ reserva.metodoPago }}
+          </p>
+
+          <p>
+            <strong>Comentarios:</strong>
+            {{ reserva.comentarios || 'Sin comentarios' }}
+          </p>
         </div>
 
         <div class="appointment-actions">
@@ -97,7 +115,15 @@
             [class.completed]="reserva.estado === 'Completada'"
             [class.cancelled]="reserva.estado === 'Cancelada'"
           >
-            {{ reserva.estado }}
+            Cita: {{ reserva.estado }}
+          </span>
+
+          <span
+            class="payment-status"
+            [class.payment-pending]="reserva.estadoPago !== 'Pagado'"
+            [class.payment-paid]="reserva.estadoPago === 'Pagado'"
+          >
+            Pago: {{ reserva.estadoPago || 'Pendiente' }}
           </span>
 
           <a

@@ -8,7 +8,9 @@
     <a routerLink="/reservas">Reservas</a>
 
     <!-- Opciones cuando no hay sesión iniciada -->
-    <a routerLink="/login" *ngIf="sinSesion">Cliente</a>
+    <a routerLink="/login" *ngIf="sinSesion">
+      Cliente
+    </a>
 
     <a routerLink="/admin/login" class="admin-link" *ngIf="sinSesion">
       Admin
@@ -36,8 +38,16 @@
       Disponibilidad
     </a>
 
+    <a routerLink="/admin/servicios" *ngIf="adminLogueado">
+      Gestionar servicios
+    </a>
+
     <a routerLink="/admin/calificaciones" *ngIf="adminLogueado">
       Calificaciones
+    </a>
+
+    <a routerLink="/admin/pagos" *ngIf="adminLogueado">
+      Pagos
     </a>
 
     <!-- Cerrar sesión -->

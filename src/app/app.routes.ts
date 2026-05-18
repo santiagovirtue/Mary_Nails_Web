@@ -18,6 +18,7 @@ import { Cronograma } from './admin/cronograma/cronograma';
 import { Disponibilidad } from './admin/disponibilidad/disponibilidad';
 import { Calificaciones } from './admin/calificaciones/calificaciones';
 import { ServiciosAdmin } from './admin/servicios-admin/servicios-admin';
+import { Pagos } from './admin/pagos/pagos';
 
 export const routes: Routes = [
   {
@@ -89,6 +90,12 @@ export const routes: Routes = [
   {
     path: 'admin/servicios',
     component: ServiciosAdmin,
+    canActivate: [adminGuard],
+  },
+
+  {
+    path: 'admin/pagos',
+    component: Pagos,
     canActivate: [adminGuard],
   },
 

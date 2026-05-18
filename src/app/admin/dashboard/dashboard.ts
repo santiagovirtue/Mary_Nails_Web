@@ -12,6 +12,7 @@ interface Reserva {
   metodoPago: string;
   comentarios: string;
   estado: string;
+  estadoPago?: string;
 }
 
 interface Calificacion {
@@ -67,24 +68,65 @@ export class Dashboard implements OnInit {
 
   cargarServicios(): void {
     const serviciosGuardados = localStorage.getItem('maryNailsServicios');
-    this.servicios = serviciosGuardados ? JSON.parse(serviciosGuardados) : [];
+
+    if (serviciosGuardados) {
+      this.servicios = JSON.parse(serviciosGuardados);
+      return;
+    }
+
+    this.servicios = [
+      {
+        id: 1,
+        nombre: 'Manicure profesional',
+        descripcion:
+          'Limpieza, cuidado de cutícula, limado y esmaltado para mantener tus manos impecables.',
+        duracion: '45 min',
+        precio: '$25.000',
+        icono: '💅',
+        estado: 'Activo',
+      },
+      {
+        id: 2,
+        nombre: 'Pedicure',
+        descripcion:
+          'Cuidado completo de pies, limpieza, hidratación y esmaltado con acabado profesional.',
+        duracion: '60 min',
+        precio: '$30.000',
+        icono: '✨',
+        estado: 'Activo',
+      },
+      {
+        id: 3,
+        nombre: 'Uñas acrílicas',
+        descripcion:
+          'Extensión y diseño de uñas acrílicas con diferentes estilos, formas y colores.',
+        duracion: '90 min',
+        precio: '$60.000',
+        icono: '🌸',
+        estado: 'Activo',
+      },
+      {
+        id: 4,
+        nombre: 'Diseño personalizado',
+        descripcion:
+          'Decoración artística según el gusto del cliente: colores, detalles, brillos y tendencias.',
+        duracion: 'Variable',
+        precio: 'Desde $15.000',
+        icono: '🎨',
+        estado: 'Activo',
+      },
+    ];
+
+    localStorage.setItem('maryNailsServicios', JSON.stringify(this.servicios));
   }
 
   obtenerFechaHoy(): string {
-    const hoy = new Date();
-    const year = hoy.getFullYear();
-    const month = String(hoy.getMonth() + 1).padStart(2, '0');
-    const day = String(hoy.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
+    return new Date().toISOString().slice(0, 10);
   }
 
   contarCitasHoy(): number {
     const hoy = this.obtenerFechaHoy();
-
-    return this.reservas.filter(
-      (reserva) => reserva.fecha === hoy && reserva.estado !== 'Cancelada'
-    ).length;
+    return this.reservas.filter((reserva) => reserva.fecha === hoy).length;
   }
 
   contarClientes(): number {
@@ -101,9 +143,13 @@ export class Dashboard implements OnInit {
     return this.servicios.filter((servicio) => servicio.estado === 'Activo').length;
   }
 
-  contarPagosPendientes(): number {
-    return this.reservas.filter((reserva) => reserva.estado === 'Pendiente').length;
+  contarServiciosInactivos(): number {
+    return this.servicios.filter((servicio) => servicio.estado === 'Inactivo').length;
   }
+
+   contarPagosPendientes(): number {
+  return this.reservas.filter((reserva) => reserva.estadoPago !== 'Pagado').length;
+   }
 
   contarCalificaciones(): number {
     return this.calificaciones.length;
@@ -124,10 +170,7 @@ export class Dashboard implements OnInit {
 
   obtenerProximasCitas(): Reserva[] {
     return [...this.reservas]
-      .filter(
-        (reserva) =>
-          reserva.estado !== 'Cancelada' && reserva.estado !== 'Completada'
-      )
+      .filter((reserva) => reserva.estado !== 'Cancelada')
       .sort((a, b) => {
         const fechaA = `${a.fecha} ${a.hora}`;
         const fechaB = `${b.fecha} ${b.hora}`;

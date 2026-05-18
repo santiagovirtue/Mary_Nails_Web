@@ -1,0 +1,142 @@
+<section class="payments-page">
+  <div class="payments-header">
+    <div>
+      <span>Pagos</span>
+      <h1>Gestión de pagos</h1>
+      <p>
+        En esta sección el administrador puede revisar los métodos de pago
+        seleccionados por los clientes y marcar cada reserva como pagada o pendiente.
+      </p>
+    </div>
+
+    <a routerLink="/admin/dashboard" class="btn-main">
+      Volver al dashboard
+    </a>
+  </div>
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <h3>Total reservas</h3>
+      <strong>{{ contarTotal() }}</strong>
+      <p>Reservas registradas en el sistema.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Pagos pendientes</h3>
+      <strong>{{ contarPendientes() }}</strong>
+      <p>Reservas pendientes por validar pago.</p>
+    </article>
+
+    <article class="summary-card">
+      <h3>Pagos realizados</h3>
+      <strong>{{ contarPagados() }}</strong>
+      <p>Reservas marcadas como pagadas.</p>
+    </article>
+  </div>
+
+  <div class="filters-card">
+    <div class="filter-group">
+      <label>Buscar pago</label>
+      <input
+        type="text"
+        name="busqueda"
+        placeholder="Buscar por cliente, teléfono, servicio o método de pago"
+        [(ngModel)]="busqueda"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label>Filtrar por estado de pago</label>
+      <select name="filtroPago" [(ngModel)]="filtroPago">
+        <option value="Todos">Todos</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="Pagado">Pagado</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn-clear" (click)="limpiarFiltros()">
+      Limpiar filtros
+    </button>
+  </div>
+
+  <p class="action-message" *ngIf="mensaje">
+    {{ mensaje }}
+  </p>
+
+  <div class="payments-card">
+    <h2>Listado de pagos</h2>
+
+    <p class="empty-message" *ngIf="reservas.length === 0">
+      Todavía no hay reservas registradas para gestionar pagos.
+    </p>
+
+    <p
+      class="empty-message"
+      *ngIf="reservas.length > 0 && obtenerPagosFiltrados().length === 0"
+    >
+      No se encontraron pagos con los filtros seleccionados.
+    </p>
+
+    <div class="table-wrapper" *ngIf="obtenerPagosFiltrados().length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>Servicio</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Método</th>
+            <th>Estado cita</th>
+            <th>Estado pago</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let reserva of obtenerPagosFiltrados()">
+            <td>{{ reserva.nombre }}</td>
+            <td>{{ reserva.telefono }}</td>
+            <td>{{ reserva.servicio }}</td>
+            <td>{{ reserva.fecha }}</td>
+            <td>{{ reserva.hora }}</td>
+            <td>{{ reserva.metodoPago }}</td>
+            <td>{{ reserva.estado }}</td>
+
+            <td>
+              <span
+                class="payment-status"
+                [class.pending]="reserva.estadoPago !== 'Pagado'"
+                [class.paid]="reserva.estadoPago === 'Pagado'"
+              >
+                {{ reserva.estadoPago || 'Pendiente' }}
+              </span>
+            </td>
+
+            <td>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="action paid"
+                  *ngIf="reserva.estadoPago !== 'Pagado'"
+                  (click)="marcarComoPagado(reserva.id)"
+                >
+                  Marcar pagado
+                </button>
+
+                <button
+                  type="button"
+                  class="action pending"
+                  *ngIf="reserva.estadoPago === 'Pagado'"
+                  (click)="marcarComoPendiente(reserva.id)"
+                >
+                  Marcar pendiente
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

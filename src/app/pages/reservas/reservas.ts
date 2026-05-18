@@ -13,6 +13,7 @@ interface Reserva {
   metodoPago: string;
   comentarios: string;
   estado: string;
+  estadoPago?: string;
 }
 
 interface Horario {

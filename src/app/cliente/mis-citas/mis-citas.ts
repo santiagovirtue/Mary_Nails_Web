@@ -13,6 +13,7 @@ interface Reserva {
   metodoPago: string;
   comentarios: string;
   estado: string;
+  estadoPago?: string;
 }
 
 @Component({
@@ -36,7 +37,14 @@ export class MisCitas implements OnInit {
     }
 
     const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    this.reservas = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
+    const reservas: Reserva[] = reservasGuardadas
+      ? JSON.parse(reservasGuardadas)
+      : [];
+
+    this.reservas = reservas.map((reserva) => ({
+      ...reserva,
+      estadoPago: reserva.estadoPago || 'Pendiente',
+    }));
   }
 
   contarActivas(): number {
@@ -58,6 +66,12 @@ export class MisCitas implements OnInit {
     ).length;
   }
 
+  contarPagadas(): number {
+    return this.reservas.filter(
+      (reserva) => reserva.estadoPago === 'Pagado'
+    ).length;
+  }
+
   obtenerReservasFiltradas(): Reserva[] {
     const texto = this.busqueda.toLowerCase().trim();
 
@@ -69,7 +83,8 @@ export class MisCitas implements OnInit {
         reserva.servicio.toLowerCase().includes(texto) ||
         reserva.fecha.toLowerCase().includes(texto) ||
         reserva.hora.toLowerCase().includes(texto) ||
-        reserva.metodoPago.toLowerCase().includes(texto);
+        reserva.metodoPago.toLowerCase().includes(texto) ||
+        (reserva.estadoPago || 'Pendiente').toLowerCase().includes(texto);
 
       return coincideEstado && coincideBusqueda;
     });
