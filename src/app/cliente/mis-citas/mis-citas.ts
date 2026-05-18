@@ -94,4 +94,15 @@ export class MisCitas implements OnInit {
     this.filtroEstado = 'Todas';
     this.busqueda = '';
   }
+  guardarReservas(): void {
+  localStorage.setItem('maryNailsReservas', JSON.stringify(this.reservas));
+}
+
+cancelarCita(id: number): void {
+  this.reservas = this.reservas.map((reserva) =>
+    reserva.id === id ? { ...reserva, estado: 'Cancelada' } : reserva
+  );
+
+  this.guardarReservas();
+}
 }

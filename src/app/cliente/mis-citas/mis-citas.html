@@ -125,6 +125,15 @@
           >
             Pago: {{ reserva.estadoPago || 'Pendiente' }}
           </span>
+          
+          <button
+           type="button"
+           class="btn-cancel"
+           *ngIf="reserva.estado === 'Pendiente' || reserva.estado === 'Confirmada'"
+           (click)="cancelarCita(reserva.id)"
+           >
+           Cancelar cita
+           </button>
 
           <a
             *ngIf="reserva.estado === 'Completada'"

@@ -5,44 +5,57 @@
       <h1>Control de citas programadas</h1>
       <p>
         En esta sección el administrador puede revisar las citas solicitadas,
-        validar horarios, cambiar estados y controlar la agenda de Mary Nails.
+        validar horarios, cambiar estados, controlar pagos y gestionar la agenda
+        de Mary Nails.
       </p>
     </div>
 
-    <a routerLink="/admin/disponibilidad" class="btn-main">
-      Gestionar disponibilidad
-    </a>
+    <div class="header-actions">
+      <a routerLink="/admin/disponibilidad" class="btn-main">
+        Gestionar disponibilidad
+      </a>
+
+      <a routerLink="/admin/pagos" class="btn-secondary">
+        Ver pagos
+      </a>
+    </div>
   </div>
 
-  <div class="summary-grid">
-    <article class="summary-card">
+  <div class="stats-grid">
+    <article class="stat-card">
       <h3>Total</h3>
       <strong>{{ contarTotal() }}</strong>
       <p>Citas registradas</p>
     </article>
 
-    <article class="summary-card">
+    <article class="stat-card">
       <h3>Pendientes</h3>
-      <strong>{{ contarPorEstado('Pendiente') }}</strong>
+      <strong>{{ contarPendientes() }}</strong>
       <p>Citas por confirmar</p>
     </article>
 
-    <article class="summary-card">
+    <article class="stat-card">
       <h3>Confirmadas</h3>
-      <strong>{{ contarPorEstado('Confirmada') }}</strong>
+      <strong>{{ contarConfirmadas() }}</strong>
       <p>Citas aprobadas</p>
     </article>
 
-    <article class="summary-card">
+    <article class="stat-card">
       <h3>Completadas</h3>
-      <strong>{{ contarPorEstado('Completada') }}</strong>
+      <strong>{{ contarCompletadas() }}</strong>
       <p>Servicios realizados</p>
     </article>
 
-    <article class="summary-card">
+    <article class="stat-card">
       <h3>Canceladas</h3>
-      <strong>{{ contarPorEstado('Cancelada') }}</strong>
+      <strong>{{ contarCanceladas() }}</strong>
       <p>Citas canceladas</p>
+    </article>
+
+    <article class="stat-card">
+      <h3>Pagadas</h3>
+      <strong>{{ contarPagadas() }}</strong>
+      <p>Pagos validados</p>
     </article>
   </div>
 
@@ -52,13 +65,13 @@
       <input
         type="text"
         name="busqueda"
-        placeholder="Buscar por cliente, teléfono, servicio o pago"
+        placeholder="Buscar por cliente, teléfono, servicio, pago o estado"
         [(ngModel)]="busqueda"
       />
     </div>
 
     <div class="filter-group">
-      <label>Filtrar por estado</label>
+      <label>Filtrar por estado de cita</label>
       <select name="filtroEstado" [(ngModel)]="filtroEstado">
         <option value="Todas">Todas</option>
         <option value="Pendiente">Pendiente</option>
@@ -73,12 +86,12 @@
     </button>
   </div>
 
-  <p class="action-message" *ngIf="mensajeAccion">
-    {{ mensajeAccion }}
+  <p class="action-message" *ngIf="mensaje">
+    {{ mensaje }}
   </p>
 
-  <div class="schedule-table-card">
-    <div class="table-header">
+  <div class="agenda-card">
+    <div class="agenda-header">
       <h2>Agenda semanal</h2>
 
       <a routerLink="/reservas" class="btn-main">
@@ -87,8 +100,8 @@
     </div>
 
     <p class="empty-message" *ngIf="reservas.length === 0">
-      Todavía no hay reservas registradas. Cuando un cliente confirme una solicitud,
-      aparecerá en este cronograma.
+      Todavía no hay reservas registradas. Cuando un cliente confirme una
+      solicitud, aparecerá en este cronograma.
     </p>
 
     <p
@@ -108,7 +121,8 @@
             <th>Teléfono</th>
             <th>Servicio</th>
             <th>Método de pago</th>
-            <th>Estado</th>
+            <th>Estado cita</th>
+            <th>Estado pago</th>
             <th>Comentarios</th>
             <th>Acciones</th>
           </tr>
@@ -136,14 +150,22 @@
             </td>
 
             <td>
-              {{ reserva.comentarios || 'Sin comentarios' }}
+              <span
+                class="payment-status"
+                [class.payment-pending]="reserva.estadoPago !== 'Pagado'"
+                [class.payment-paid]="reserva.estadoPago === 'Pagado'"
+              >
+                {{ reserva.estadoPago || 'Pendiente' }}
+              </span>
             </td>
+
+            <td>{{ reserva.comentarios || 'Sin comentarios' }}</td>
 
             <td>
               <div class="actions">
                 <button
                   type="button"
-                  class="action approve"
+                  class="action confirm"
                   *ngIf="reserva.estado === 'Pendiente'"
                   (click)="confirmarReserva(reserva.id)"
                 >
@@ -162,7 +184,7 @@
                 <button
                   type="button"
                   class="action cancel"
-                  *ngIf="reserva.estado !== 'Cancelada' && reserva.estado !== 'Completada'"
+                  *ngIf="reserva.estado === 'Pendiente' || reserva.estado === 'Confirmada'"
                   (click)="cancelarReserva(reserva.id)"
                 >
                   Cancelar

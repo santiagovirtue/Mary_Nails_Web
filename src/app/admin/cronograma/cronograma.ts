@@ -13,6 +13,7 @@ interface Reserva {
   metodoPago: string;
   comentarios: string;
   estado: string;
+  estadoPago?: string;
 }
 
 @Component({
@@ -24,9 +25,9 @@ interface Reserva {
 export class Cronograma implements OnInit {
   reservas: Reserva[] = [];
 
-  filtroEstado = 'Todas';
   busqueda = '';
-  mensajeAccion = '';
+  filtroEstado = 'Todas';
+  mensaje = '';
 
   ngOnInit(): void {
     this.cargarReservas();
@@ -38,69 +39,100 @@ export class Cronograma implements OnInit {
     }
 
     const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    this.reservas = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
+    const reservas: Reserva[] = reservasGuardadas
+      ? JSON.parse(reservasGuardadas)
+      : [];
+
+    this.reservas = reservas.map((reserva) => ({
+      ...reserva,
+      estadoPago: reserva.estadoPago || 'Pendiente',
+    }));
+
+    this.guardarReservas();
   }
 
   guardarReservas(): void {
     localStorage.setItem('maryNailsReservas', JSON.stringify(this.reservas));
   }
 
-  contarPorEstado(estado: string): number {
-    return this.reservas.filter((reserva) => reserva.estado === estado).length;
+  obtenerReservasFiltradas(): Reserva[] {
+    const texto = this.busqueda.toLowerCase().trim();
+
+    return this.reservas.filter((reserva) => {
+      const coincideBusqueda =
+        reserva.nombre.toLowerCase().includes(texto) ||
+        reserva.telefono.toLowerCase().includes(texto) ||
+        reserva.servicio.toLowerCase().includes(texto) ||
+        reserva.metodoPago.toLowerCase().includes(texto) ||
+        reserva.estado.toLowerCase().includes(texto) ||
+        (reserva.estadoPago || 'Pendiente').toLowerCase().includes(texto);
+
+      const coincideEstado =
+        this.filtroEstado === 'Todas' || reserva.estado === this.filtroEstado;
+
+      return coincideBusqueda && coincideEstado;
+    });
   }
 
   contarTotal(): number {
     return this.reservas.length;
   }
 
-  obtenerReservasFiltradas(): Reserva[] {
-    const texto = this.busqueda.toLowerCase().trim();
-
-    return this.reservas.filter((reserva) => {
-      const coincideEstado =
-        this.filtroEstado === 'Todas' || reserva.estado === this.filtroEstado;
-
-      const coincideBusqueda =
-        reserva.nombre.toLowerCase().includes(texto) ||
-        reserva.servicio.toLowerCase().includes(texto) ||
-        reserva.metodoPago.toLowerCase().includes(texto) ||
-        reserva.telefono.toLowerCase().includes(texto);
-
-      return coincideEstado && coincideBusqueda;
-    });
+  contarPendientes(): number {
+    return this.reservas.filter((reserva) => reserva.estado === 'Pendiente').length;
   }
 
-  limpiarFiltros(): void {
-    this.filtroEstado = 'Todas';
-    this.busqueda = '';
+  contarConfirmadas(): number {
+    return this.reservas.filter((reserva) => reserva.estado === 'Confirmada').length;
+  }
+
+  contarCompletadas(): number {
+    return this.reservas.filter((reserva) => reserva.estado === 'Completada').length;
+  }
+
+  contarCanceladas(): number {
+    return this.reservas.filter((reserva) => reserva.estado === 'Cancelada').length;
+  }
+
+  contarPagadas(): number {
+    return this.reservas.filter((reserva) => reserva.estadoPago === 'Pagado').length;
   }
 
   confirmarReserva(id: number): void {
-    this.actualizarEstado(id, 'Confirmada');
-    this.mensajeAccion = 'La reserva fue confirmada correctamente.';
-  }
+    this.reservas = this.reservas.map((reserva) =>
+      reserva.id === id ? { ...reserva, estado: 'Confirmada' } : reserva
+    );
 
-  cancelarReserva(id: number): void {
-    this.actualizarEstado(id, 'Cancelada');
-    this.mensajeAccion = 'La reserva fue cancelada correctamente.';
+    this.guardarReservas();
+    this.mensaje = 'La reserva fue confirmada correctamente.';
   }
 
   completarReserva(id: number): void {
-    this.actualizarEstado(id, 'Completada');
-    this.mensajeAccion = 'La reserva fue marcada como completada.';
+    this.reservas = this.reservas.map((reserva) =>
+      reserva.id === id ? { ...reserva, estado: 'Completada' } : reserva
+    );
+
+    this.guardarReservas();
+    this.mensaje = 'La reserva fue marcada como completada.';
+  }
+
+  cancelarReserva(id: number): void {
+    this.reservas = this.reservas.map((reserva) =>
+      reserva.id === id ? { ...reserva, estado: 'Cancelada' } : reserva
+    );
+
+    this.guardarReservas();
+    this.mensaje = 'La reserva fue cancelada correctamente.';
   }
 
   eliminarReserva(id: number): void {
     this.reservas = this.reservas.filter((reserva) => reserva.id !== id);
     this.guardarReservas();
-    this.mensajeAccion = 'La reserva fue eliminada correctamente.';
+    this.mensaje = 'La reserva fue eliminada correctamente.';
   }
 
-  actualizarEstado(id: number, nuevoEstado: string): void {
-    this.reservas = this.reservas.map((reserva) =>
-      reserva.id === id ? { ...reserva, estado: nuevoEstado } : reserva
-    );
-
-    this.guardarReservas();
+  limpiarFiltros(): void {
+    this.busqueda = '';
+    this.filtroEstado = 'Todas';
   }
 }
