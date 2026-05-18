@@ -27,6 +27,10 @@ export class Navbar {
     return this.obtenerSesion('maryNailsAdminSesion') === 'true';
   }
 
+  get sinSesion(): boolean {
+    return !this.clienteLogueado && !this.adminLogueado;
+  }
+
   get haySesionActiva(): boolean {
     return this.clienteLogueado || this.adminLogueado;
   }

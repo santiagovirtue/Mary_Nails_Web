@@ -26,8 +26,11 @@ export class LoginAdmin {
       this.usuario === 'admin@marynails.com' &&
       this.password === '12345'
     ) {
-      localStorage.setItem('maryNailsAdminSesion', 'true');
-      localStorage.setItem('maryNailsAdminUsuario', this.usuario);
+      localStorage.removeItem('maryNailsClienteSesion');
+localStorage.removeItem('maryNailsClienteUsuario');
+
+localStorage.setItem('maryNailsAdminSesion', 'true');
+localStorage.setItem('maryNailsAdminUsuario', this.usuario);
 
       this.router.navigate(['/admin/dashboard']);
       return;

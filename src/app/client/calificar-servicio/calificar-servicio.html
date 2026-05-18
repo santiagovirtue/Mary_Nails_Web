@@ -1,43 +1,68 @@
 <section class="rating-page">
   <div class="rating-card">
-    <div class="rating-header">
-      <span>Calificación</span>
-      <h1>Calificar servicio</h1>
-      <p>
-        Comparte tu experiencia sobre el servicio recibido. Tu opinión ayuda a mejorar
-        la atención y calidad de Mary Nails.
-      </p>
-    </div>
+    <span class="rating-badge">Calificación</span>
 
-    <form class="rating-form">
+    <h1>Calificar servicio</h1>
+
+    <p>
+      Comparte tu experiencia sobre el servicio recibido. Tu opinión ayuda a
+      mejorar la atención y calidad de Mary Nails.
+    </p>
+
+    <form>
       <div class="form-group">
         <label>Servicio realizado</label>
-        <select>
-          <option>Selecciona el servicio</option>
-          <option>Manicure profesional</option>
-          <option>Pedicure</option>
-          <option>Uñas acrílicas</option>
-          <option>Diseño personalizado</option>
+        <select name="servicio" [(ngModel)]="calificacion.servicio">
+          <option value="">Selecciona un servicio</option>
+
+          <option
+            *ngFor="let servicio of obtenerServiciosDisponibles()"
+            [value]="servicio"
+          >
+            {{ servicio }}
+          </option>
         </select>
       </div>
 
       <div class="form-group">
         <label>Puntuación</label>
+
         <div class="stars">
-          <span>★</span>
-          <span>★</span>
-          <span>★</span>
-          <span>★</span>
-          <span>★</span>
+          <button
+            type="button"
+            *ngFor="let estrella of estrellas"
+            [class.active]="estrella <= calificacion.puntuacion"
+            (click)="seleccionarPuntuacion(estrella)"
+          >
+            ★
+          </button>
         </div>
+
+        <p class="rating-text">
+          {{ obtenerTextoPuntuacion() }}
+        </p>
       </div>
 
       <div class="form-group">
         <label>Comentario</label>
-        <textarea placeholder="Escribe tu opinión sobre el servicio recibido"></textarea>
+        <textarea
+          name="comentario"
+          placeholder="Escribe tu opinión sobre el servicio recibido"
+          [(ngModel)]="calificacion.comentario"
+        ></textarea>
       </div>
 
-      <button type="button" class="btn-rating">Enviar calificación</button>
+      <button type="button" class="btn-rating" (click)="enviarCalificacion()">
+        Enviar calificación
+      </button>
+
+      <p class="success-message" *ngIf="mensajeExito">
+        {{ mensajeExito }}
+      </p>
+
+      <p class="error-message" *ngIf="mensajeError">
+        {{ mensajeError }}
+      </p>
     </form>
   </div>
 </section>

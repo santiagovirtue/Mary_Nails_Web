@@ -26,8 +26,11 @@ export class Login {
       this.usuario === 'cliente@marynails.com' &&
       this.password === '12345'
     ) {
-      localStorage.setItem('maryNailsClienteSesion', 'true');
-      localStorage.setItem('maryNailsClienteUsuario', this.usuario);
+      localStorage.removeItem('maryNailsAdminSesion');
+localStorage.removeItem('maryNailsAdminUsuario');
+
+localStorage.setItem('maryNailsClienteSesion', 'true');
+localStorage.setItem('maryNailsClienteUsuario', this.usuario);
 
       this.router.navigate(['/cliente/mis-citas']);
       return;

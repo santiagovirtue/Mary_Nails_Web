@@ -38,6 +38,18 @@
       <strong>{{ contarPagosPendientes() }}</strong>
       <p>Reservas pendientes por validar pago.</p>
     </article>
+
+    <article class="stat-card">
+      <h3>Calificaciones</h3>
+      <strong>{{ contarCalificaciones() }}</strong>
+      <p>Opiniones recibidas por los clientes.</p>
+    </article>
+
+    <article class="stat-card">
+      <h3>Promedio</h3>
+      <strong>{{ obtenerPromedioCalificaciones() }}</strong>
+      <p>Promedio general de satisfacción.</p>
+    </article>
   </div>
 
   <div class="dashboard-content">
@@ -57,6 +69,26 @@
           </div>
 
           <span>{{ reserva.estado }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-card">
+      <h2>Últimas calificaciones</h2>
+
+      <p class="empty-message" *ngIf="obtenerUltimasCalificaciones().length === 0">
+        Todavía no hay calificaciones registradas.
+      </p>
+
+      <div class="rating-list" *ngIf="obtenerUltimasCalificaciones().length > 0">
+        <div class="rating-item" *ngFor="let calificacion of obtenerUltimasCalificaciones()">
+          <div>
+            <strong>{{ calificacion.servicio }}</strong>
+            <p>{{ calificacion.comentario }}</p>
+            <small>{{ calificacion.fecha }}</small>
+          </div>
+
+          <span>{{ calificacion.puntuacion }} ★</span>
         </div>
       </div>
     </div>

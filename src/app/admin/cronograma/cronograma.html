@@ -16,6 +16,12 @@
 
   <div class="summary-grid">
     <article class="summary-card">
+      <h3>Total</h3>
+      <strong>{{ contarTotal() }}</strong>
+      <p>Citas registradas</p>
+    </article>
+
+    <article class="summary-card">
       <h3>Pendientes</h3>
       <strong>{{ contarPorEstado('Pendiente') }}</strong>
       <p>Citas por confirmar</p>
@@ -32,12 +38,52 @@
       <strong>{{ contarPorEstado('Completada') }}</strong>
       <p>Servicios realizados</p>
     </article>
+
+    <article class="summary-card">
+      <h3>Canceladas</h3>
+      <strong>{{ contarPorEstado('Cancelada') }}</strong>
+      <p>Citas canceladas</p>
+    </article>
   </div>
+
+  <div class="filters-card">
+    <div class="filter-group">
+      <label>Buscar cita</label>
+      <input
+        type="text"
+        name="busqueda"
+        placeholder="Buscar por cliente, teléfono, servicio o pago"
+        [(ngModel)]="busqueda"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label>Filtrar por estado</label>
+      <select name="filtroEstado" [(ngModel)]="filtroEstado">
+        <option value="Todas">Todas</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="Confirmada">Confirmada</option>
+        <option value="Completada">Completada</option>
+        <option value="Cancelada">Cancelada</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn-clear" (click)="limpiarFiltros()">
+      Limpiar filtros
+    </button>
+  </div>
+
+  <p class="action-message" *ngIf="mensajeAccion">
+    {{ mensajeAccion }}
+  </p>
 
   <div class="schedule-table-card">
     <div class="table-header">
       <h2>Agenda semanal</h2>
-      <a routerLink="/reservas" class="btn-main">Agregar cita</a>
+
+      <a routerLink="/reservas" class="btn-main">
+        Agregar cita
+      </a>
     </div>
 
     <p class="empty-message" *ngIf="reservas.length === 0">
@@ -45,25 +91,35 @@
       aparecerá en este cronograma.
     </p>
 
-    <div class="table-wrapper" *ngIf="reservas.length > 0">
+    <p
+      class="empty-message"
+      *ngIf="reservas.length > 0 && obtenerReservasFiltradas().length === 0"
+    >
+      No se encontraron citas con los filtros seleccionados.
+    </p>
+
+    <div class="table-wrapper" *ngIf="obtenerReservasFiltradas().length > 0">
       <table>
         <thead>
           <tr>
             <th>Fecha</th>
             <th>Hora</th>
             <th>Cliente</th>
+            <th>Teléfono</th>
             <th>Servicio</th>
             <th>Método de pago</th>
             <th>Estado</th>
+            <th>Comentarios</th>
             <th>Acciones</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr *ngFor="let reserva of reservas">
+          <tr *ngFor="let reserva of obtenerReservasFiltradas()">
             <td>{{ reserva.fecha }}</td>
             <td>{{ reserva.hora }}</td>
             <td>{{ reserva.nombre }}</td>
+            <td>{{ reserva.telefono }}</td>
             <td>{{ reserva.servicio }}</td>
             <td>{{ reserva.metodoPago }}</td>
 
@@ -73,46 +129,53 @@
                 [class.pending]="reserva.estado === 'Pendiente'"
                 [class.confirmed]="reserva.estado === 'Confirmada'"
                 [class.completed]="reserva.estado === 'Completada'"
+                [class.cancelled]="reserva.estado === 'Cancelada'"
               >
                 {{ reserva.estado }}
               </span>
             </td>
 
             <td>
-              <button
-                class="action approve"
-                type="button"
-                (click)="confirmarReserva(reserva.id)"
-                *ngIf="reserva.estado === 'Pendiente'"
-              >
-                Confirmar
-              </button>
+              {{ reserva.comentarios || 'Sin comentarios' }}
+            </td>
 
-              <button
-                class="action edit"
-                type="button"
-                (click)="completarReserva(reserva.id)"
-                *ngIf="reserva.estado === 'Confirmada'"
-              >
-                Completar
-              </button>
+            <td>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="action approve"
+                  *ngIf="reserva.estado === 'Pendiente'"
+                  (click)="confirmarReserva(reserva.id)"
+                >
+                  Confirmar
+                </button>
 
-              <button
-                class="action cancel"
-                type="button"
-                (click)="cancelarReserva(reserva.id)"
-                *ngIf="reserva.estado !== 'Cancelada' && reserva.estado !== 'Completada'"
-              >
-                Cancelar
-              </button>
+                <button
+                  type="button"
+                  class="action complete"
+                  *ngIf="reserva.estado === 'Confirmada'"
+                  (click)="completarReserva(reserva.id)"
+                >
+                  Completar
+                </button>
 
-              <button
-                class="action cancel"
-                type="button"
-                (click)="eliminarReserva(reserva.id)"
-              >
-                Eliminar
-              </button>
+                <button
+                  type="button"
+                  class="action cancel"
+                  *ngIf="reserva.estado !== 'Cancelada' && reserva.estado !== 'Completada'"
+                  (click)="cancelarReserva(reserva.id)"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  class="action delete"
+                  (click)="eliminarReserva(reserva.id)"
+                >
+                  Eliminar
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>

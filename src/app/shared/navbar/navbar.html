@@ -7,15 +7,36 @@
     <a routerLink="/galeria">Galería</a>
     <a routerLink="/reservas">Reservas</a>
 
-    <a routerLink="/login" *ngIf="!clienteLogueado">Cliente</a>
+    <!-- Opciones sin sesión -->
+    <a routerLink="/login" *ngIf="sinSesion">Cliente</a>
 
-    <a routerLink="/cliente/mis-citas">Cronograma cliente</a>
-    <a routerLink="/admin/cronograma">Cronograma admin</a>
-
-    <a routerLink="/admin/login" class="admin-link" *ngIf="!adminLogueado">
+    <a routerLink="/admin/login" class="admin-link" *ngIf="sinSesion">
       Admin
     </a>
 
+    <!-- Opciones del cliente -->
+    <a routerLink="/cliente/mis-citas" *ngIf="clienteLogueado">
+      Cronograma cliente
+    </a>
+
+    <a routerLink="/cliente/calificar-servicio" *ngIf="clienteLogueado">
+      Calificar servicio
+    </a>
+
+    <!-- Opciones del administrador -->
+    <a routerLink="/admin/dashboard" *ngIf="adminLogueado">
+      Dashboard
+    </a>
+
+    <a routerLink="/admin/cronograma" *ngIf="adminLogueado">
+      Cronograma admin
+    </a>
+
+    <a routerLink="/admin/disponibilidad" *ngIf="adminLogueado">
+      Disponibilidad
+    </a>
+
+    <!-- Cerrar sesión -->
     <button
       type="button"
       class="logout-link"
