@@ -2,29 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+
 import { Reserva, ReservasService } from '../../services/reservas.service';
-
-interface Calificacion {
-  id: number;
-  idCita?: number;
-  cliente?: string;
-  servicio: string;
-  fechaCita?: string;
-  horaCita?: string;
-  puntuacion: number;
-  comentario: string;
-  fecha: string;
-}
-
-interface Servicio {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  duracion: string;
-  precio: string;
-  icono: string;
-  estado: string;
-}
+import {
+  Calificacion,
+  CalificacionesService,
+} from '../../services/calificaciones.service';
+import { Servicio, ServiciosService } from '../../services/servicios.service';
 
 @Component({
   selector: 'app-reportes',
@@ -40,7 +24,11 @@ export class Reportes implements OnInit {
   fechaInicio = '';
   fechaFin = '';
 
-  constructor(private reservasService: ReservasService) {}
+  constructor(
+    private reservasService: ReservasService,
+    private calificacionesService: CalificacionesService,
+    private serviciosService: ServiciosService
+  ) {}
 
   ngOnInit(): void {
     this.cargarDatos();
@@ -48,18 +36,8 @@ export class Reportes implements OnInit {
 
   cargarDatos(): void {
     this.reservas = this.reservasService.obtenerReservas();
-
-    const calificacionesGuardadas = localStorage.getItem(
-      'maryNailsCalificaciones'
-    );
-
-    const serviciosGuardados = localStorage.getItem('maryNailsServicios');
-
-    this.calificaciones = calificacionesGuardadas
-      ? JSON.parse(calificacionesGuardadas)
-      : [];
-
-    this.servicios = serviciosGuardados ? JSON.parse(serviciosGuardados) : [];
+    this.calificaciones = this.calificacionesService.obtenerCalificaciones();
+    this.servicios = this.serviciosService.obtenerServicios();
   }
 
   rangoFechasValido(): boolean {
@@ -145,13 +123,11 @@ export class Reportes implements OnInit {
   }
 
   contarServiciosActivos(): number {
-    return this.servicios.filter((servicio) => servicio.estado === 'Activo')
-      .length;
+    return this.serviciosService.contarServiciosActivos();
   }
 
   contarServiciosInactivos(): number {
-    return this.servicios.filter((servicio) => servicio.estado === 'Inactivo')
-      .length;
+    return this.serviciosService.contarServiciosInactivos();
   }
 
   contarCalificaciones(): number {

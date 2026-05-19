@@ -3,19 +3,8 @@ import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ReservasService } from '../../services/reservas.service';
-interface Reserva {
-  id: number;
-  nombre: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  metodoPago: string;
-  comentarios: string;
-  estado: string;
-  estadoPago?: string;
-}
-
+import { ServiciosService } from '../../services/servicios.service';
+import { DisponibilidadService } from '../../services/disponibilidad.service';
 interface Horario {
   id: number;
   dia: string;
@@ -46,6 +35,7 @@ export class Reservas implements OnInit {
 
   horarios: Horario[] = [];
   serviciosActivos: Servicio[] = [];
+
   reserva = {
     nombre: '',
     telefono: '',
@@ -65,8 +55,11 @@ export class Reservas implements OnInit {
 
   constructor(
   private route: ActivatedRoute,
-  private reservasService: ReservasService
+  private reservasService: ReservasService,
+  private serviciosService: ServiciosService,
+  private disponibilidadService: DisponibilidadService
 ) {}
+
   ngOnInit(): void {
     this.fechaMinima = this.obtenerFechaActual();
     this.cargarHorarios();
@@ -82,9 +75,7 @@ export class Reservas implements OnInit {
   }
 
   cargarHorarios(): void {
-    if (typeof window === 'undefined') {
-      return;
-    }
+  this.horarios = this.disponibilidadService.obtenerHorarios();
 
     const horariosGuardados = localStorage.getItem('maryNailsDisponibilidad');
 
@@ -135,55 +126,8 @@ export class Reservas implements OnInit {
   }
 
   cargarServicios(): void {
-  const serviciosGuardados = localStorage.getItem('maryNailsServicios');
-
-  if (serviciosGuardados) {
-    const servicios: Servicio[] = JSON.parse(serviciosGuardados);
-    this.serviciosActivos = servicios.filter(
-      (servicio) => servicio.estado === 'Activo'
-    );
-    return;
+    this.serviciosActivos = this.serviciosService.obtenerServiciosActivos();
   }
-
-  this.serviciosActivos = [
-    {
-      id: 1,
-      nombre: 'Manicure profesional',
-      descripcion: '',
-      duracion: '45 min',
-      precio: '$25.000',
-      icono: '💅',
-      estado: 'Activo',
-    },
-    {
-      id: 2,
-      nombre: 'Pedicure',
-      descripcion: '',
-      duracion: '60 min',
-      precio: '$30.000',
-      icono: '✨',
-      estado: 'Activo',
-    },
-    {
-      id: 3,
-      nombre: 'Uñas acrílicas',
-      descripcion: '',
-      duracion: '90 min',
-      precio: '$60.000',
-      icono: '🌸',
-      estado: 'Activo',
-    },
-    {
-      id: 4,
-      nombre: 'Diseño personalizado',
-      descripcion: '',
-      duracion: 'Variable',
-      precio: 'Desde $15.000',
-      icono: '🎨',
-      estado: 'Activo',
-    },
-  ];
-}
 
   seleccionarMotivo(event: Event): void {
     const motivo = (event.target as HTMLSelectElement).value;
@@ -260,15 +204,15 @@ export class Reservas implements OnInit {
       return;
     }
 
-   this.reservasService.agregarReserva({
-  nombre: this.reserva.nombre,
-  telefono: this.reserva.telefono,
-  servicio: this.reserva.servicio,
-  fecha: this.reserva.fecha,
-  hora: this.reserva.hora,
-  metodoPago: this.reserva.metodoPago,
-  comentarios: this.reserva.comentarios,
-});
+    this.reservasService.agregarReserva({
+      nombre: this.reserva.nombre,
+      telefono: this.reserva.telefono,
+      servicio: this.reserva.servicio,
+      fecha: this.reserva.fecha,
+      hora: this.reserva.hora,
+      metodoPago: this.reserva.metodoPago,
+      comentarios: this.reserva.comentarios,
+    });
 
     this.mensajeConfirmacion = `Solicitud registrada correctamente. Tu cita quedó pendiente de confirmación para el día ${this.reserva.fecha} a las ${this.reserva.hora}.`;
 
@@ -286,19 +230,10 @@ export class Reservas implements OnInit {
     this.diaHorarioSeleccionado = '';
   }
 
-  obtenerReservasGuardadas(): Reserva[] {
-    const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    return reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
-  }
-
   reservaDuplicada(): boolean {
-    const reservas = this.obtenerReservasGuardadas();
-
-    return reservas.some(
-      (reserva) =>
-        reserva.fecha === this.reserva.fecha &&
-        reserva.hora === this.reserva.hora &&
-        reserva.estado !== 'Cancelada'
+    return this.reservasService.existeReserva(
+      this.reserva.fecha,
+      this.reserva.hora
     );
   }
 

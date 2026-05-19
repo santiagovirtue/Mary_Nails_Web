@@ -2,16 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Servicio {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  duracion: string;
-  precio: string;
-  icono: string;
-  estado: string;
-}
+import {
+  Servicio,
+  ServiciosService,
+} from '../../services/servicios.service';
 
 @Component({
   selector: 'app-servicios-admin',
@@ -23,6 +17,7 @@ export class ServiciosAdmin implements OnInit {
   servicios: Servicio[] = [];
 
   servicio = {
+    id: 0,
     nombre: '',
     descripcion: '',
     duracion: '',
@@ -31,163 +26,124 @@ export class ServiciosAdmin implements OnInit {
     estado: 'Activo',
   };
 
+  editando = false;
   servicioEditandoId: number | null = null;
+
   mensaje = '';
+  mensajeError = '';
+
+  constructor(private serviciosService: ServiciosService) {}
 
   ngOnInit(): void {
     this.cargarServicios();
   }
 
   cargarServicios(): void {
-    const serviciosGuardados = localStorage.getItem('maryNailsServicios');
-
-    if (serviciosGuardados) {
-      this.servicios = JSON.parse(serviciosGuardados);
-      return;
-    }
-
-    this.servicios = [
-      {
-        id: 1,
-        nombre: 'Manicure profesional',
-        descripcion:
-          'Limpieza, cuidado de cutícula, limado y esmaltado para mantener tus manos impecables.',
-        duracion: '45 min',
-        precio: '$25.000',
-        icono: '💅',
-        estado: 'Activo',
-      },
-      {
-        id: 2,
-        nombre: 'Pedicure',
-        descripcion:
-          'Cuidado completo de pies, limpieza, hidratación y esmaltado con acabado profesional.',
-        duracion: '60 min',
-        precio: '$30.000',
-        icono: '✨',
-        estado: 'Activo',
-      },
-      {
-        id: 3,
-        nombre: 'Uñas acrílicas',
-        descripcion:
-          'Extensión y diseño de uñas acrílicas con diferentes estilos, formas y colores.',
-        duracion: '90 min',
-        precio: '$60.000',
-        icono: '🌸',
-        estado: 'Activo',
-      },
-      {
-        id: 4,
-        nombre: 'Diseño personalizado',
-        descripcion:
-          'Decoración artística según el gusto del cliente: colores, detalles, brillos y tendencias.',
-        duracion: 'Variable',
-        precio: 'Desde $15.000',
-        icono: '🎨',
-        estado: 'Activo',
-      },
-    ];
-
-    this.guardarServicios();
+    this.servicios = this.serviciosService.obtenerServicios();
   }
 
-  guardarServicios(): void {
-    localStorage.setItem('maryNailsServicios', JSON.stringify(this.servicios));
+  contarServicios(): number {
+    return this.servicios.length;
+  }
+
+  contarServiciosActivos(): number {
+    return this.servicios.filter(
+      (servicio) => servicio.estado === 'Activo'
+    ).length;
+  }
+
+  contarServiciosInactivos(): number {
+    return this.servicios.filter(
+      (servicio) => servicio.estado === 'Inactivo'
+    ).length;
   }
 
   guardarServicio(): void {
     this.mensaje = '';
+    this.mensajeError = '';
 
-    if (
-      !this.servicio.nombre.trim() ||
-      !this.servicio.descripcion.trim() ||
-      !this.servicio.duracion.trim() ||
-      !this.servicio.precio.trim()
-    ) {
-      this.mensaje = 'Completa todos los campos del servicio.';
+    if (!this.camposValidos()) {
+      this.mensajeError =
+        'Completa todos los campos antes de guardar el servicio.';
       return;
     }
 
-    if (this.servicioEditandoId) {
-      this.servicios = this.servicios.map((item) =>
-        item.id === this.servicioEditandoId
-          ? {
-              ...item,
-              nombre: this.servicio.nombre.trim(),
-              descripcion: this.servicio.descripcion.trim(),
-              duracion: this.servicio.duracion.trim(),
-              precio: this.servicio.precio.trim(),
-              icono: this.servicio.icono,
-              estado: this.servicio.estado,
-            }
-          : item
-      );
-
-      this.mensaje = 'Servicio actualizado correctamente.';
-    } else {
-      const nuevoServicio: Servicio = {
-        id: Date.now(),
+    if (this.editando) {
+      this.serviciosService.actualizarServicio({
+        id: this.servicio.id,
         nombre: this.servicio.nombre.trim(),
         descripcion: this.servicio.descripcion.trim(),
         duracion: this.servicio.duracion.trim(),
         precio: this.servicio.precio.trim(),
         icono: this.servicio.icono,
         estado: this.servicio.estado,
-      };
+      });
 
-      this.servicios.push(nuevoServicio);
+      this.mensaje = 'Servicio actualizado correctamente.';
+    } else {
+      this.serviciosService.agregarServicio({
+        nombre: this.servicio.nombre,
+        descripcion: this.servicio.descripcion,
+        duracion: this.servicio.duracion,
+        precio: this.servicio.precio,
+        icono: this.servicio.icono,
+        estado: this.servicio.estado,
+      });
+
       this.mensaje = 'Servicio agregado correctamente.';
     }
 
-    this.guardarServicios();
+    this.cargarServicios();
     this.limpiarFormulario();
   }
 
   editarServicio(servicio: Servicio): void {
+    this.servicio = { ...servicio };
+    this.editando = true;
     this.servicioEditandoId = servicio.id;
-
-    this.servicio = {
-      nombre: servicio.nombre,
-      descripcion: servicio.descripcion,
-      duracion: servicio.duracion,
-      precio: servicio.precio,
-      icono: servicio.icono,
-      estado: servicio.estado,
-    };
-
     this.mensaje = 'Editando servicio seleccionado.';
+    this.mensajeError = '';
+  }
+
+  cancelarEdicion(): void {
+    this.limpiarFormulario();
+    this.mensaje = '';
+    this.mensajeError = '';
+  }
+
+  cambiarEstadoServicio(id: number): void {
+    this.serviciosService.cambiarEstadoServicio(id);
+    this.cargarServicios();
+    this.mensaje = 'Estado del servicio actualizado correctamente.';
+    this.mensajeError = '';
   }
 
   cambiarEstado(id: number): void {
-    this.servicios = this.servicios.map((servicio) =>
-      servicio.id === id
-        ? {
-            ...servicio,
-            estado: servicio.estado === 'Activo' ? 'Inactivo' : 'Activo',
-          }
-        : servicio
-    );
-
-    this.guardarServicios();
+    this.cambiarEstadoServicio(id);
   }
 
   eliminarServicio(id: number): void {
-  const confirmar = confirm(
-    '¿Seguro que deseas eliminar este servicio? Esta acción no se puede deshacer.'
-  );
+    const confirmar = confirm(
+      '¿Seguro que deseas eliminar este servicio? Esta acción no se puede deshacer.'
+    );
 
-  if (!confirmar) {
-    return;
+    if (!confirmar) {
+      return;
+    }
+
+    this.serviciosService.eliminarServicio(id);
+    this.cargarServicios();
+    this.mensaje = 'Servicio eliminado correctamente.';
+    this.mensajeError = '';
+
+    if (this.servicio.id === id) {
+      this.limpiarFormulario();
+    }
   }
-
-  this.servicios = this.servicios.filter((servicio) => servicio.id !== id);
-  this.guardarServicios();
-  this.mensaje = 'Servicio eliminado correctamente.';
-}
 
   limpiarFormulario(): void {
     this.servicio = {
+      id: 0,
       nombre: '',
       descripcion: '',
       duracion: '',
@@ -196,21 +152,18 @@ export class ServiciosAdmin implements OnInit {
       estado: 'Activo',
     };
 
+    this.editando = false;
     this.servicioEditandoId = null;
   }
 
-  cancelarEdicion(): void {
-    this.limpiarFormulario();
-    this.mensaje = 'Edición cancelada.';
-  }
-
-  contarServiciosActivos(): number {
-    return this.servicios.filter((servicio) => servicio.estado === 'Activo')
-      .length;
-  }
-
-  contarServiciosInactivos(): number {
-    return this.servicios.filter((servicio) => servicio.estado === 'Inactivo')
-      .length;
+  camposValidos(): boolean {
+    return (
+      this.servicio.nombre.trim() !== '' &&
+      this.servicio.descripcion.trim() !== '' &&
+      this.servicio.duracion.trim() !== '' &&
+      this.servicio.precio.trim() !== '' &&
+      this.servicio.icono.trim() !== '' &&
+      this.servicio.estado.trim() !== ''
+    );
   }
 }

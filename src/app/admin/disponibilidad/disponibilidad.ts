@@ -2,19 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Horario {
-  id: number;
-  dia: string;
-  horaInicio: string;
-  horaFinal: string;
-  estado: string;
-  observacion: string;
-}
+import {
+  Horario,
+  DisponibilidadService,
+} from '../../services/disponibilidad.service';
 
 @Component({
   selector: 'app-disponibilidad',
-  imports: [FormsModule, NgFor, NgIf, RouterLink],
+  imports: [NgFor, NgIf, FormsModule, RouterLink],
   templateUrl: './disponibilidad.html',
   styleUrl: './disponibilidad.css',
 })
@@ -22,6 +17,7 @@ export class Disponibilidad implements OnInit {
   horarios: Horario[] = [];
 
   horario = {
+    id: 0,
     dia: '',
     horaInicio: '',
     horaFinal: '',
@@ -29,109 +25,151 @@ export class Disponibilidad implements OnInit {
     observacion: '',
   };
 
+  editando = false;
+  horarioEditandoId: number | null = null;
+
   mensaje = '';
+  mensajeError = '';
+
+  constructor(private disponibilidadService: DisponibilidadService) {}
 
   ngOnInit(): void {
     this.cargarHorarios();
   }
 
   cargarHorarios(): void {
-    const horariosGuardados = localStorage.getItem('maryNailsDisponibilidad');
+    this.horarios = this.disponibilidadService.obtenerHorarios();
+  }
 
-    if (horariosGuardados) {
-      this.horarios = JSON.parse(horariosGuardados);
+  contarHorarios(): number {
+    return this.horarios.length;
+  }
+
+  contarDisponibles(): number {
+    return this.horarios.filter(
+      (horario) => horario.estado === 'Disponible'
+    ).length;
+  }
+
+  contarOcupados(): number {
+    return this.horarios.filter(
+      (horario) => horario.estado === 'Ocupado'
+    ).length;
+  }
+
+  guardarHorario(): void {
+    this.mensaje = '';
+    this.mensajeError = '';
+
+    if (!this.camposValidos()) {
+      this.mensajeError =
+        'Completa todos los campos antes de guardar el horario.';
       return;
     }
 
-    this.horarios = [
-      {
-        id: 1,
-        dia: 'Lunes',
-        horaInicio: '09:00',
-        horaFinal: '12:00',
-        estado: 'Disponible',
-        observacion: 'Horario disponible para reservas.',
-      },
-      {
-        id: 2,
-        dia: 'Miércoles',
-        horaInicio: '14:00',
-        horaFinal: '17:00',
-        estado: 'Disponible',
-        observacion: 'Horario disponible para reservas.',
-      },
-      {
-        id: 3,
-        dia: 'Viernes',
-        horaInicio: '10:00',
-        horaFinal: '13:00',
-        estado: 'Ocupado',
-        observacion: 'Horario reservado.',
-      },
-      {
-        id: 4,
-        dia: 'Sábado',
-        horaInicio: '08:00',
-        horaFinal: '11:00',
-        estado: 'Disponible',
-        observacion: 'Horario disponible para reservas.',
-      },
-    ];
-
-    this.guardarHorarios();
-  }
-
-  guardarHorarios(): void {
-    localStorage.setItem('maryNailsDisponibilidad', JSON.stringify(this.horarios));
-  }
-
-  agregarHorario(): void {
-    if (!this.horario.dia || !this.horario.horaInicio || !this.horario.horaFinal) {
-      this.mensaje = 'Completa el día, la hora inicial y la hora final.';
+    if (this.horario.horaInicio >= this.horario.horaFinal) {
+      this.mensajeError =
+        'La hora inicial debe ser menor que la hora final.';
       return;
     }
 
-    const nuevoHorario: Horario = {
-      id: Date.now(),
-      dia: this.horario.dia,
-      horaInicio: this.horario.horaInicio,
-      horaFinal: this.horario.horaFinal,
-      estado: this.horario.estado,
-      observacion: this.horario.observacion || 'Sin observación.',
-    };
+    if (this.editando) {
+      this.disponibilidadService.actualizarHorario({
+        id: this.horario.id,
+        dia: this.horario.dia,
+        horaInicio: this.horario.horaInicio,
+        horaFinal: this.horario.horaFinal,
+        estado: this.horario.estado,
+        observacion: this.horario.observacion.trim(),
+      });
 
-    this.horarios.push(nuevoHorario);
-    this.guardarHorarios();
+      this.mensaje = 'Horario actualizado correctamente.';
+    } else {
+      this.disponibilidadService.agregarHorario({
+        dia: this.horario.dia,
+        horaInicio: this.horario.horaInicio,
+        horaFinal: this.horario.horaFinal,
+        estado: this.horario.estado,
+        observacion: this.horario.observacion,
+      });
 
-    this.mensaje = 'Horario agregado correctamente. Ya puede verse en reservas.';
+      this.mensaje = 'Horario agregado correctamente.';
+    }
 
+    this.cargarHorarios();
+    this.limpiarFormulario();
+  }
+
+   agregarHorario(): void {
+  this.guardarHorario();
+}
+
+  editarHorario(horario: Horario): void {
+    this.horario = { ...horario };
+    this.editando = true;
+    this.horarioEditandoId = horario.id;
+    this.mensaje = 'Editando horario seleccionado.';
+    this.mensajeError = '';
+  }
+
+  cancelarEdicion(): void {
+    this.limpiarFormulario();
+    this.mensaje = '';
+    this.mensajeError = '';
+  }
+
+  cambiarEstado(id: number): void {
+    this.disponibilidadService.cambiarEstadoHorario(id);
+    this.cargarHorarios();
+    this.mensaje = 'Estado del horario actualizado correctamente.';
+    this.mensajeError = '';
+  }
+
+  cambiarEstadoHorario(id: number): void {
+    this.cambiarEstado(id);
+  }
+
+  eliminarHorario(id: number): void {
+    const confirmar = confirm(
+      '¿Seguro que deseas eliminar este horario? Esta acción no se puede deshacer.'
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    this.disponibilidadService.eliminarHorario(id);
+    this.cargarHorarios();
+    this.mensaje = 'Horario eliminado correctamente.';
+    this.mensajeError = '';
+
+    if (this.horario.id === id) {
+      this.limpiarFormulario();
+    }
+  }
+
+  limpiarFormulario(): void {
     this.horario = {
+      id: 0,
       dia: '',
       horaInicio: '',
       horaFinal: '',
       estado: 'Disponible',
       observacion: '',
     };
+
+    this.editando = false;
+    this.horarioEditandoId = null;
   }
 
-  cambiarEstado(id: number): void {
-    this.horarios = this.horarios.map((horario) => {
-      if (horario.id === id) {
-        return {
-          ...horario,
-          estado: horario.estado === 'Disponible' ? 'Ocupado' : 'Disponible',
-        };
-      }
-
-      return horario;
-    });
-
-    this.guardarHorarios();
-  }
-
-  eliminarHorario(id: number): void {
-    this.horarios = this.horarios.filter((horario) => horario.id !== id);
-    this.guardarHorarios();
+  camposValidos(): boolean {
+    return (
+      this.horario.dia.trim() !== '' &&
+      this.horario.horaInicio.trim() !== '' &&
+      this.horario.horaFinal.trim() !== '' &&
+      this.horario.estado.trim() !== '' &&
+      this.horario.observacion.trim() !== ''
+    );
   }
 
   formatearHora(hora: string): string {

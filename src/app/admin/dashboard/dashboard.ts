@@ -1,29 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
+
 import { Reserva, ReservasService } from '../../services/reservas.service';
-
-interface Calificacion {
-  id: number;
-  idCita?: number;
-  cliente?: string;
-  servicio: string;
-  fechaCita?: string;
-  horaCita?: string;
-  puntuacion: number;
-  comentario: string;
-  fecha: string;
-}
-
-interface Servicio {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  duracion: string;
-  precio: string;
-  icono: string;
-  estado: string;
-}
+import {
+  Calificacion,
+  CalificacionesService,
+} from '../../services/calificaciones.service';
+import { Servicio, ServiciosService } from '../../services/servicios.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,78 +20,20 @@ export class Dashboard implements OnInit {
   calificaciones: Calificacion[] = [];
   servicios: Servicio[] = [];
 
-  constructor(private reservasService: ReservasService) {}
+  constructor(
+    private reservasService: ReservasService,
+    private calificacionesService: CalificacionesService,
+    private serviciosService: ServiciosService
+  ) {}
 
   ngOnInit(): void {
-    this.cargarReservas();
-    this.cargarCalificaciones();
-    this.cargarServicios();
+    this.cargarDatos();
   }
 
-  cargarReservas(): void {
+  cargarDatos(): void {
     this.reservas = this.reservasService.obtenerReservas();
-  }
-
-  cargarCalificaciones(): void {
-    const calificacionesGuardadas = localStorage.getItem('maryNailsCalificaciones');
-
-    this.calificaciones = calificacionesGuardadas
-      ? JSON.parse(calificacionesGuardadas)
-      : [];
-  }
-
-  cargarServicios(): void {
-    const serviciosGuardados = localStorage.getItem('maryNailsServicios');
-
-    if (serviciosGuardados) {
-      this.servicios = JSON.parse(serviciosGuardados);
-      return;
-    }
-
-    this.servicios = [
-      {
-        id: 1,
-        nombre: 'Manicure profesional',
-        descripcion:
-          'Limpieza, cuidado de cutícula, limado y esmaltado para mantener tus manos impecables.',
-        duracion: '45 min',
-        precio: '$25.000',
-        icono: '💅',
-        estado: 'Activo',
-      },
-      {
-        id: 2,
-        nombre: 'Pedicure',
-        descripcion:
-          'Cuidado completo de pies, limpieza, hidratación y esmaltado con acabado profesional.',
-        duracion: '60 min',
-        precio: '$30.000',
-        icono: '✨',
-        estado: 'Activo',
-      },
-      {
-        id: 3,
-        nombre: 'Uñas acrílicas',
-        descripcion:
-          'Extensión y diseño de uñas acrílicas con diferentes estilos, formas y colores.',
-        duracion: '90 min',
-        precio: '$60.000',
-        icono: '🌸',
-        estado: 'Activo',
-      },
-      {
-        id: 4,
-        nombre: 'Diseño personalizado',
-        descripcion:
-          'Decoración artística según el gusto del cliente: colores, detalles, brillos y tendencias.',
-        duracion: 'Variable',
-        precio: 'Desde $15.000',
-        icono: '🎨',
-        estado: 'Activo',
-      },
-    ];
-
-    localStorage.setItem('maryNailsServicios', JSON.stringify(this.servicios));
+    this.calificaciones = this.calificacionesService.obtenerCalificaciones();
+    this.servicios = this.serviciosService.obtenerServicios();
   }
 
   obtenerFechaHoy(): string {
@@ -116,6 +42,7 @@ export class Dashboard implements OnInit {
 
   contarCitasHoy(): number {
     const hoy = this.obtenerFechaHoy();
+
     return this.reservas.filter((reserva) => reserva.fecha === hoy).length;
   }
 
@@ -124,11 +51,11 @@ export class Dashboard implements OnInit {
   }
 
   contarServiciosActivos(): number {
-    return this.servicios.filter((servicio) => servicio.estado === 'Activo').length;
+    return this.serviciosService.contarServiciosActivos();
   }
 
   contarServiciosInactivos(): number {
-    return this.servicios.filter((servicio) => servicio.estado === 'Inactivo').length;
+    return this.serviciosService.contarServiciosInactivos();
   }
 
   contarPagosPendientes(): number {
@@ -136,20 +63,11 @@ export class Dashboard implements OnInit {
   }
 
   contarCalificaciones(): number {
-    return this.calificaciones.length;
+    return this.calificacionesService.contarCalificaciones();
   }
 
   obtenerPromedioCalificaciones(): string {
-    if (this.calificaciones.length === 0) {
-      return '0.0';
-    }
-
-    const suma = this.calificaciones.reduce(
-      (total, calificacion) => total + calificacion.puntuacion,
-      0
-    );
-
-    return (suma / this.calificaciones.length).toFixed(1);
+    return this.calificacionesService.obtenerPromedio();
   }
 
   obtenerProximasCitas(): Reserva[] {
@@ -164,8 +82,6 @@ export class Dashboard implements OnInit {
   }
 
   obtenerUltimasCalificaciones(): Calificacion[] {
-    return [...this.calificaciones]
-      .sort((a, b) => b.id - a.id)
-      .slice(0, 4);
+    return this.calificacionesService.obtenerUltimasCalificaciones(4);
   }
 }
