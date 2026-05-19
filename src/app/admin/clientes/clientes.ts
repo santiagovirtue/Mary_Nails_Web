@@ -2,19 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Reserva {
-  id: number;
-  nombre: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  metodoPago: string;
-  comentarios: string;
-  estado: string;
-  estadoPago?: string;
-}
+import { Reserva, ReservasService } from '../../services/reservas.service';
 
 interface Cliente {
   nombre: string;
@@ -42,19 +30,15 @@ export class Clientes implements OnInit {
   busqueda = '';
   clienteExpandido = '';
 
+  constructor(private reservasService: ReservasService) {}
+
   ngOnInit(): void {
     this.cargarReservas();
     this.generarClientes();
   }
 
   cargarReservas(): void {
-    const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    const reservas: Reserva[] = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
-
-    this.reservas = reservas.map((reserva) => ({
-      ...reserva,
-      estadoPago: reserva.estadoPago || 'Pendiente',
-    }));
+    this.reservas = this.reservasService.obtenerReservas();
   }
 
   generarClientes(): void {
@@ -121,8 +105,8 @@ export class Clientes implements OnInit {
   }
 
   obtenerReservasCliente(telefono: string): Reserva[] {
-    return this.reservas
-      .filter((reserva) => reserva.telefono.trim() === telefono)
+    return this.reservasService
+      .obtenerReservasPorTelefono(telefono)
       .sort((a, b) => b.fecha.localeCompare(a.fecha));
   }
 

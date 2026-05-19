@@ -2,18 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Calificacion {
-  id: number;
-  idCita?: number;
-  cliente?: string;
-  servicio: string;
-  fechaCita?: string;
-  horaCita?: string;
-  puntuacion: number;
-  comentario: string;
-  fecha: string;
-}
+import {
+  Calificacion,
+  CalificacionesService,
+} from '../../services/calificaciones.service';
 
 @Component({
   selector: 'app-calificaciones',
@@ -26,31 +18,26 @@ export class Calificaciones implements OnInit {
 
   busqueda = '';
   filtroPuntuacion = 'Todas';
+  mensaje = '';
+
+  constructor(private calificacionesService: CalificacionesService) {}
 
   ngOnInit(): void {
     this.cargarCalificaciones();
   }
 
   cargarCalificaciones(): void {
-    const calificacionesGuardadas = localStorage.getItem('maryNailsCalificaciones');
-
-    this.calificaciones = calificacionesGuardadas
-      ? JSON.parse(calificacionesGuardadas)
-      : [];
+    this.calificaciones = this.calificacionesService.obtenerCalificaciones();
   }
 
   obtenerCalificacionesFiltradas(): Calificacion[] {
     const texto = this.busqueda.toLowerCase().trim();
 
     return this.calificaciones.filter((calificacion) => {
-      const cliente = calificacion.cliente || 'Cliente no registrado';
-      const servicio = calificacion.servicio || '';
-      const comentario = calificacion.comentario || '';
-
       const coincideBusqueda =
-        cliente.toLowerCase().includes(texto) ||
-        servicio.toLowerCase().includes(texto) ||
-        comentario.toLowerCase().includes(texto);
+        calificacion.servicio.toLowerCase().includes(texto) ||
+        calificacion.comentario.toLowerCase().includes(texto) ||
+        (calificacion.cliente || '').toLowerCase().includes(texto);
 
       const coincidePuntuacion =
         this.filtroPuntuacion === 'Todas' ||
@@ -60,50 +47,44 @@ export class Calificaciones implements OnInit {
     });
   }
 
-  obtenerPromedio(): string {
-    if (this.calificaciones.length === 0) {
-      return '0.0';
-    }
-
-    const suma = this.calificaciones.reduce(
-      (total, calificacion) => total + calificacion.puntuacion,
-      0
-    );
-
-    return (suma / this.calificaciones.length).toFixed(1);
-  }
-
-  contarCalificaciones(): number {
+  contarTotal(): number {
     return this.calificaciones.length;
   }
+  
+  contarCalificaciones(): number {
+  return this.calificaciones.length;
+}
+  obtenerPromedio(): string {
+    return this.calificacionesService.obtenerPromedio();
+  }
 
-  contarPorPuntuacion(puntuacion: number): number {
+  contarCincoEstrellas(): number {
     return this.calificaciones.filter(
-      (calificacion) => calificacion.puntuacion === puntuacion
+      (calificacion) => calificacion.puntuacion === 5
     ).length;
+  }
+   contarPorPuntuacion(puntuacion: number): number {
+  return this.calificaciones.filter(
+    (calificacion) => calificacion.puntuacion === puntuacion
+  ).length;
+   }
+
+  eliminarCalificacion(id: number): void {
+    const confirmar = confirm(
+      '¿Seguro que deseas eliminar esta calificación? Esta acción no se puede deshacer.'
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    this.calificacionesService.eliminarCalificacion(id);
+    this.cargarCalificaciones();
+    this.mensaje = 'Calificación eliminada correctamente.';
   }
 
   limpiarFiltros(): void {
     this.busqueda = '';
     this.filtroPuntuacion = 'Todas';
   }
-
-eliminarCalificacion(id: number): void {
-  const confirmar = confirm(
-    '¿Seguro que deseas eliminar esta calificación? Esta acción no se puede deshacer.'
-  );
-
-  if (!confirmar) {
-    return;
-  }
-
-  this.calificaciones = this.calificaciones.filter(
-    (calificacion) => calificacion.id !== id
-  );
-
-  localStorage.setItem(
-    'maryNailsCalificaciones',
-    JSON.stringify(this.calificaciones)
-  );
-}
 }

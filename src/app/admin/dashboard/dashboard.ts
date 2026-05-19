@@ -1,19 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
-
-interface Reserva {
-  id: number;
-  nombre: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  metodoPago: string;
-  comentarios: string;
-  estado: string;
-  estadoPago?: string;
-}
+import { Reserva, ReservasService } from '../../services/reservas.service';
 
 interface Calificacion {
   id: number;
@@ -48,6 +36,8 @@ export class Dashboard implements OnInit {
   calificaciones: Calificacion[] = [];
   servicios: Servicio[] = [];
 
+  constructor(private reservasService: ReservasService) {}
+
   ngOnInit(): void {
     this.cargarReservas();
     this.cargarCalificaciones();
@@ -55,12 +45,12 @@ export class Dashboard implements OnInit {
   }
 
   cargarReservas(): void {
-    const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    this.reservas = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
+    this.reservas = this.reservasService.obtenerReservas();
   }
 
   cargarCalificaciones(): void {
     const calificacionesGuardadas = localStorage.getItem('maryNailsCalificaciones');
+
     this.calificaciones = calificacionesGuardadas
       ? JSON.parse(calificacionesGuardadas)
       : [];
@@ -130,13 +120,7 @@ export class Dashboard implements OnInit {
   }
 
   contarClientes(): number {
-    const telefonosUnicos = new Set(
-      this.reservas
-        .map((reserva) => reserva.telefono)
-        .filter((telefono) => telefono.trim() !== '')
-    );
-
-    return telefonosUnicos.size;
+    return this.reservasService.contarClientesUnicos();
   }
 
   contarServiciosActivos(): number {
@@ -147,9 +131,9 @@ export class Dashboard implements OnInit {
     return this.servicios.filter((servicio) => servicio.estado === 'Inactivo').length;
   }
 
-   contarPagosPendientes(): number {
-  return this.reservas.filter((reserva) => reserva.estadoPago !== 'Pagado').length;
-   }
+  contarPagosPendientes(): number {
+    return this.reservasService.contarPagosPendientes();
+  }
 
   contarCalificaciones(): number {
     return this.calificaciones.length;

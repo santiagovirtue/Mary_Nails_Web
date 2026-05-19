@@ -2,19 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Reserva {
-  id: number;
-  nombre: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  metodoPago: string;
-  comentarios: string;
-  estado: string;
-  estadoPago?: string;
-}
+import { Reserva, ReservasService } from '../../services/reservas.service';
 
 interface Calificacion {
   id: number;
@@ -52,18 +40,20 @@ export class Reportes implements OnInit {
   fechaInicio = '';
   fechaFin = '';
 
+  constructor(private reservasService: ReservasService) {}
+
   ngOnInit(): void {
     this.cargarDatos();
   }
 
   cargarDatos(): void {
-    const reservasGuardadas = localStorage.getItem('maryNailsReservas');
+    this.reservas = this.reservasService.obtenerReservas();
+
     const calificacionesGuardadas = localStorage.getItem(
       'maryNailsCalificaciones'
     );
-    const serviciosGuardados = localStorage.getItem('maryNailsServicios');
 
-    this.reservas = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
+    const serviciosGuardados = localStorage.getItem('maryNailsServicios');
 
     this.calificaciones = calificacionesGuardadas
       ? JSON.parse(calificacionesGuardadas)
@@ -89,8 +79,7 @@ export class Reportes implements OnInit {
       const cumpleInicio =
         !this.fechaInicio || reserva.fecha >= this.fechaInicio;
 
-      const cumpleFin =
-        !this.fechaFin || reserva.fecha <= this.fechaFin;
+      const cumpleFin = !this.fechaFin || reserva.fecha <= this.fechaFin;
 
       return cumpleInicio && cumpleFin;
     });
@@ -213,9 +202,10 @@ export class Reportes implements OnInit {
     return Array.from(contador.entries()).map(([metodo, total]) => ({
       metodo,
       total,
-    })); 
+    }));
   }
+
   imprimirReporte(): void {
-  window.print();
-   }
+    window.print();
+  }
 }

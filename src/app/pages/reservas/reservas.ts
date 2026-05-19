@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-
+import { ReservasService } from '../../services/reservas.service';
 interface Reserva {
   id: number;
   nombre: string;
@@ -63,8 +63,10 @@ export class Reservas implements OnInit {
   mensajeWhatsapp = 'Hola, quiero reservar una cita en Mary Nails.';
   fechaMinima = '';
 
-  constructor(private route: ActivatedRoute) {}
-
+  constructor(
+  private route: ActivatedRoute,
+  private reservasService: ReservasService
+) {}
   ngOnInit(): void {
     this.fechaMinima = this.obtenerFechaActual();
     this.cargarHorarios();
@@ -258,23 +260,15 @@ export class Reservas implements OnInit {
       return;
     }
 
-    const nuevaReserva: Reserva = {
-      id: Date.now(),
-      nombre: this.reserva.nombre.trim(),
-      telefono: this.reserva.telefono.trim(),
-      servicio: this.reserva.servicio,
-      fecha: this.reserva.fecha,
-      hora: this.reserva.hora,
-      metodoPago: this.reserva.metodoPago,
-      comentarios: this.reserva.comentarios.trim(),
-      estado: 'Pendiente',
-    };
-
-    const reservas = this.obtenerReservasGuardadas();
-
-    reservas.push(nuevaReserva);
-
-    localStorage.setItem('maryNailsReservas', JSON.stringify(reservas));
+   this.reservasService.agregarReserva({
+  nombre: this.reserva.nombre,
+  telefono: this.reserva.telefono,
+  servicio: this.reserva.servicio,
+  fecha: this.reserva.fecha,
+  hora: this.reserva.hora,
+  metodoPago: this.reserva.metodoPago,
+  comentarios: this.reserva.comentarios,
+});
 
     this.mensajeConfirmacion = `Solicitud registrada correctamente. Tu cita quedó pendiente de confirmación para el día ${this.reserva.fecha} a las ${this.reserva.hora}.`;
 

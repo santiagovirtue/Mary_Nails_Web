@@ -1,30 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface Reserva {
-  id: number;
-  nombre: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  metodoPago: string;
-  comentarios: string;
-  estado: string;
-}
-
-interface Calificacion {
-  id: number;
-  idCita: number;
-  cliente: string;
-  servicio: string;
-  fechaCita: string;
-  horaCita: string;
-  puntuacion: number;
-  comentario: string;
-  fecha: string;
-}
+import { Reserva, ReservasService } from '../../services/reservas.service';
+import { CalificacionesService } from '../../services/calificaciones.service';
 
 @Component({
   selector: 'app-calificar-servicio',
@@ -36,7 +14,6 @@ export class CalificarServicio implements OnInit {
   estrellas = [1, 2, 3, 4, 5];
 
   reservasCompletadas: Reserva[] = [];
-  calificaciones: Calificacion[] = [];
 
   calificacion = {
     idCita: 0,
@@ -47,31 +24,22 @@ export class CalificarServicio implements OnInit {
   mensajeExito = '';
   mensajeError = '';
 
+  constructor(
+    private reservasService: ReservasService,
+    private calificacionesService: CalificacionesService
+  ) {}
+
   ngOnInit(): void {
     this.cargarDatos();
   }
 
   cargarDatos(): void {
-    const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    const calificacionesGuardadas = localStorage.getItem('maryNailsCalificaciones');
-
-    const reservas: Reserva[] = reservasGuardadas
-      ? JSON.parse(reservasGuardadas)
-      : [];
-
-    this.calificaciones = calificacionesGuardadas
-      ? JSON.parse(calificacionesGuardadas)
-      : [];
+    const reservas = this.reservasService.obtenerReservas();
 
     this.reservasCompletadas = reservas.filter(
       (reserva) =>
-        reserva.estado === 'Completada' && !this.yaFueCalificada(reserva.id)
-    );
-  }
-
-  yaFueCalificada(idCita: number): boolean {
-    return this.calificaciones.some(
-      (calificacion) => calificacion.idCita === idCita
+        reserva.estado === 'Completada' &&
+        !this.calificacionesService.yaExisteCalificacionParaCita(reserva.id)
     );
   }
 
@@ -119,8 +87,7 @@ export class CalificarServicio implements OnInit {
       return;
     }
 
-    const nuevaCalificacion: Calificacion = {
-      id: Date.now(),
+    this.calificacionesService.agregarCalificacion({
       idCita: reservaSeleccionada.id,
       cliente: reservaSeleccionada.nombre,
       servicio: reservaSeleccionada.servicio,
@@ -128,15 +95,7 @@ export class CalificarServicio implements OnInit {
       horaCita: reservaSeleccionada.hora,
       puntuacion: this.calificacion.puntuacion,
       comentario: this.calificacion.comentario,
-      fecha: new Date().toISOString().slice(0, 10),
-    };
-
-    this.calificaciones.push(nuevaCalificacion);
-
-    localStorage.setItem(
-      'maryNailsCalificaciones',
-      JSON.stringify(this.calificaciones)
-    );
+    });
 
     this.mensajeExito =
       'Calificación enviada correctamente. Gracias por compartir tu experiencia.';

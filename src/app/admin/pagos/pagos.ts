@@ -2,19 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Reserva {
-  id: number;
-  nombre: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  metodoPago: string;
-  comentarios: string;
-  estado: string;
-  estadoPago?: string;
-}
+import { Reserva, ReservasService } from '../../services/reservas.service';
 
 @Component({
   selector: 'app-pagos',
@@ -29,24 +17,14 @@ export class Pagos implements OnInit {
   busqueda = '';
   mensaje = '';
 
+  constructor(private reservasService: ReservasService) {}
+
   ngOnInit(): void {
     this.cargarReservas();
   }
 
   cargarReservas(): void {
-    const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    const reservas: Reserva[] = reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
-
-    this.reservas = reservas.map((reserva) => ({
-      ...reserva,
-      estadoPago: reserva.estadoPago || 'Pendiente',
-    }));
-
-    this.guardarReservas();
-  }
-
-  guardarReservas(): void {
-    localStorage.setItem('maryNailsReservas', JSON.stringify(this.reservas));
+    this.reservas = this.reservasService.obtenerReservas();
   }
 
   obtenerPagosFiltrados(): Reserva[] {
@@ -79,20 +57,14 @@ export class Pagos implements OnInit {
   }
 
   marcarComoPagado(id: number): void {
-    this.reservas = this.reservas.map((reserva) =>
-      reserva.id === id ? { ...reserva, estadoPago: 'Pagado' } : reserva
-    );
-
-    this.guardarReservas();
+    this.reservasService.actualizarEstadoPago(id, 'Pagado');
+    this.cargarReservas();
     this.mensaje = 'Pago marcado como pagado correctamente.';
   }
 
   marcarComoPendiente(id: number): void {
-    this.reservas = this.reservas.map((reserva) =>
-      reserva.id === id ? { ...reserva, estadoPago: 'Pendiente' } : reserva
-    );
-
-    this.guardarReservas();
+    this.reservasService.actualizarEstadoPago(id, 'Pendiente');
+    this.cargarReservas();
     this.mensaje = 'Pago marcado como pendiente correctamente.';
   }
 

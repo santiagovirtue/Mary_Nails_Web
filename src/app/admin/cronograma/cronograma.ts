@@ -2,19 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Reserva {
-  id: number;
-  nombre: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  metodoPago: string;
-  comentarios: string;
-  estado: string;
-  estadoPago?: string;
-}
+import { Reserva, ReservasService } from '../../services/reservas.service';
 
 @Component({
   selector: 'app-cronograma',
@@ -29,30 +17,14 @@ export class Cronograma implements OnInit {
   filtroEstado = 'Todas';
   mensaje = '';
 
+  constructor(private reservasService: ReservasService) {}
+
   ngOnInit(): void {
     this.cargarReservas();
   }
 
   cargarReservas(): void {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    const reservas: Reserva[] = reservasGuardadas
-      ? JSON.parse(reservasGuardadas)
-      : [];
-
-    this.reservas = reservas.map((reserva) => ({
-      ...reserva,
-      estadoPago: reserva.estadoPago || 'Pendiente',
-    }));
-
-    this.guardarReservas();
-  }
-
-  guardarReservas(): void {
-    localStorage.setItem('maryNailsReservas', JSON.stringify(this.reservas));
+    this.reservas = this.reservasService.obtenerReservas();
   }
 
   obtenerReservasFiltradas(): Reserva[] {
@@ -65,7 +37,7 @@ export class Cronograma implements OnInit {
         reserva.servicio.toLowerCase().includes(texto) ||
         reserva.metodoPago.toLowerCase().includes(texto) ||
         reserva.estado.toLowerCase().includes(texto) ||
-        (reserva.estadoPago || 'Pendiente').toLowerCase().includes(texto);
+        reserva.estadoPago.toLowerCase().includes(texto);
 
       const coincideEstado =
         this.filtroEstado === 'Todas' || reserva.estado === this.filtroEstado;
@@ -99,53 +71,44 @@ export class Cronograma implements OnInit {
   }
 
   confirmarReserva(id: number): void {
-    this.reservas = this.reservas.map((reserva) =>
-      reserva.id === id ? { ...reserva, estado: 'Confirmada' } : reserva
-    );
-
-    this.guardarReservas();
+    this.reservasService.actualizarEstadoCita(id, 'Confirmada');
+    this.cargarReservas();
     this.mensaje = 'La reserva fue confirmada correctamente.';
   }
 
   completarReserva(id: number): void {
-    this.reservas = this.reservas.map((reserva) =>
-      reserva.id === id ? { ...reserva, estado: 'Completada' } : reserva
-    );
-
-    this.guardarReservas();
+    this.reservasService.actualizarEstadoCita(id, 'Completada');
+    this.cargarReservas();
     this.mensaje = 'La reserva fue marcada como completada.';
   }
 
- cancelarReserva(id: number): void {
-  const confirmar = confirm(
-    '¿Seguro que deseas cancelar esta reserva? El estado cambiará a Cancelada.'
-  );
+  cancelarReserva(id: number): void {
+    const confirmar = confirm(
+      '¿Seguro que deseas cancelar esta reserva? El estado cambiará a Cancelada.'
+    );
 
-  if (!confirmar) {
-    return;
+    if (!confirmar) {
+      return;
+    }
+
+    this.reservasService.actualizarEstadoCita(id, 'Cancelada');
+    this.cargarReservas();
+    this.mensaje = 'La reserva fue cancelada correctamente.';
   }
 
-  this.reservas = this.reservas.map((reserva) =>
-    reserva.id === id ? { ...reserva, estado: 'Cancelada' } : reserva
-  );
+  eliminarReserva(id: number): void {
+    const confirmar = confirm(
+      '¿Seguro que deseas eliminar esta reserva? Esta acción no se puede deshacer.'
+    );
 
-  this.guardarReservas();
-  this.mensaje = 'La reserva fue cancelada correctamente.';
-}
+    if (!confirmar) {
+      return;
+    }
 
- eliminarReserva(id: number): void {
-  const confirmar = confirm(
-    '¿Seguro que deseas eliminar esta reserva? Esta acción no se puede deshacer.'
-  );
-
-  if (!confirmar) {
-    return;
+    this.reservasService.eliminarReserva(id);
+    this.cargarReservas();
+    this.mensaje = 'La reserva fue eliminada correctamente.';
   }
-
-  this.reservas = this.reservas.filter((reserva) => reserva.id !== id);
-  this.guardarReservas();
-  this.mensaje = 'La reserva fue eliminada correctamente.';
-}
 
   limpiarFiltros(): void {
     this.busqueda = '';

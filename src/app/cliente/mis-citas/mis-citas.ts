@@ -2,19 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-
-interface Reserva {
-  id: number;
-  nombre: string;
-  telefono: string;
-  servicio: string;
-  fecha: string;
-  hora: string;
-  metodoPago: string;
-  comentarios: string;
-  estado: string;
-  estadoPago?: string;
-}
+import { Reserva, ReservasService } from '../../services/reservas.service';
 
 @Component({
   selector: 'app-mis-citas',
@@ -27,24 +15,14 @@ export class MisCitas implements OnInit {
   filtroEstado = 'Todas';
   busqueda = '';
 
+  constructor(private reservasService: ReservasService) {}
+
   ngOnInit(): void {
     this.cargarReservas();
   }
 
   cargarReservas(): void {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const reservasGuardadas = localStorage.getItem('maryNailsReservas');
-    const reservas: Reserva[] = reservasGuardadas
-      ? JSON.parse(reservasGuardadas)
-      : [];
-
-    this.reservas = reservas.map((reserva) => ({
-      ...reserva,
-      estadoPago: reserva.estadoPago || 'Pendiente',
-    }));
+    this.reservas = this.reservasService.obtenerReservas();
   }
 
   contarActivas(): number {
@@ -84,7 +62,7 @@ export class MisCitas implements OnInit {
         reserva.fecha.toLowerCase().includes(texto) ||
         reserva.hora.toLowerCase().includes(texto) ||
         reserva.metodoPago.toLowerCase().includes(texto) ||
-        (reserva.estadoPago || 'Pendiente').toLowerCase().includes(texto);
+        reserva.estadoPago.toLowerCase().includes(texto);
 
       return coincideEstado && coincideBusqueda;
     });
@@ -94,23 +72,17 @@ export class MisCitas implements OnInit {
     this.filtroEstado = 'Todas';
     this.busqueda = '';
   }
-  guardarReservas(): void {
-  localStorage.setItem('maryNailsReservas', JSON.stringify(this.reservas));
-}
 
-cancelarCita(id: number): void {
-  const confirmar = confirm(
-    '¿Seguro que deseas cancelar esta cita? Esta acción cambiará el estado de la reserva a Cancelada.'
-  );
+  cancelarCita(id: number): void {
+    const confirmar = confirm(
+      '¿Seguro que deseas cancelar esta cita? Esta acción cambiará el estado de la reserva a Cancelada.'
+    );
 
-  if (!confirmar) {
-    return;
+    if (!confirmar) {
+      return;
+    }
+
+    this.reservasService.actualizarEstadoCita(id, 'Cancelada');
+    this.cargarReservas();
   }
-
-  this.reservas = this.reservas.map((reserva) =>
-    reserva.id === id ? { ...reserva, estado: 'Cancelada' } : reserva
-  );
-
-  this.guardarReservas();
-}
 }
