@@ -2,27 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { ReservasService } from '../../services/reservas.service';
-import { ServiciosService } from '../../services/servicios.service';
-import { DisponibilidadService } from '../../services/disponibilidad.service';
-interface Horario {
-  id: number;
-  dia: string;
-  horaInicio: string;
-  horaFinal: string;
-  estado: string;
-  observacion: string;
-}
 
-interface Servicio {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  duracion: string;
-  precio: string;
-  icono: string;
-  estado: string;
-}
+import { ReservasService } from '../../services/reservas.service';
+import { ServiciosService, Servicio } from '../../services/servicios.service';
+import {
+  DisponibilidadService,
+  Horario,
+} from '../../services/disponibilidad.service';
 
 @Component({
   selector: 'app-reservas',
@@ -54,11 +40,11 @@ export class Reservas implements OnInit {
   fechaMinima = '';
 
   constructor(
-  private route: ActivatedRoute,
-  private reservasService: ReservasService,
-  private serviciosService: ServiciosService,
-  private disponibilidadService: DisponibilidadService
-) {}
+    private route: ActivatedRoute,
+    private reservasService: ReservasService,
+    private serviciosService: ServiciosService,
+    private disponibilidadService: DisponibilidadService
+  ) {}
 
   ngOnInit(): void {
     this.fechaMinima = this.obtenerFechaActual();
@@ -75,54 +61,7 @@ export class Reservas implements OnInit {
   }
 
   cargarHorarios(): void {
-  this.horarios = this.disponibilidadService.obtenerHorarios();
-
-    const horariosGuardados = localStorage.getItem('maryNailsDisponibilidad');
-
-    if (horariosGuardados) {
-      this.horarios = JSON.parse(horariosGuardados);
-      return;
-    }
-
-    this.horarios = [
-      {
-        id: 1,
-        dia: 'Lunes',
-        horaInicio: '09:00',
-        horaFinal: '12:00',
-        estado: 'Disponible',
-        observacion: 'Horario disponible para reservas.',
-      },
-      {
-        id: 2,
-        dia: 'Miércoles',
-        horaInicio: '14:00',
-        horaFinal: '17:00',
-        estado: 'Disponible',
-        observacion: 'Horario disponible para reservas.',
-      },
-      {
-        id: 3,
-        dia: 'Viernes',
-        horaInicio: '10:00',
-        horaFinal: '13:00',
-        estado: 'Ocupado',
-        observacion: 'Horario reservado.',
-      },
-      {
-        id: 4,
-        dia: 'Sábado',
-        horaInicio: '08:00',
-        horaFinal: '11:00',
-        estado: 'Disponible',
-        observacion: 'Horario disponible para reservas.',
-      },
-    ];
-
-    localStorage.setItem(
-      'maryNailsDisponibilidad',
-      JSON.stringify(this.horarios)
-    );
+    this.horarios = this.disponibilidadService.obtenerHorarios();
   }
 
   cargarServicios(): void {

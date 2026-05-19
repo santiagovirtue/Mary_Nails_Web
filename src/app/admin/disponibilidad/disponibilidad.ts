@@ -2,10 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import {
-  Horario,
-  DisponibilidadService,
-} from '../../services/disponibilidad.service';
+import {Horario,DisponibilidadService,} from '../../services/disponibilidad.service';
 
 @Component({
   selector: 'app-disponibilidad',
