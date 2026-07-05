@@ -1,18 +1,18 @@
-.schedule-page {
+.cronograma-page {
   min-height: 100vh;
   padding: 80px 6%;
   background: linear-gradient(135deg, #fff7fb 0%, #fde8f2 100%);
 }
 
-.schedule-header {
+.cronograma-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 30px;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 }
 
-.schedule-header span {
+.cronograma-header span {
   display: inline-block;
   background: #f7c6da;
   color: #c2185b;
@@ -22,102 +22,64 @@
   margin-bottom: 20px;
 }
 
-.schedule-header h1 {
+.cronograma-header h1 {
   color: #c2185b;
-  font-size: 46px;
-  margin-bottom: 18px;
+  font-size: 42px;
+  margin-bottom: 14px;
   line-height: 1.1;
 }
 
-.schedule-header p {
+.cronograma-header p {
   color: #444;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.7;
   max-width: 850px;
 }
 
-.header-actions {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.btn-main,
-.btn-secondary {
-  text-decoration: none;
-  padding: 14px 28px;
-  border-radius: 30px;
-  font-weight: 800;
-  white-space: nowrap;
-  transition: 0.3s;
-}
-
-.btn-main {
-  background: #c2185b;
-  color: white;
-}
-
-.btn-main:hover {
-  background: #a4144c;
-  transform: translateY(-2px);
-}
-
-.btn-secondary {
-  background: #fff0f6;
-  color: #c2185b;
-}
-
-.btn-secondary:hover {
-  background: #c2185b;
-  color: white;
-}
-
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 24px;
-  margin-bottom: 34px;
-}
-
-.stat-card,
-.filters-card,
-.agenda-card {
-  background: #ffffff;
-  border: 1px solid #f3bfd5;
-  border-radius: 24px;
-  box-shadow: 0 18px 40px rgba(194, 24, 91, 0.08);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
 }
 
 .stat-card {
-  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #f3bfd5;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(194, 24, 91, 0.06);
 }
 
 .stat-card h3 {
   color: #333;
-  font-size: 18px;
-  margin-bottom: 14px;
+  font-size: 15px;
+  margin-bottom: 10px;
 }
 
 .stat-card strong {
   display: block;
   color: #c2185b;
-  font-size: 42px;
-  margin-bottom: 12px;
+  font-size: 36px;
 }
 
-.stat-card p {
-  color: #555;
-  line-height: 1.5;
-}
+.stat-card.pendiente strong { color: #9a6500; }
+.stat-card.confirmada strong { color: #008a3d; }
+.stat-card.completada strong { color: #3046b0; }
+.stat-card.cancelada strong { color: #c2183a; }
+.stat-card.pagada strong { color: #00796b; }
 
 .filters-card {
-  padding: 26px;
-  margin-bottom: 30px;
+  background: #ffffff;
+  border: 1px solid #f3bfd5;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
   display: grid;
   grid-template-columns: 1.2fr 0.8fr auto;
   gap: 18px;
   align-items: end;
+  box-shadow: 0 12px 30px rgba(194, 24, 91, 0.06);
 }
 
 .filter-group label {
@@ -130,9 +92,9 @@
 .filter-group input,
 .filter-group select {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border: 1px solid #efb7ce;
-  border-radius: 14px;
+  border-radius: 12px;
   background: #fffafd;
   outline: none;
   font-size: 15px;
@@ -147,8 +109,8 @@
   border: none;
   background: #fff0f6;
   color: #c2185b;
-  padding: 14px 22px;
-  border-radius: 22px;
+  padding: 12px 22px;
+  border-radius: 20px;
   font-weight: 800;
   cursor: pointer;
   transition: 0.3s;
@@ -159,40 +121,32 @@
   color: white;
 }
 
-.action-message {
-  margin-bottom: 24px;
-  padding: 16px;
-  border-radius: 16px;
+.mensaje-exito {
+  margin-bottom: 20px;
+  padding: 14px 20px;
+  border-radius: 14px;
   background: #e8f8ef;
   border: 1px solid #b9e7ce;
   color: #008a3d;
-  font-weight: 800;
+  font-weight: 700;
 }
 
-.agenda-card {
-  padding: 32px;
-}
-
-.agenda-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 28px;
-}
-
-.agenda-header h2 {
-  color: #c2185b;
-  font-size: 32px;
+.table-card {
+  background: #ffffff;
+  border: 1px solid #f3bfd5;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 12px 30px rgba(194, 24, 91, 0.06);
 }
 
 .empty-message {
   padding: 18px;
   background: #fff0f6;
   border: 1px solid #f3bfd5;
-  border-radius: 16px;
+  border-radius: 14px;
   color: #555;
   font-weight: 700;
+  text-align: center;
 }
 
 .table-wrapper {
@@ -202,7 +156,7 @@
 
 table {
   width: 100%;
-  min-width: 1200px;
+  min-width: 1100px;
   border-collapse: collapse;
 }
 
@@ -213,138 +167,68 @@ thead {
 th {
   color: #c2185b;
   text-align: left;
-  padding: 16px;
-  font-size: 15px;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 800;
 }
 
 td {
-  padding: 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid #f3d6e4;
   color: #333;
   vertical-align: middle;
-  line-height: 1.4;
-}
-
-td:nth-child(1),
-td:nth-child(2),
-th:nth-child(1),
-th:nth-child(2) {
-  white-space: nowrap;
+  font-size: 14px;
 }
 
 .status,
 .payment-status {
   display: inline-block;
-  padding: 8px 14px;
-  border-radius: 18px;
+  padding: 6px 14px;
+  border-radius: 16px;
   font-weight: 800;
   font-size: 13px;
   white-space: nowrap;
 }
 
-.status.pending {
-  background: #fff3cd;
-  color: #9a6500;
-}
-
-.status.confirmed {
-  background: #e8f8ef;
-  color: #008a3d;
-}
-
-.status.completed {
-  background: #e8ecff;
-  color: #3046b0;
-}
-
-.status.cancelled {
-  background: #ffe4e4;
-  color: #c2183a;
-}
-
-.payment-status.payment-pending {
-  background: #fff3cd;
-  color: #9a6500;
-}
-
-.payment-status.payment-paid {
-  background: #e8f8ef;
-  color: #008a3d;
-}
+.status.pending { background: #fff3cd; color: #9a6500; }
+.status.confirmed { background: #e8f8ef; color: #008a3d; }
+.status.completed { background: #e8ecff; color: #3046b0; }
+.status.cancelled { background: #ffe4e4; color: #c2183a; }
+.payment-status.payment-pending { background: #fff3cd; color: #9a6500; }
+.payment-status.payment-paid { background: #e8f8ef; color: #008a3d; }
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .action {
   border: none;
-  padding: 9px 14px;
-  border-radius: 18px;
-  font-weight: 800;
+  padding: 7px 12px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 13px;
   cursor: pointer;
   transition: 0.3s;
 }
 
 .action:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   opacity: 0.9;
 }
 
-.action.confirm {
-  background: #008a3d;
-  color: white;
-}
-
-.action.complete {
-  background: #3046b0;
-  color: white;
-}
-
-.action.cancel {
-  background: #fff0f6;
-  color: #c2185b;
-}
-
-.action.delete {
-  background: #c2185b;
-  color: white;
-}
+.action.confirm { background: #008a3d; color: white; }
+.action.complete { background: #3046b0; color: white; }
+.action.cancel { background: #fff0f6; color: #c2185b; }
+.action.delete { background: #c2185b; color: white; }
 
 @media (max-width: 1000px) {
-  .schedule-header {
-    flex-direction: column;
-  }
-
-  .header-actions {
-    justify-content: flex-start;
-  }
-
-  .filters-card {
-    grid-template-columns: 1fr;
-  }
-
-  .agenda-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  .cronograma-header { flex-direction: column; }
+  .filters-card { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 650px) {
-  .schedule-page {
-    padding: 55px 6%;
-  }
-
-  .schedule-header h1 {
-    font-size: 34px;
-  }
-
-  .schedule-header p {
-    font-size: 16px;
-  }
-
-  .agenda-card {
-    padding: 24px 18px;
-  }
+  .cronograma-page { padding: 55px 4%; }
+  .cronograma-header h1 { font-size: 32px; }
 }

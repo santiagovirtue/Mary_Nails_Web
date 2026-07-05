@@ -21,6 +21,7 @@ import { ServiciosAdmin } from './admin/servicios-admin/servicios-admin';
 import { Pagos } from './admin/pagos/pagos';
 import { Clientes } from './admin/clientes/clientes';
 import { Reportes } from './admin/reportes/reportes';
+import { Contacto } from './pages/contacto/contacto';
 
 export const routes: Routes = [
   {
@@ -111,6 +112,11 @@ export const routes: Routes = [
     path: 'admin/reportes',
     component: Reportes,
     canActivate: [adminGuard],
+  },
+  
+  {
+  path: 'contacto',
+  component: Contacto,
   },
 
   {

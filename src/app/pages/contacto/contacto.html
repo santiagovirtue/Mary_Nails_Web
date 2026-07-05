@@ -1,0 +1,108 @@
+<section class="contact-page">
+  <div class="section-header">
+    <span>Contacto</span>
+    <h1>Comunícate con nosotros</h1>
+    <p>¿Tienes alguna pregunta o quieres agendar una cita? Estamos aquí para ayudarte.</p>
+  </div>
+
+  <div class="contact-layout">
+    <div class="contact-form-card">
+      <h2>Envíanos un mensaje</h2>
+
+      <form>
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" name="nombre" placeholder="Ej: María González" [(ngModel)]="nombre" />
+        </div>
+
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" name="correo" placeholder="Ej: maria@correo.com" [(ngModel)]="correo" />
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" name="telefono" placeholder="Ej: 300 123 4567" [(ngModel)]="telefono" />
+        </div>
+
+        <div class="form-group">
+          <label>Asunto</label>
+          <select name="asunto" [(ngModel)]="asunto">
+            <option value="">Selecciona un asunto</option>
+            <option value="reserva">Reservar cita</option>
+            <option value="disponibilidad">Consultar disponibilidad</option>
+            <option value="servicios">Información de servicios</option>
+            <option value="precios">Consultar precios</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Mensaje</label>
+          <textarea name="mensaje" placeholder="Escribe tu mensaje aquí..." [(ngModel)]="mensaje"></textarea>
+        </div>
+
+        <button type="button" class="btn-submit" (click)="enviarMensaje()">Enviar mensaje</button>
+
+        <p class="success-message" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+        <p class="error-message" *ngIf="mensajeError">{{ mensajeError }}</p>
+      </form>
+    </div>
+
+    <div class="contact-info-card">
+      <div class="info-section">
+        <h2>Información de contacto</h2>
+        <p>Estamos disponibles para atenderte en los siguientes canales.</p>
+      </div>
+
+      <div class="info-item">
+        <span class="info-icon">📍</span>
+        <div>
+          <strong>Dirección</strong>
+          <p>Soacha, Cundinamarca, Colombia</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <span class="info-icon">📧</span>
+        <div>
+          <strong>Correo electrónico</strong>
+          <p>marynails@correo.com</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <span class="info-icon">📱</span>
+        <div>
+          <strong>Teléfono / WhatsApp</strong>
+          <p>+57 313 214 6285</p>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <span class="info-icon">🕐</span>
+        <div>
+          <strong>Horario de atención</strong>
+          <p>Lunes a Sábado: 9:00 a.m. - 6:00 p.m.</p>
+        </div>
+      </div>
+
+      <div class="whatsapp-cta">
+        <h3>¿Prefieres WhatsApp?</h3>
+        <p>Escríbenos directamente y te respondemos lo antes posible.</p>
+        <a href="https://api.whatsapp.com/send?phone=573132146285&text=Hola%2C%20quiero%20información%20sobre%20Mary%20Nails." target="_blank" class="btn-whatsapp">
+          Escribir por WhatsApp
+        </a>
+      </div>
+
+      <div class="social-links">
+        <h3>Síguenos</h3>
+        <div class="social-icons">
+          <a href="#" target="_blank" class="social-icon">Facebook</a>
+          <a href="#" target="_blank" class="social-icon">Instagram</a>
+          <a href="#" target="_blank" class="social-icon">TikTok</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
