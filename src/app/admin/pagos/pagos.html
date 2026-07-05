@@ -1,138 +1,114 @@
 <section class="payments-page">
   <div class="payments-header">
     <div>
-      <span>Pagos</span>
-      <h1>Gestión de pagos</h1>
-      <p>
-        En esta sección el administrador puede revisar los métodos de pago
-        seleccionados por los clientes y marcar cada reserva como pagada o pendiente.
-      </p>
+      <span class="etiqueta">Gestión</span>
+      <h1>Control de pagos</h1>
+      <p class="subtitulo">Revisa y valida los pagos de cada reserva. Marca como pagado o pendiente según corresponda.</p>
     </div>
-
-    <a routerLink="/admin/dashboard" class="btn-main">
-      Volver al dashboard
-    </a>
+    <a routerLink="/admin/dashboard" class="btn-main">Volver al dashboard</a>
   </div>
 
-  <div class="summary-grid">
-    <article class="summary-card">
-      <h3>Total reservas</h3>
-      <strong>{{ contarTotal() }}</strong>
-      <p>Reservas registradas en el sistema.</p>
-    </article>
+  <div class="kpi-row">
+    <div class="kpi-mini">
+      <span class="kpi-icon">📋</span>
+      <div><strong>{{ contarTotal() }}</strong><span>Total pagos</span></div>
+    </div>
+    <div class="kpi-mini success">
+      <span class="kpi-icon">✅</span>
+      <div><strong>{{ contarPagados() }}</strong><span>Pagados</span></div>
+    </div>
+    <div class="kpi-mini warning">
+      <span class="kpi-icon">⏳</span>
+      <div><strong>{{ contarPendientes() }}</strong><span>Pendientes</span></div>
+    </div>
+    <div class="kpi-mini money">
+      <span class="kpi-icon">💵</span>
+      <div><strong>{{ sumarTotal() }}</strong><span>Total facturado</span></div>
+    </div>
+    <div class="kpi-mini paid">
+      <span class="kpi-icon">💰</span>
+      <div><strong>{{ sumarPagado() }}</strong><span>Total cobrado</span></div>
+    </div>
+  </div>
 
-    <article class="summary-card">
-      <h3>Pagos pendientes</h3>
-      <strong>{{ contarPendientes() }}</strong>
-      <p>Reservas pendientes por validar pago.</p>
-    </article>
-
-    <article class="summary-card">
-      <h3>Pagos realizados</h3>
-      <strong>{{ contarPagados() }}</strong>
-      <p>Reservas marcadas como pagadas.</p>
-    </article>
+  <div class="alerta" *ngIf="mensaje" [class.exito]="tipoMensaje==='exito'" [class.error]="tipoMensaje==='error'">
+    {{ mensaje }}
   </div>
 
   <div class="filters-card">
     <div class="filter-group">
       <label>Buscar pago</label>
-      <input
-        type="text"
-        name="busqueda"
-        placeholder="Buscar por cliente, teléfono, servicio o método de pago"
-        [(ngModel)]="busqueda"
-      />
+      <input type="text" name="busqueda" placeholder="Buscar por cliente, teléfono, servicio o método" [(ngModel)]="busqueda"/>
     </div>
-
     <div class="filter-group">
-      <label>Filtrar por estado de pago</label>
+      <label>Estado de pago</label>
       <select name="filtroPago" [(ngModel)]="filtroPago">
         <option value="Todos">Todos</option>
         <option value="Pendiente">Pendiente</option>
         <option value="Pagado">Pagado</option>
       </select>
     </div>
-
-    <button type="button" class="btn-clear" (click)="limpiarFiltros()">
-      Limpiar filtros
-    </button>
+    <button type="button" class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
   </div>
 
-  <p class="action-message" *ngIf="mensaje">
-    {{ mensaje }}
-  </p>
+  <div *ngIf="cargando" class="cargando">Cargando pagos...</div>
 
-  <div class="payments-card">
-    <h2>Listado de pagos</h2>
+  <div class="payments-card" *ngIf="!cargando">
+    <h2>Listado de pagos ({{ obtenerPagosFiltrados().length }})</h2>
 
-    <p class="empty-message" *ngIf="reservas.length === 0">
-      Todavía no hay reservas registradas para gestionar pagos.
-    </p>
-
-    <p
-      class="empty-message"
-      *ngIf="reservas.length > 0 && obtenerPagosFiltrados().length === 0"
-    >
-      No se encontraron pagos con los filtros seleccionados.
-    </p>
+    <p class="empty-msg" *ngIf="pagos.length === 0">No hay pagos registrados.</p>
+    <p class="empty-msg" *ngIf="pagos.length > 0 && obtenerPagosFiltrados().length === 0">No se encontraron pagos con los filtros seleccionados.</p>
 
     <div class="table-wrapper" *ngIf="obtenerPagosFiltrados().length > 0">
       <table>
         <thead>
           <tr>
             <th>Cliente</th>
-            <th>Teléfono</th>
             <th>Servicio</th>
             <th>Fecha</th>
             <th>Hora</th>
             <th>Método</th>
+            <th>Valor</th>
             <th>Estado cita</th>
             <th>Estado pago</th>
-            <th>Acciones</th>
+            <th>Acción</th>
           </tr>
         </thead>
-
         <tbody>
-          <tr *ngFor="let reserva of obtenerPagosFiltrados()">
-            <td>{{ reserva.nombre }}</td>
-            <td>{{ reserva.telefono }}</td>
-            <td>{{ reserva.servicio }}</td>
-            <td>{{ reserva.fecha }}</td>
-            <td>{{ reserva.hora }}</td>
-            <td>{{ reserva.metodoPago }}</td>
-            <td>{{ reserva.estado }}</td>
-
+          <tr *ngFor="let pago of obtenerPagosFiltrados()">
             <td>
-              <span
-                class="payment-status"
-                [class.pending]="reserva.estadoPago !== 'Pagado'"
-                [class.paid]="reserva.estadoPago === 'Pagado'"
-              >
-                {{ reserva.estadoPago || 'Pendiente' }}
+              <div class="cell-client">
+                <strong>{{ pago.nombre }}</strong>
+                <span>{{ pago.telefono }}</span>
+              </div>
+            </td>
+            <td>{{ pago.servicio }}</td>
+            <td>{{ formatearFecha(pago.fecha) }}</td>
+            <td>{{ formatearHora(pago.hora) }}</td>
+            <td><span class="metodo-badge">{{ pago.metodoPago || '-' }}</span></td>
+            <td><strong class="valor">{{ pago.valorFormateado }}</strong></td>
+            <td>
+              <span class="status"
+                [class.pending]="pago.estado === 'Pendiente'"
+                [class.confirmed]="pago.estado === 'Confirmada'"
+                [class.completed]="pago.estado === 'Completada'"
+                [class.cancelled]="pago.estado === 'Cancelada'">
+                {{ pago.estado }}
               </span>
             </td>
-
             <td>
-              <div class="actions">
-                <button
-                  type="button"
-                  class="action paid"
-                  *ngIf="reserva.estadoPago !== 'Pagado'"
-                  (click)="marcarComoPagado(reserva.id)"
-                >
-                  Marcar pagado
-                </button>
-
-                <button
-                  type="button"
-                  class="action pending"
-                  *ngIf="reserva.estadoPago === 'Pagado'"
-                  (click)="marcarComoPendiente(reserva.id)"
-                >
-                  Marcar pendiente
-                </button>
-              </div>
+              <span class="payment-status"
+                [class.payment-pending]="pago.estadoPago !== 'Pagado'"
+                [class.payment-paid]="pago.estadoPago === 'Pagado'">
+                {{ pago.estadoPago }}
+              </span>
+            </td>
+            <td>
+              <button type="button" class="btn-toggle-pay"
+                [class.is-paid]="pago.estadoPago === 'Pagado'"
+                (click)="togglePago(pago.id, pago.estadoPago)">
+                {{ pago.estadoPago === 'Pagado' ? 'Revertir' : 'Marcar pagado' }}
+              </button>
             </td>
           </tr>
         </tbody>
