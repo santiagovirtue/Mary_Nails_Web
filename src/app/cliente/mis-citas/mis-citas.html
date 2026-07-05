@@ -1,149 +1,129 @@
-<section class="client-schedule-page">
-  <div class="client-header">
-    <div>
-      <span>Cronograma del cliente</span>
-      <h1>Mis citas reservadas</h1>
-      <p>
-        Consulta tus reservas, revisa el estado de cada cita, verifica la fecha,
-        hora, servicio, método de pago y estado del pago.
-      </p>
+<div class="cliente-container">
+  <aside class="sidebar-cliente">
+    <div class="sidebar-header">
+      <h3>Mi Cuenta</h3>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/cliente/perfil" class="nav-item">👤 Perfil</a>
+      <a routerLink="/cliente/mis-citas" class="nav-item activo">📅 Mis citas</a>
+      <a class="nav-item deshabilitado" title="Próximamente">⭐ Favoritos</a>
+      <a class="nav-item deshabilitado" title="Próximamente">⚙️ Preferencias</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a routerLink="/" class="btn-cerrar-sesion">Cerrar sesión</a>
+    </div>
+  </aside>
+
+  <main class="contenido-cliente">
+    <div *ngIf="cargando" class="cargando">Cargando tus citas...</div>
+
+    <div *ngIf="!cargando && !correoSesion" class="sin-sesion">
+      <h2>No has iniciado sesión</h2>
+      <p>Debes iniciar sesión para ver tus citas.</p>
+      <a routerLink="/login" class="btn-primario">Iniciar sesión</a>
     </div>
 
-    <a routerLink="/reservas" class="btn-main">Nueva reserva</a>
-  </div>
-
-  <div class="stats-grid">
-    <article class="stat-card">
-      <h3>Reservas activas</h3>
-      <strong>{{ contarActivas() }}</strong>
-      <p>Citas pendientes o confirmadas.</p>
-    </article>
-
-    <article class="stat-card">
-      <h3>Completadas</h3>
-      <strong>{{ contarCompletadas() }}</strong>
-      <p>Servicios ya realizados.</p>
-    </article>
-
-    <article class="stat-card">
-      <h3>Pendientes</h3>
-      <strong>{{ contarPendientes() }}</strong>
-      <p>Reservas por confirmar.</p>
-    </article>
-
-    <article class="stat-card">
-      <h3>Pagadas</h3>
-      <strong>{{ contarPagadas() }}</strong>
-      <p>Reservas con pago validado.</p>
-    </article>
-  </div>
-
-  <div class="filters-card">
-    <div class="filter-group">
-      <label>Buscar cita</label>
-      <input
-        type="text"
-        name="busqueda"
-        placeholder="Buscar por servicio, fecha, hora, pago o estado de pago"
-        [(ngModel)]="busqueda"
-      />
-    </div>
-
-    <div class="filter-group">
-      <label>Filtrar por estado de cita</label>
-      <select name="filtroEstado" [(ngModel)]="filtroEstado">
-        <option value="Todas">Todas</option>
-        <option value="Pendiente">Pendiente</option>
-        <option value="Confirmada">Confirmada</option>
-        <option value="Completada">Completada</option>
-        <option value="Cancelada">Cancelada</option>
-      </select>
-    </div>
-
-    <button type="button" class="btn-clear" (click)="limpiarFiltros()">
-      Limpiar filtros
-    </button>
-  </div>
-
-  <div class="appointments-card">
-    <h2>Historial de citas</h2>
-
-    <p class="empty-message" *ngIf="reservas.length === 0">
-      Aún no tienes citas registradas. Realiza una reserva para verla aquí.
-    </p>
-
-    <p
-      class="empty-message"
-      *ngIf="reservas.length > 0 && obtenerReservasFiltradas().length === 0"
-    >
-      No se encontraron citas con los filtros seleccionados.
-    </p>
-
-    <div class="appointment-list" *ngIf="obtenerReservasFiltradas().length > 0">
-      <article
-        class="appointment-item"
-        *ngFor="let reserva of obtenerReservasFiltradas()"
-      >
-        <div class="date-box">
-          <strong>{{ reserva.fecha }}</strong>
+    <div *ngIf="!cargando && correoSesion">
+      <div class="header-mis-citas">
+        <div>
+          <span class="etiqueta">Área cliente</span>
+          <h1>Mis citas reservadas</h1>
+          <p class="subtitulo">Consulta tus reservas, revisa el estado de cada cita, verifica fecha, hora, servicio y pago.</p>
         </div>
+        <a routerLink="/reservas" class="btn-nueva">+ Nueva reserva</a>
+      </div>
 
-        <div class="appointment-info">
-          <h3>{{ reserva.servicio }}</h3>
+      <div class="stats-grid">
+        <article class="stat-card activas">
+          <div class="stat-icon">📌</div>
+          <div>
+            <strong>{{ contarActivas() }}</strong>
+            <span>Activas</span>
+          </div>
+        </article>
+        <article class="stat-card completadas">
+          <div class="stat-icon">✅</div>
+          <div>
+            <strong>{{ contarCompletadas() }}</strong>
+            <span>Completadas</span>
+          </div>
+        </article>
+        <article class="stat-card pendientes">
+          <div class="stat-icon">⏳</div>
+          <div>
+            <strong>{{ contarPendientes() }}</strong>
+            <span>Pendientes</span>
+          </div>
+        </article>
+        <article class="stat-card pagadas">
+          <div class="stat-icon">💰</div>
+          <div>
+            <strong>{{ contarPagadas() }}</strong>
+            <span>Pagadas</span>
+          </div>
+        </article>
+      </div>
 
-          <p>
-            <strong>Hora:</strong>
-            {{ reserva.hora }}
-          </p>
-
-          <p>
-            <strong>Método de pago:</strong>
-            {{ reserva.metodoPago }}
-          </p>
-
-          <p>
-            <strong>Comentarios:</strong>
-            {{ reserva.comentarios || 'Sin comentarios' }}
-          </p>
+      <div class="filters-card">
+        <div class="filter-group">
+          <label>Buscar cita</label>
+          <input type="text" name="busqueda" placeholder="Servicio, fecha, hora, pago..." [(ngModel)]="busqueda"/>
         </div>
-
-        <div class="appointment-actions">
-          <span
-            class="status"
-            [class.pending]="reserva.estado === 'Pendiente'"
-            [class.confirmed]="reserva.estado === 'Confirmada'"
-            [class.completed]="reserva.estado === 'Completada'"
-            [class.cancelled]="reserva.estado === 'Cancelada'"
-          >
-            Cita: {{ reserva.estado }}
-          </span>
-
-          <span
-            class="payment-status"
-            [class.payment-pending]="reserva.estadoPago !== 'Pagado'"
-            [class.payment-paid]="reserva.estadoPago === 'Pagado'"
-          >
-            Pago: {{ reserva.estadoPago || 'Pendiente' }}
-          </span>
-          
-          <button
-           type="button"
-           class="btn-cancel"
-           *ngIf="reserva.estado === 'Pendiente' || reserva.estado === 'Confirmada'"
-           (click)="cancelarCita(reserva.id)"
-           >
-           Cancelar cita
-           </button>
-
-          <a
-            *ngIf="reserva.estado === 'Completada'"
-            routerLink="/cliente/calificar-servicio"
-            class="btn-rate"
-          >
-            Calificar
-          </a>
+        <div class="filter-group">
+          <label>Estado</label>
+          <select name="filtroEstado" [(ngModel)]="filtroEstado">
+            <option value="Todas">Todas</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Confirmada">Confirmada</option>
+            <option value="Completada">Completada</option>
+            <option value="Cancelada">Cancelada</option>
+          </select>
         </div>
-      </article>
+        <button type="button" class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
+      </div>
+
+      <div class="appointments-card">
+        <h2>Historial de citas</h2>
+
+        <p class="empty-message" *ngIf="reservas.length === 0">
+          Aún no tienes citas registradas. <a routerLink="/reservas">Realiza tu primera reserva</a>.
+        </p>
+
+        <p class="empty-message" *ngIf="reservas.length > 0 && obtenerReservasFiltradas().length === 0">
+          No se encontraron citas con los filtros seleccionados.
+        </p>
+
+        <div class="appointment-list" *ngIf="obtenerReservasFiltradas().length > 0">
+          <article class="appointment-item" *ngFor="let reserva of obtenerReservasFiltradas()">
+            <div class="date-box">
+              <span class="dia-semana">{{ obtenerDiaSemana(reserva.fecha) }}</span>
+              <strong>{{ formatearFecha(reserva.fecha) }}</strong>
+              <span class="hora">{{ reserva.hora }}</span>
+            </div>
+            <div class="appointment-info">
+              <h3>{{ reserva.servicio }}</h3>
+              <p><strong>Método de pago:</strong> {{ reserva.metodoPago || 'No definido' }}</p>
+              <p><strong>Comentarios:</strong> {{ reserva.comentarios || 'Sin comentarios' }}</p>
+              <div class="badges">
+                <span class="status" [class.pending]="reserva.estado === 'Pendiente'" [class.confirmed]="reserva.estado === 'Confirmada'" [class.completed]="reserva.estado === 'Completada'" [class.cancelled]="reserva.estado === 'Cancelada'">
+                  {{ reserva.estado }}
+                </span>
+                <span class="payment-status" [class.payment-pending]="reserva.estadoPago !== 'Pagado'" [class.payment-paid]="reserva.estadoPago === 'Pagado'">
+                  {{ reserva.estadoPago === 'Pagado' ? '💰 Pagado' : '⏳ Pago pendiente' }}
+                </span>
+              </div>
+            </div>
+            <div class="appointment-actions">
+              <button type="button" class="btn-cancel" *ngIf="reserva.estado === 'Pendiente' || reserva.estado === 'Confirmada'" (click)="cancelarCita(reserva.id)">
+                Cancelar
+              </button>
+              <a *ngIf="reserva.estado === 'Completada'" routerLink="/cliente/calificar-servicio" class="btn-rate">
+                Calificar
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </main>
+</div>
