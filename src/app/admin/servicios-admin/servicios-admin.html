@@ -1,175 +1,101 @@
 <section class="services-admin-page">
   <div class="services-header">
     <div>
-      <span>Servicios</span>
-      <h1>Gestión de servicios</h1>
-      <p>
-        En esta sección el administrador puede agregar, editar, activar,
-        desactivar o eliminar los servicios ofrecidos por Mary Nails.
-      </p>
+      <span class="etiqueta">Gestión</span>
+      <h1>Servicios del negocio</h1>
+      <p class="subtitulo">Agrega, edita, activa o desactiva los servicios de Mary Nails. Los cambios se reflejan inmediatamente para los clientes.</p>
     </div>
-
-    <a routerLink="/servicios" class="btn-main">
-      Ver servicios públicos
-    </a>
+    <a routerLink="/servicios" class="btn-main">Ver servicios públicos</a>
   </div>
 
-  <div class="summary-grid">
-    <article class="summary-card">
-      <h3>Total</h3>
-      <strong>{{ servicios.length }}</strong>
-      <p>Servicios registrados</p>
-    </article>
+  <div class="kpi-row">
+    <div class="kpi-mini">
+      <span class="kpi-icon">💅</span>
+      <div><strong>{{ servicios.length }}</strong><span>Total</span></div>
+    </div>
+    <div class="kpi-mini success">
+      <span class="kpi-icon">✅</span>
+      <div><strong>{{ contarServiciosActivos() }}</strong><span>Activos</span></div>
+    </div>
+    <div class="kpi-mini warning">
+      <span class="kpi-icon">⏸️</span>
+      <div><strong>{{ contarServiciosInactivos() }}</strong><span>Inactivos</span></div>
+    </div>
+  </div>
 
-    <article class="summary-card">
-      <h3>Activos</h3>
-      <strong>{{ contarServiciosActivos() }}</strong>
-      <p>Servicios visibles para clientes</p>
-    </article>
-
-    <article class="summary-card">
-      <h3>Inactivos</h3>
-      <strong>{{ contarServiciosInactivos() }}</strong>
-      <p>Servicios ocultos temporalmente</p>
-    </article>
+  <div class="alerta" *ngIf="mensaje" [class.exito]="tipoMensaje==='exito'" [class.error]="tipoMensaje==='error'">
+    {{ mensaje }}
   </div>
 
   <div class="services-layout">
     <div class="service-form-card">
-      <h2>
-        {{ servicioEditandoId ? 'Editar servicio' : 'Agregar servicio' }}
-      </h2>
+      <div class="form-title">
+        <h2>{{ editando ? 'Editar servicio' : 'Agregar servicio' }}</h2>
+        <button type="button" class="btn-cancelar" *ngIf="editando" (click)="cancelarEdicion()">Cancelar</button>
+      </div>
 
-      <form>
+      <div class="form-group">
+        <label>Nombre del servicio</label>
+        <input type="text" name="nombre" placeholder="Ej: Manicure profesional" [(ngModel)]="servicio.nombre"/>
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea name="descripcion" rows="3" placeholder="Describe el servicio ofrecido" [(ngModel)]="servicio.descripcion"></textarea>
+      </div>
+      <div class="form-row">
         <div class="form-group">
-          <label>Nombre del servicio</label>
-          <input
-            type="text"
-            name="nombre"
-            placeholder="Ej: Manicure profesional"
-            [(ngModel)]="servicio.nombre"
-          />
+          <label>Duración (minutos)</label>
+          <input type="number" name="duracion" placeholder="Ej: 45" [(ngModel)]="servicio.duracion" min="1"/>
         </div>
-
         <div class="form-group">
-          <label>Descripción</label>
-          <textarea
-            name="descripcion"
-            placeholder="Describe el servicio ofrecido"
-            [(ngModel)]="servicio.descripcion"
-          ></textarea>
+          <label>Precio (COP)</label>
+          <input type="number" name="precio" placeholder="Ej: 25000" [(ngModel)]="servicio.precio" min="0"/>
         </div>
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select name="estado" [(ngModel)]="servicio.estado">
+          <option value="Activo">Activo (visible para clientes)</option>
+          <option value="Inactivo">Inactivo (oculto)</option>
+        </select>
+      </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Duración</label>
-            <input
-              type="text"
-              name="duracion"
-              placeholder="Ej: 45 min"
-              [(ngModel)]="servicio.duracion"
-            />
-          </div>
+      <p class="error-msg" *ngIf="mensajeError">{{ mensajeError }}</p>
 
-          <div class="form-group">
-            <label>Precio</label>
-            <input
-              type="text"
-              name="precio"
-              placeholder="Ej: $25.000"
-              [(ngModel)]="servicio.precio"
-            />
-          </div>
-        </div>
+      <button type="button" class="btn-submit" (click)="guardarServicio()" [disabled]="guardando">
+        {{ guardando ? 'Guardando...' : (editando ? 'Actualizar servicio' : 'Guardar servicio') }}
+      </button>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Icono</label>
-            <select name="icono" [(ngModel)]="servicio.icono">
-              <option value="💅">💅 Uñas</option>
-              <option value="✨">✨ Brillo</option>
-              <option value="🌸">🌸 Estilo</option>
-              <option value="🎨">🎨 Diseño</option>
-              <option value="💇‍♀️">💇‍♀️ Cabello</option>
-              <option value="💆‍♀️">💆‍♀️ Cuidado</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Estado</label>
-            <select name="estado" [(ngModel)]="servicio.estado">
-              <option value="Activo">Activo</option>
-              <option value="Inactivo">Inactivo</option>
-            </select>
-          </div>
-        </div>
-
-        <button type="button" class="btn-submit" (click)="guardarServicio()">
-          {{ servicioEditandoId ? 'Actualizar servicio' : 'Guardar servicio' }}
-        </button>
-
-        <button
-          type="button"
-          class="btn-secondary"
-          *ngIf="servicioEditandoId"
-          (click)="cancelarEdicion()"
-        >
-          Cancelar edición
-        </button>
-
-        <p class="message" *ngIf="mensaje">
-          {{ mensaje }}
-        </p>
-      </form>
+      <div class="nota-info">
+        <strong>💡 Nota:</strong> Los servicios activos aparecen en la página pública y en el formulario de reservas. Los inactivos están ocultos para los clientes pero puedes reactivarlos cuando quieras.
+      </div>
     </div>
 
     <div class="services-list-card">
       <h2>Servicios registrados</h2>
+      <div *ngIf="cargando" class="cargando">Cargando servicios...</div>
+      <p class="empty-msg" *ngIf="!cargando && servicios.length === 0">No hay servicios registrados.</p>
 
-      <p class="empty-message" *ngIf="servicios.length === 0">
-        Todavía no hay servicios registrados.
-      </p>
-
-      <div class="services-list" *ngIf="servicios.length > 0">
-        <article class="service-item" *ngFor="let item of servicios">
-          <div class="service-icon">
-            {{ item.icono }}
-          </div>
-
+      <div class="services-list" *ngIf="!cargando && servicios.length > 0">
+        <article class="service-item" *ngFor="let item of servicios" [class.inactive-item]="item.estado === 'Inactivo'" [class.editing-item]="editando && servicio.id === (item.id_servicio || item.id)">
+          <div class="service-icon-box">💅</div>
           <div class="service-info">
             <h3>{{ item.nombre }}</h3>
             <p>{{ item.descripcion }}</p>
-
             <div class="service-meta">
-              <span>Duración: {{ item.duracion }}</span>
-              <strong>{{ item.precio }}</strong>
+              <span>⏱ {{ item.duracion_minutos || item.duracion }} min</span>
+              <strong>{{ item.precioFormateado }}</strong>
             </div>
           </div>
-
           <div class="service-actions">
-            <span
-              class="status"
-              [class.active]="item.estado === 'Activo'"
-              [class.inactive]="item.estado === 'Inactivo'"
-            >
+            <span class="badge-estado" [class.activo]="item.estado === 'Activo'" [class.inactivo]="item.estado === 'Inactivo'">
               {{ item.estado }}
             </span>
-
-            <button type="button" (click)="editarServicio(item)">
-              Editar
+            <button type="button" class="btn-action btn-edit" (click)="editarServicio(item)">Editar</button>
+            <button type="button" class="btn-action btn-toggle" (click)="cambiarEstado(item.id_servicio || item.id)">
+              {{ item.estado === 'Activo' ? 'Desactivar' : 'Activar' }}
             </button>
-
-            <button type="button" (click)="cambiarEstado(item.id)">
-              Cambiar estado
-            </button>
-
-            <button
-              type="button"
-              class="delete-btn"
-              (click)="eliminarServicio(item.id)"
-            >
-              Eliminar
-            </button>
+            <button type="button" class="btn-action btn-delete" (click)="eliminarServicio(item.id_servicio || item.id)">Eliminar</button>
           </div>
         </article>
       </div>
