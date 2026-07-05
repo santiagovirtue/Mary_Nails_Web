@@ -6,67 +6,15 @@
     <a routerLink="/servicios">Servicios</a>
     <a routerLink="/galeria">Galería</a>
     <a routerLink="/reservas">Reservas</a>
+    <a routerLink="/contacto">Contacto</a>
 
-    <!-- Opciones cuando no hay sesión iniciada -->
-    <a routerLink="/login" *ngIf="sinSesion">
-      Cliente
-    </a>
+    <a routerLink="/login" *ngIf="sinSesion" class="btn-client">Cliente</a>
+    <a routerLink="/admin/login" *ngIf="sinSesion" class="btn-admin">Admin</a>
 
-    <a routerLink="/admin/login" class="admin-link" *ngIf="sinSesion">
-      Admin
-    </a>
+    <a routerLink="/cliente/perfil" *ngIf="clienteLogueado">Mi Perfil</a>
+    <a routerLink="/cliente/mis-citas" *ngIf="clienteLogueado">Mis citas</a>
+    <a routerLink="/cliente/calificar-servicio" *ngIf="clienteLogueado">Calificar</a>
 
-    <!-- Opciones del cliente -->
-    <a routerLink="/cliente/mis-citas" *ngIf="clienteLogueado">
-      Cronograma cliente
-    </a>
-
-    <a routerLink="/cliente/calificar-servicio" *ngIf="clienteLogueado">
-      Calificar servicio
-    </a>
-
-    <!-- Opciones del administrador -->
-    <a routerLink="/admin/dashboard" *ngIf="adminLogueado">
-      Dashboard
-    </a>
-
-    <a routerLink="/admin/cronograma" *ngIf="adminLogueado">
-      Cronograma admin
-    </a>
-
-    <a routerLink="/admin/disponibilidad" *ngIf="adminLogueado">
-      Disponibilidad
-    </a>
-
-    <a routerLink="/admin/servicios" *ngIf="adminLogueado">
-      Gestionar servicios
-    </a>
-
-    <a routerLink="/admin/calificaciones" *ngIf="adminLogueado">
-      Calificaciones
-    </a>
-
-    <a routerLink="/admin/pagos" *ngIf="adminLogueado">
-      Pagos
-     </a>
-
-    <a routerLink="/admin/clientes" *ngIf="adminLogueado">
-     Clientes
-    </a>
-
-    <a routerLink="/admin/reportes" *ngIf="adminLogueado">
-     Reportes
-    </a>
-
-
-    <!-- Cerrar sesión -->
-    <button
-      type="button"
-      class="logout-link"
-      *ngIf="haySesionActiva"
-      (click)="cerrarSesion()"
-    >
-      Cerrar sesión
-    </button>
+    <button type="button" class="logout-link" *ngIf="clienteLogueado" (click)="cerrarSesion()">Cerrar sesión</button>
   </nav>
 </header>

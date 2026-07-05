@@ -1,0 +1,96 @@
+<div class="perfil-container">
+  <aside class="sidebar-cliente">
+    <div class="sidebar-header">
+      <h3>Mi Cuenta</h3>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/cliente/perfil" class="nav-item activo">👤 Perfil</a>
+      <a routerLink="/cliente/mis-citas" class="nav-item">📅 Mis citas</a>
+      <a class="nav-item deshabilitado" title="Próximamente">⭐ Favoritos</a>
+      <a class="nav-item deshabilitado" title="Próximamente">⚙️ Preferencias</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a routerLink="/" class="btn-cerrar-sesion">Cerrar sesión</a>
+    </div>
+  </aside>
+
+  <main class="contenido-perfil">
+    <div *ngIf="cargando" class="cargando">Cargando perfil...</div>
+
+    <div *ngIf="!cargando && !correoSesion" class="sin-sesion">
+      <h2>No has iniciado sesión</h2>
+      <p>Debes iniciar sesión para ver tu perfil.</p>
+      <a routerLink="/login" class="btn-primario">Iniciar sesión</a>
+    </div>
+
+    <div *ngIf="!cargando && correoSesion" class="perfil-contenido">
+      <div class="perfil-header">
+        <span class="etiqueta">Área cliente</span>
+        <h1>Mi Perfil</h1>
+        <p class="subtitulo">Administra tus datos personales y preferencias</p>
+      </div>
+
+      <div *ngIf="mensaje" class="alerta" [class.exito]="tipoMensaje==='exito'" [class.error]="tipoMensaje==='error'">
+        {{ mensaje }}
+      </div>
+
+      <div class="tarjeta-foto">
+        <div class="foto-wrapper">
+          <img *ngIf="perfil.foto_perfil" [src]="perfil.foto_perfil" alt="Foto de perfil" class="foto-perfil"/>
+          <div *ngIf="!perfil.foto_perfil" class="foto-placeholder">
+            {{ (perfil.nombre || '?').charAt(0).toUpperCase() }}
+          </div>
+        </div>
+        <div class="foto-info">
+          <h2>{{ perfil.nombre || 'Cliente' }}</h2>
+          <p class="fecha-registro" *ngIf="perfil.fecha_registro">
+            Cliente desde {{ formatearFecha(perfil.fecha_registro) }}
+          </p>
+          <label class="btn-cambiar-foto">
+            📷 Cambiar foto
+            <input type="file" accept="image/*" (change)="cambiarFoto($event)" hidden/>
+          </label>
+        </div>
+      </div>
+
+      <div class="tarjeta-datos">
+        <h3>Datos personales</h3>
+
+        <div class="campo">
+          <label>Nombre completo</label>
+          <input type="text" [(ngModel)]="perfil.nombre" placeholder="Tu nombre completo"/>
+        </div>
+
+        <div class="campo">
+          <label>Correo electrónico</label>
+          <input type="email" [value]="perfil.correo" disabled/>
+          <small>El correo no se puede modificar</small>
+        </div>
+
+        <div class="campo">
+          <label>Teléfono</label>
+          <input type="tel" [(ngModel)]="perfil.telefono" placeholder="Ej: 300 123 4567"/>
+        </div>
+
+        <div class="campo">
+          <label>Dirección</label>
+          <input type="text" [(ngModel)]="perfil.direccion" placeholder="Tu dirección"/>
+        </div>
+
+        <div class="campo">
+          <label>Preferencias</label>
+          <textarea [(ngModel)]="perfil.preferencias" rows="3" placeholder="Ej: Prefiero horarios por la tarde y diseños elegantes"></textarea>
+        </div>
+
+        <div class="acciones">
+          <button class="btn-primario" (click)="guardarCambios()" [disabled]="guardando">
+            {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+          <button class="btn-secundario" (click)="cancelarCambios()" [disabled]="guardando">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, NgIf],
+  imports: [RouterLink, RouterLinkActive, NgIf],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
@@ -12,10 +12,7 @@ export class Navbar {
   constructor(private router: Router) {}
 
   private obtenerSesion(clave: string): string | null {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-
+    if (typeof window === 'undefined') return null;
     return localStorage.getItem(clave);
   }
 
@@ -42,7 +39,6 @@ export class Navbar {
       localStorage.removeItem('maryNailsAdminSesion');
       localStorage.removeItem('maryNailsAdminUsuario');
     }
-
     this.router.navigate(['/']);
   }
 }

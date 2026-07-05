@@ -21,6 +21,7 @@ import { ServiciosAdmin } from './admin/servicios-admin/servicios-admin';
 import { Pagos } from './admin/pagos/pagos';
 import { Clientes } from './admin/clientes/clientes';
 import { Reportes } from './admin/reportes/reportes';
+import { Perfil } from './cliente/perfil/perfil';
 import { Contacto } from './pages/contacto/contacto';
 
 export const routes: Routes = [
@@ -49,6 +50,9 @@ export const routes: Routes = [
     component: Login,
   },
 
+  {
+    path: 'cliente/perfil', component: Perfil, canActivate: [clienteGuard],
+  },
   {
     path: 'cliente/mis-citas',
     component: MisCitas,
