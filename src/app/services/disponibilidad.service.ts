@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export interface Horario {
   id: number;
@@ -29,6 +31,12 @@ export class DisponibilidadService {
   ];
   constructor(private http: HttpClient) {}
 
+  obtenerHorariosAPI(): Observable<Horario[]> {
+    return this.http.get<Horario[]>('/api/disponibilidad').pipe(
+      catchError(() => of([]))
+    );
+  }
+
   obtenerHorarios(): Horario[] {
     if (typeof window === 'undefined') return [];
     const data = localStorage.getItem(this.storageKey);
@@ -42,30 +50,20 @@ export class DisponibilidadService {
     localStorage.setItem(this.storageKey, JSON.stringify(horarios));
   }
 
-  agregarHorario(nuevo: NuevoHorario): void {
-    const horarios = this.obtenerHorarios();
-    const horario: Horario = { id: Date.now(), ...nuevo };
-    horarios.push(horario);
-    this.guardarHorarios(horarios);
-    this.http.post('/api/disponibilidad', nuevo).subscribe({ error: () => {} });
+  agregarHorario(nuevo: NuevoHorario): Observable<any> {
+    return this.http.post('/api/disponibilidad', nuevo);
   }
 
-  actualizarHorario(actualizado: Horario): void {
-    const horarios = this.obtenerHorarios().map(h => h.id === actualizado.id ? actualizado : h);
-    this.guardarHorarios(horarios);
-    this.http.put(`/api/disponibilidad/${actualizado.id}`, actualizado).subscribe({ error: () => {} });
+  actualizarHorario(actualizado: Horario): Observable<any> {
+    return this.http.put('/api/disponibilidad/' + actualizado.id, actualizado);
   }
 
-  cambiarEstadoHorario(id: number): void {
-    const horarios = this.obtenerHorarios().map(h => h.id === id ? { ...h, estado: h.estado === 'Disponible' ? 'Ocupado' : 'Disponible' } : h);
-    this.guardarHorarios(horarios);
-    this.http.patch(`/api/disponibilidad/${id}/estado`, {}).subscribe({ error: () => {} });
+  cambiarEstadoHorario(id: number): Observable<any> {
+    return this.http.patch('/api/disponibilidad/' + id + '/estado', {});
   }
 
-  eliminarHorario(id: number): void {
-    const horarios = this.obtenerHorarios().filter(h => h.id !== id);
-    this.guardarHorarios(horarios);
-    this.http.delete(`/api/disponibilidad/${id}`).subscribe({ error: () => {} });
+  eliminarHorario(id: number): Observable<any> {
+    return this.http.delete('/api/disponibilidad/' + id);
   }
 
   contarDisponibles(): number { return this.obtenerHorarios().filter(h => h.estado === 'Disponible').length; }

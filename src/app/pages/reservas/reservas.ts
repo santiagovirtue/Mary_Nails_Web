@@ -38,7 +38,7 @@ export class Reservas implements OnInit {
 
   ngOnInit(): void {
     this.fechaMinima = this.obtenerFechaActual();
-    this.horarios = this.disponibilidadService.obtenerHorarios();
+    this.disponibilidadService.obtenerHorariosAPI().subscribe(hs => { this.zone.run(() => { this.horarios = hs; this.cdr.detectChanges(); }); });
     this.cargarServiciosReales();
     this.route.queryParams.subscribe((params) => {
       if (params['servicio']) this.reserva.servicio = params['servicio'];
