@@ -1,43 +1,48 @@
-<section class="services-page">
-  <div class="section-header">
-    <span>Servicios</span>
-
+<section class="services-hero">
+  <div class="hero-inner">
+    <span class="hero-tag">Nuestros servicios</span>
     <h1>Elige el servicio ideal para ti</h1>
-
-    <p>
-      En Mary Nails ofrecemos servicios de cuidado y diseño pensados para
-      resaltar tu estilo y brindarte una experiencia cómoda y personalizada.
-    </p>
+    <p>En Mary Nails ofrecemos servicios de cuidado y diseño pensados para resaltar tu estilo.</p>
   </div>
+</section>
 
-  <p class="empty-message" *ngIf="servicios.length === 0">
-    Actualmente no hay servicios activos disponibles.
-  </p>
+<section class="services-page">
+  <div class="cargando" *ngIf="cargando">Cargando servicios...</div>
+  <p class="empty-message" *ngIf="!cargando && servicios.length === 0">Actualmente no hay servicios activos disponibles.</p>
 
-  <div class="services-grid" *ngIf="servicios.length > 0">
-    <article class="service-card" *ngFor="let servicio of servicios">
-      <div class="service-icon">
-        {{ servicio.icono }}
+  <div class="services-grid" *ngIf="!cargando && servicios.length > 0">
+    <article class="service-card" *ngFor="let servicio of servicios; let i = index">
+      <div class="card-top">
+        <div class="service-icon">{{ obtenerIcono(i) }}</div>
+        <span class="badge-activo">Disponible</span>
       </div>
-
       <h2>{{ servicio.nombre }}</h2>
-
-      <p>
-        {{ servicio.descripcion }}
-      </p>
-
-      <div class="service-info">
-        <span>Duración: {{ servicio.duracion }}</span>
-        <strong>{{ servicio.precio }}</strong>
+      <p class="descripcion">{{ servicio.descripcion }}</p>
+      <div class="service-meta">
+        <div class="meta-item">
+          <span class="meta-icon">⏱</span>
+          <div>
+            <span class="meta-label">Duración</span>
+            <span class="meta-value">{{ formatearDuracion(servicio) }}</span>
+          </div>
+        </div>
+        <div class="meta-item">
+          <span class="meta-icon">💰</span>
+          <div>
+            <span class="meta-label">Precio</span>
+            <span class="meta-value precio">{{ formatearPrecio(servicio) }}</span>
+          </div>
+        </div>
       </div>
-
-      <a
-        routerLink="/reservas"
-        [queryParams]="{ servicio: servicio.nombre }"
-        class="btn-service"
-      >
-        Reservar
-      </a>
+      <a routerLink="/reservas" [queryParams]="{ servicio: servicio.nombre }" class="btn-service">Reservar ahora</a>
     </article>
+  </div>
+</section>
+
+<section class="cta-servicios">
+  <div class="cta-inner">
+    <h2>¿No estás segura de qué servicio elegir?</h2>
+    <p>Contáctanos y te ayudamos a decidir el mejor para ti.</p>
+    <a routerLink="/contacto" class="btn-contact">Hablar con nosotros</a>
   </div>
 </section>

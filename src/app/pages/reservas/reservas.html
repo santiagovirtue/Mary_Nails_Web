@@ -1,174 +1,114 @@
-<section class="reservation-page">
-  <div class="section-header">
-    <span>Reservas</span>
-
+<section class="reservation-hero">
+  <div class="hero-inner">
+    <span class="hero-tag">Reservas</span>
     <h1>Agenda tu cita en Mary Nails</h1>
-
-    <p>
-      Completa tus datos, selecciona un servicio, revisa la disponibilidad y
-      envía tu solicitud de reserva. El administrador revisará la información y
-      confirmará la cita.
-    </p>
+    <p>Selecciona tu servicio, revisa la disponibilidad y envía tu solicitud de reserva. El administrador revisará la información y confirmará la cita.</p>
   </div>
+</section>
 
+<section class="reservation-page">
   <div class="reservation-layout">
     <div class="reservation-form">
       <h2>Datos de la reserva</h2>
 
-      <form>
-        <div class="form-group">
-          <label>Nombre completo</label>
-          <input
-            type="text"
-            name="nombre"
-            placeholder="Ej: María González"
-            [(ngModel)]="reserva.nombre"
-          />
+      <div class="paso">
+        <span class="paso-numero">1</span>
+        <span class="paso-titulo">Elige tu servicio</span>
+      </div>
+      <div class="servicios-mini-grid">
+        <div class="servicio-mini" *ngFor="let s of serviciosActivos" [class.seleccionado]="reserva.servicio === s.nombre" (click)="seleccionarServicio(s)">
+          <strong>{{ s.nombre }}</strong>
+          <span class="precio">{{ formatearPrecio(s.precio) }}</span>
+          <span class="duracion">{{ s.duracion_minutos }} min</span>
         </div>
+      </div>
 
+      <div class="paso">
+        <span class="paso-numero">2</span>
+        <span class="paso-titulo">Tus datos</span>
+      </div>
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" name="nombre" placeholder="Ej: María González" [(ngModel)]="reserva.nombre"/>
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="tel" name="telefono" placeholder="Ej: 300 123 4567" [(ngModel)]="reserva.telefono"/>
+      </div>
+
+      <div class="paso">
+        <span class="paso-numero">3</span>
+        <span class="paso-titulo">Fecha y hora</span>
+      </div>
+      <div class="form-row">
         <div class="form-group">
-          <label>Teléfono</label>
-          <input
-            type="tel"
-            name="telefono"
-            placeholder="Ej: 300 123 4567"
-            [(ngModel)]="reserva.telefono"
-          />
+          <label>Fecha</label>
+          <input type="date" name="fecha" [min]="fechaMinima" [(ngModel)]="reserva.fecha"/>
         </div>
-
         <div class="form-group">
-          <label>Servicio</label>
-          <select name="servicio" [(ngModel)]="reserva.servicio">
-            <option value="">Selecciona un servicio</option>
-
-            <option
-              *ngFor="let servicio of serviciosActivos"
-              [value]="servicio.nombre"
-            >
-              {{ servicio.nombre }}
+          <label>Hora</label>
+          <select name="hora" [(ngModel)]="reserva.hora">
+            <option value="">Selecciona hora</option>
+            <option *ngFor="let horario of horarios" [value]="formatearHora(horario.horaInicio) + ' - ' + formatearHora(horario.horaFinal)" [disabled]="horario.estado !== 'Disponible'">
+              {{ horario.dia }} - {{ formatearHora(horario.horaInicio) }} - {{ formatearHora(horario.horaFinal) }} {{ horario.estado !== 'Disponible' ? '(Ocupado)' : '' }}
             </option>
           </select>
         </div>
+      </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Fecha</label>
-            <input
-              type="date"
-              name="fecha"
-              [min]="fechaMinima"
-              [(ngModel)]="reserva.fecha"
-            />
-          </div>
+      <div class="paso">
+        <span class="paso-numero">4</span>
+        <span class="paso-titulo">Método de pago y detalles</span>
+      </div>
+      <div class="form-group">
+        <label>Método de pago</label>
+        <select name="metodoPago" [(ngModel)]="reserva.metodoPago">
+          <option value="">Selecciona método de pago</option>
+          <option value="Efectivo">Efectivo</option>
+          <option value="Nequi">Nequi</option>
+          <option value="Daviplata">Daviplata</option>
+          <option value="Pago en local">Pago en local</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Comentarios adicionales</label>
+        <textarea name="comentarios" placeholder="Escribe detalles sobre el diseño, color o estilo que deseas" [(ngModel)]="reserva.comentarios"></textarea>
+      </div>
 
-          <div class="form-group">
-            <label>Hora</label>
-            <select name="hora" [(ngModel)]="reserva.hora">
-              <option value="">Selecciona hora</option>
+      <button type="button" class="btn-submit" (click)="confirmarSolicitud()" [disabled]="guardando">
+        {{ guardando ? 'Guardando...' : 'Confirmar reserva' }}
+      </button>
 
-              <option
-                *ngFor="let horario of horarios"
-                [value]="formatearHora(horario.horaInicio) + ' - ' + formatearHora(horario.horaFinal)"
-                [disabled]="horario.estado !== 'Disponible'"
-              >
-                {{ horario.dia }} -
-                {{ formatearHora(horario.horaInicio) }} -
-                {{ formatearHora(horario.horaFinal) }}
-                {{ horario.estado !== 'Disponible' ? '(Ocupado)' : '' }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Método de pago</label>
-          <select name="metodoPago" [(ngModel)]="reserva.metodoPago">
-            <option value="">Selecciona método de pago</option>
-            <option value="Efectivo">Efectivo</option>
-            <option value="Nequi">Nequi</option>
-            <option value="Daviplata">Daviplata</option>
-            <option value="Pago en local">Pago en local</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Comentarios adicionales</label>
-          <textarea
-            name="comentarios"
-            placeholder="Escribe detalles sobre el diseño, color o estilo que deseas"
-            [(ngModel)]="reserva.comentarios"
-          ></textarea>
-        </div>
-
-        <button
-          type="button"
-          class="btn-submit"
-          (click)="confirmarSolicitud()"
-        >
-          Confirmar solicitud
-        </button>
-
-        <p class="error-message" *ngIf="mensajeError">
-          {{ mensajeError }}
-        </p>
-
-        <p class="confirmation-message" *ngIf="mensajeConfirmacion">
-          {{ mensajeConfirmacion }}
-        </p>
-      </form>
+      <p class="error-message" *ngIf="mensajeError">{{ mensajeError }}</p>
     </div>
 
     <div class="availability-card">
       <h2>Disponibilidad</h2>
-
-      <p class="availability-text">
-        Estos horarios vienen desde la gestión de disponibilidad del
-        administrador. Selecciona un horario disponible y luego elige una fecha
-        que coincida con ese día.
-      </p>
+      <p class="availability-text">Selecciona un horario disponible y luego elige una fecha que coincida con ese día.</p>
 
       <div class="schedule-list">
-        <button
-          type="button"
-          class="schedule-item"
-          *ngFor="let horario of horarios"
+        <button type="button" class="schedule-item" *ngFor="let horario of horarios"
           [class.available]="horario.estado === 'Disponible'"
           [class.busy]="horario.estado !== 'Disponible'"
           [class.clickable]="horario.estado === 'Disponible'"
           [class.disabled]="horario.estado !== 'Disponible'"
-          (click)="seleccionarDisponibilidad(horario)"
-        >
+          (click)="seleccionarDisponibilidad(horario)">
           <div>
             <strong>{{ horario.dia }}</strong>
-
-            <span>
-              {{ formatearHora(horario.horaInicio) }} -
-              {{ formatearHora(horario.horaFinal) }}
-            </span>
-
-            <small>
-              {{ horario.observacion }}
-            </small>
+            <span>{{ formatearHora(horario.horaInicio) }} - {{ formatearHora(horario.horaFinal) }}</span>
+            <small>{{ horario.observacion }}</small>
           </div>
-
           <p>{{ horario.estado }}</p>
         </button>
       </div>
 
-      <p class="selected-schedule-message" *ngIf="horarioSeleccionado">
-        {{ horarioSeleccionado }}
-      </p>
+      <p class="selected-schedule-message" *ngIf="horarioSeleccionado">{{ horarioSeleccionado }}</p>
 
       <div class="whatsapp-box">
         <h3>¿Tienes dudas?</h3>
-
-        <p>
-          Selecciona el motivo de tu consulta y comunícate por WhatsApp.
-        </p>
-
+        <p>Selecciona el motivo de tu consulta y comunícate por WhatsApp.</p>
         <div class="whatsapp-select">
           <label>Motivo del mensaje</label>
-
           <select (change)="seleccionarMotivo($event)">
             <option value="reserva">Reservar cita</option>
             <option value="disponibilidad">Consultar disponibilidad</option>
@@ -179,11 +119,25 @@
             <option value="otro">Otro motivo</option>
           </select>
         </div>
-
-        <a [href]="whatsappUrl" target="_blank">
-          Enviar mensaje
-        </a>
+        <a [href]="whatsappUrl" target="_blank">Enviar mensaje</a>
       </div>
     </div>
   </div>
 </section>
+
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-icon">✓</div>
+    <h2>¡Reserva confirmada!</h2>
+    <p class="modal-subtitle">Tu solicitud fue registrada exitosamente</p>
+    <div class="modal-details" *ngIf="reservaConfirmada">
+      <div class="detail-row"><span>Cliente:</span><strong>{{ reservaConfirmada.nombre }}</strong></div>
+      <div class="detail-row"><span>Servicio:</span><strong>{{ reservaConfirmada.servicio }}</strong></div>
+      <div class="detail-row"><span>Fecha:</span><strong>{{ reservaConfirmada.fecha }}</strong></div>
+      <div class="detail-row"><span>Hora:</span><strong>{{ reservaConfirmada.hora }}</strong></div>
+      <div class="detail-row"><span>Pago:</span><strong>{{ reservaConfirmada.metodoPago }}</strong></div>
+    </div>
+    <p class="modal-info">Recibirás la confirmación pronto. Puedes revisar el estado en "Mis citas".</p>
+    <button class="modal-close" (click)="cerrarModal()">Entendido</button>
+  </div>
+</div>

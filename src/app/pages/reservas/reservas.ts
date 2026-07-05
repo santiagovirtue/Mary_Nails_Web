@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { ReservasService } from '../../services/reservas.service';
-import { ServiciosService, Servicio } from '../../services/servicios.service';
 import { DisponibilidadService, Horario } from '../../services/disponibilidad.service';
 
 @Component({
@@ -15,7 +15,7 @@ import { DisponibilidadService, Horario } from '../../services/disponibilidad.se
 export class Reservas implements OnInit {
   private readonly telefonoWhatsapp = '573132146285';
   horarios: Horario[] = [];
-  serviciosActivos: Servicio[] = [];
+  serviciosActivos: any[] = [];
   reserva = { nombre: '', telefono: '', servicio: '', fecha: '', hora: '', metodoPago: '', comentarios: '' };
   mensajeConfirmacion = '';
   mensajeError = '';
@@ -23,21 +23,54 @@ export class Reservas implements OnInit {
   diaHorarioSeleccionado = '';
   mensajeWhatsapp = 'Hola, quiero reservar una cita en Mary Nails.';
   fechaMinima = '';
+  guardando = false;
+  mostrarModal = false;
+  reservaConfirmada: any = null;
 
   constructor(
     private route: ActivatedRoute,
     private reservasService: ReservasService,
-    private serviciosService: ServiciosService,
-    private disponibilidadService: DisponibilidadService
+    private disponibilidadService: DisponibilidadService,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {
     this.fechaMinima = this.obtenerFechaActual();
     this.horarios = this.disponibilidadService.obtenerHorarios();
-    this.serviciosActivos = this.serviciosService.obtenerServiciosActivos();
+    this.cargarServiciosReales();
     this.route.queryParams.subscribe((params) => {
       if (params['servicio']) this.reserva.servicio = params['servicio'];
     });
+  }
+
+  cargarServiciosReales(): void {
+    this.http.get<any[]>('/api/servicios/activos').subscribe({
+      next: (data) => {
+        this.zone.run(() => {
+          this.serviciosActivos = data || [];
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.zone.run(() => {
+          this.serviciosActivos = [];
+          this.cdr.detectChanges();
+        });
+      },
+    });
+  }
+
+  seleccionarServicio(servicio: any): void {
+    this.reserva.servicio = servicio.nombre;
+  }
+
+  formatearPrecio(precio: any): string {
+    if (!precio) return '';
+    const num = Number(precio);
+    if (isNaN(num)) return String(precio);
+    return '$' + num.toLocaleString('es-CO');
   }
 
   seleccionarMotivo(event: Event): void {
@@ -55,7 +88,7 @@ export class Reservas implements OnInit {
   }
 
   get whatsappUrl(): string {
-    return `https://api.whatsapp.com/send?phone=${this.telefonoWhatsapp}&text=${encodeURIComponent(this.mensajeWhatsapp)}`;
+    return 'https://api.whatsapp.com/send?phone=' + this.telefonoWhatsapp + '&text=' + encodeURIComponent(this.mensajeWhatsapp);
   }
 
   seleccionarDisponibilidad(horario: Horario): void {
@@ -63,9 +96,9 @@ export class Reservas implements OnInit {
       this.horarioSeleccionado = 'Este horario está ocupado. Selecciona otro horario disponible.';
       return;
     }
-    this.reserva.hora = `${this.formatearHora(horario.horaInicio)} - ${this.formatearHora(horario.horaFinal)}`;
+    this.reserva.hora = this.formatearHora(horario.horaInicio) + ' - ' + this.formatearHora(horario.horaFinal);
     this.diaHorarioSeleccionado = horario.dia;
-    this.horarioSeleccionado = `Seleccionaste el horario del día ${horario.dia}: ${this.reserva.hora}. Ahora elige la fecha correspondiente en el formulario.`;
+    this.horarioSeleccionado = 'Seleccionaste el horario del día ' + horario.dia + ': ' + this.reserva.hora + '. Ahora elige la fecha correspondiente en el formulario.';
   }
 
   confirmarSolicitud(): void {
@@ -74,13 +107,25 @@ export class Reservas implements OnInit {
     if (!this.camposObligatoriosCompletos()) { this.mensajeError = 'Por favor completa todos los campos obligatorios antes de confirmar la solicitud.'; return; }
     if (!this.telefonoValido()) { this.mensajeError = 'El teléfono debe contener mínimo 10 números.'; return; }
     if (!this.fechaValida()) { this.mensajeError = 'No puedes seleccionar una fecha pasada.'; return; }
-    if (!this.fechaCoincideConDiaSeleccionado()) { this.mensajeError = `La fecha no corresponde al día ${this.obtenerDiaHorarioSeleccionado()}.`; return; }
+    if (!this.fechaCoincideConDiaSeleccionado()) { this.mensajeError = 'La fecha no corresponde al día ' + this.obtenerDiaHorarioSeleccionado() + '.'; return; }
     if (this.reservasService.existeReserva(this.reserva.fecha, this.reserva.hora)) { this.mensajeError = 'Ya existe una reserva para esa fecha y hora.'; return; }
-    this.reservasService.agregarReserva({ ...this.reserva });
-    this.mensajeConfirmacion = `Solicitud registrada para el día ${this.reserva.fecha} a las ${this.reserva.hora}.`;
-    this.reserva = { nombre: '', telefono: '', servicio: '', fecha: '', hora: '', metodoPago: '', comentarios: '' };
-    this.horarioSeleccionado = '';
-    this.diaHorarioSeleccionado = '';
+    this.guardando = true;
+    const reservaGuardar = Object.assign({}, this.reserva);
+    this.reservasService.agregarReserva(reservaGuardar);
+    this.zone.run(() => {
+      this.reservaConfirmada = reservaGuardar;
+      this.mostrarModal = true;
+      this.guardando = false;
+      this.reserva = { nombre: '', telefono: '', servicio: '', fecha: '', hora: '', metodoPago: '', comentarios: '' };
+      this.horarioSeleccionado = '';
+      this.diaHorarioSeleccionado = '';
+      this.cdr.detectChanges();
+    });
+  }
+
+  cerrarModal(): void {
+    this.mostrarModal = false;
+    this.reservaConfirmada = null;
   }
 
   camposObligatoriosCompletos(): boolean {
@@ -90,18 +135,18 @@ export class Reservas implements OnInit {
   telefonoValido(): boolean { return this.reserva.telefono.replace(/\D/g, '').length >= 10; }
   obtenerFechaActual(): string {
     const hoy = new Date();
-    return `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+    return hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0') + '-' + String(hoy.getDate()).padStart(2,'0');
   }
   fechaValida(): boolean { return this.reserva.fecha >= this.fechaMinima; }
 
   obtenerDiaDeFecha(fecha: string): string {
-    const [year, month, day] = fecha.split('-').map(Number);
-    return ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date(year, month-1, day).getDay()];
+    const partes = fecha.split('-').map(Number);
+    return ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date(partes[0], partes[1]-1, partes[2]).getDay()];
   }
 
   obtenerDiaHorarioSeleccionado(): string {
     if (this.diaHorarioSeleccionado) return this.diaHorarioSeleccionado;
-    const h = this.horarios.find(h => `${this.formatearHora(h.horaInicio)} - ${this.formatearHora(h.horaFinal)}` === this.reserva.hora);
+    const h = this.horarios.find(h => (this.formatearHora(h.horaInicio) + ' - ' + this.formatearHora(h.horaFinal)) === this.reserva.hora);
     return h ? h.dia : '';
   }
 
@@ -113,8 +158,8 @@ export class Reservas implements OnInit {
 
   formatearHora(hora: string): string {
     if (!hora) return '';
-    const [horas, minutos] = hora.split(':');
-    const h = Number(horas);
-    return `${(h % 12 || 12).toString().padStart(2,'0')}:${minutos} ${h >= 12 ? 'p.m.' : 'a.m.'}`;
+    const partes = hora.split(':');
+    const h = Number(partes[0]);
+    return (h % 12 || 12).toString().padStart(2,'0') + ':' + partes[1] + ' ' + (h >= 12 ? 'p.m.' : 'a.m.');
   }
 }

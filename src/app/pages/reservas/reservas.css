@@ -318,3 +318,196 @@
   font-weight: 800;
   line-height: 1.5;
 }
+/* HERO NUEVO */
+.reservation-hero {
+  padding: 80px 8% 40px;
+  background: linear-gradient(135deg, #fff7fb 0%, #ffe3ef 100%);
+  text-align: center;
+}
+.hero-inner {
+  max-width: 780px;
+  margin: 0 auto;
+}
+.hero-tag {
+  display: inline-block;
+  background: white;
+  color: #c2185b;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 15px rgba(194, 24, 91, 0.1);
+}
+.hero-inner h1 {
+  font-size: 44px;
+  color: #c2185b;
+  margin: 0 0 18px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.hero-inner p {
+  color: #555;
+  font-size: 17px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* PASOS */
+.paso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 14px;
+  padding-top: 20px;
+  border-top: 1px dashed #f3d6e4;
+}
+.paso:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+.paso-numero {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #c2185b, #ff4081);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+}
+.paso-titulo {
+  color: #c2185b;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+/* SERVICIOS MINI GRID */
+.servicios-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.servicio-mini {
+  border: 2px solid #f3d6e4;
+  border-radius: 14px;
+  padding: 14px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: white;
+}
+.servicio-mini:hover {
+  border-color: #c2185b;
+  transform: translateY(-2px);
+}
+.servicio-mini.seleccionado {
+  border-color: #c2185b;
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  box-shadow: 0 6px 15px rgba(194, 24, 91, 0.2);
+}
+.servicio-mini strong {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.servicio-mini .precio {
+  color: #c2185b;
+  font-weight: 800;
+  font-size: 15px;
+}
+.servicio-mini .duracion {
+  color: #888;
+  font-size: 12px;
+}
+
+/* BOTÓN DISABLED */
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-content {
+  background: white;
+  border-radius: 24px;
+  padding: 40px 32px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  margin: 0 auto 20px;
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.3);
+}
+.modal-content h2 {
+  color: #c2185b;
+  font-size: 26px;
+  margin: 0 0 8px;
+}
+.modal-subtitle {
+  color: #666;
+  margin: 0 0 20px;
+}
+.modal-details {
+  background: #fff7fb;
+  border-radius: 14px;
+  padding: 18px;
+  margin: 20px 0;
+  text-align: left;
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #fce4ec;
+  font-size: 14px;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-row span { color: #888; }
+.detail-row strong { color: #333; }
+.modal-info {
+  color: #666;
+  font-size: 13px;
+  margin: 16px 0 24px;
+}
+.modal-close {
+  background: linear-gradient(135deg, #c2185b, #d81b60);
+  color: white;
+  border: none;
+  padding: 14px 40px;
+  border-radius: 30px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 15px;
+  box-shadow: 0 6px 15px rgba(194, 24, 91, 0.3);
+  transition: transform 0.2s;
+}
+.modal-close:hover { transform: translateY(-2px); }
