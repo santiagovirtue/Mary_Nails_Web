@@ -1,21 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Reserva, ReservasService } from '../../services/reservas.service';
-
-interface Cliente {
-  nombre: string;
-  telefono: string;
-  totalReservas: number;
-  ultimaCita: string;
-  servicios: string[];
-  citasPendientes: number;
-  citasConfirmadas: number;
-  citasCompletadas: number;
-  citasCanceladas: number;
-  pagosPendientes: number;
-}
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-clientes',
@@ -24,114 +11,69 @@ interface Cliente {
   styleUrl: './clientes.css',
 })
 export class Clientes implements OnInit {
-  reservas: Reserva[] = [];
-  clientes: Cliente[] = [];
-
+  clientes: any[] = [];
+  cargando = true;
   busqueda = '';
-  clienteExpandido = '';
+  clienteExpandido = 0;
 
-  constructor(private reservasService: ReservasService) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
-  ngOnInit(): void {
-    this.cargarReservas();
-    this.generarClientes();
-  }
+  ngOnInit(): void { this.cargarClientes(); }
 
-  cargarReservas(): void {
-    this.reservas = this.reservasService.obtenerReservas();
-  }
-
-  generarClientes(): void {
-    const clientesMap = new Map<string, Reserva[]>();
-
-    this.reservas.forEach((reserva) => {
-      const telefono = reserva.telefono.trim();
-
-      if (!clientesMap.has(telefono)) {
-        clientesMap.set(telefono, []);
-      }
-
-      clientesMap.get(telefono)?.push(reserva);
+  cargarClientes(): void {
+    this.http.get<any[]>('/api/clientes').subscribe({
+      next: (data) => {
+        this.zone.run(() => {
+          this.clientes = data || [];
+          this.cargando = false;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => { this.zone.run(() => { this.cargando = false; this.cdr.detectChanges(); }); },
     });
+  }
 
-    this.clientes = Array.from(clientesMap.entries()).map(
-      ([telefono, reservasCliente]) => {
-        const servicios = Array.from(
-          new Set(reservasCliente.map((reserva) => reserva.servicio))
-        );
-
-        const reservasOrdenadas = [...reservasCliente].sort((a, b) =>
-          b.fecha.localeCompare(a.fecha)
-        );
-
-        return {
-          nombre: reservasCliente[0].nombre,
-          telefono,
-          totalReservas: reservasCliente.length,
-          ultimaCita: reservasOrdenadas[0]?.fecha || 'Sin fecha',
-          servicios,
-          citasPendientes: reservasCliente.filter(
-            (reserva) => reserva.estado === 'Pendiente'
-          ).length,
-          citasConfirmadas: reservasCliente.filter(
-            (reserva) => reserva.estado === 'Confirmada'
-          ).length,
-          citasCompletadas: reservasCliente.filter(
-            (reserva) => reserva.estado === 'Completada'
-          ).length,
-          citasCanceladas: reservasCliente.filter(
-            (reserva) => reserva.estado === 'Cancelada'
-          ).length,
-          pagosPendientes: reservasCliente.filter(
-            (reserva) => reserva.estadoPago !== 'Pagado'
-          ).length,
-        };
-      }
+  obtenerClientesFiltrados(): any[] {
+    const texto = this.busqueda.toLowerCase().trim();
+    if (!texto) return this.clientes;
+    return this.clientes.filter(c =>
+      (c.nombre || '').toLowerCase().includes(texto) ||
+      (c.telefono || '').toLowerCase().includes(texto) ||
+      (c.correo || '').toLowerCase().includes(texto) ||
+      (c.servicios || []).join(' ').toLowerCase().includes(texto)
     );
   }
 
-  obtenerClientesFiltrados(): Cliente[] {
-    const texto = this.busqueda.toLowerCase().trim();
+  contarClientes(): number { return this.clientes.length; }
+  contarCitasTotales(): number { return this.clientes.reduce((sum, c) => sum + (c.totalCitas || 0), 0); }
+  contarConPagosPendientes(): number { return this.clientes.filter(c => c.pagosPendientes > 0).length; }
 
-    return this.clientes.filter((cliente) => {
-      const serviciosTexto = cliente.servicios.join(' ').toLowerCase();
-
-      return (
-        cliente.nombre.toLowerCase().includes(texto) ||
-        cliente.telefono.toLowerCase().includes(texto) ||
-        serviciosTexto.includes(texto)
-      );
-    });
+  alternarHistorial(id: number): void {
+    this.clienteExpandido = this.clienteExpandido === id ? 0 : id;
   }
 
-  obtenerReservasCliente(telefono: string): Reserva[] {
-    return this.reservasService
-      .obtenerReservasPorTelefono(telefono)
-      .sort((a, b) => b.fecha.localeCompare(a.fecha));
+  historialVisible(id: number): boolean { return this.clienteExpandido === id; }
+
+  formatearFecha(fecha: string): string {
+    if (!fecha) return 'Sin fecha';
+    try {
+      const d = new Date(fecha);
+      const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      return d.getDate() + ' ' + meses[d.getMonth()] + ' ' + d.getFullYear();
+    } catch { return fecha; }
   }
 
-  alternarHistorial(telefono: string): void {
-    this.clienteExpandido =
-      this.clienteExpandido === telefono ? '' : telefono;
+  formatearHora(hora: string): string {
+    if (!hora) return '';
+    const partes = String(hora).split(':');
+    const h = Number(partes[0]);
+    return (h % 12 || 12).toString().padStart(2,'0') + ':' + partes[1] + ' ' + (h >= 12 ? 'p.m.' : 'a.m.');
   }
 
-  historialVisible(telefono: string): boolean {
-    return this.clienteExpandido === telefono;
+  cap(v: string): string {
+    if (!v) return '';
+    return v.charAt(0).toUpperCase() + v.slice(1).toLowerCase();
   }
 
-  contarClientes(): number {
-    return this.clientes.length;
-  }
-
-  contarReservasTotales(): number {
-    return this.reservas.length;
-  }
-
-  contarClientesConPagosPendientes(): number {
-    return this.clientes.filter((cliente) => cliente.pagosPendientes > 0).length;
-  }
-
-  limpiarBusqueda(): void {
-    this.busqueda = '';
-  }
+  limpiarBusqueda(): void { this.busqueda = ''; }
 }

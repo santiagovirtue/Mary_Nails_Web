@@ -1,154 +1,103 @@
 <section class="clients-page">
   <div class="clients-header">
     <div>
-      <span>Clientes</span>
-
-      <h1>Gestión de clientes</h1>
-
-      <p>
-        En esta sección el administrador puede consultar los clientes generados
-        automáticamente a partir de las reservas registradas en Mary Nails.
-      </p>
+      <span class="etiqueta">Gestión</span>
+      <h1>Clientes del negocio</h1>
+      <p class="subtitulo">Consulta los clientes generados a partir de las reservas. Incluye historial de citas y estadísticas.</p>
     </div>
-
-    <a routerLink="/admin/dashboard" class="btn-main">
-      Volver al dashboard
-    </a>
+    <a routerLink="/admin/dashboard" class="btn-main">Volver al dashboard</a>
   </div>
 
-  <div class="summary-grid">
-    <article class="summary-card">
-      <h3>Total clientes</h3>
-      <strong>{{ contarClientes() }}</strong>
-      <p>Clientes únicos registrados por teléfono.</p>
-    </article>
-
-    <article class="summary-card">
-      <h3>Total reservas</h3>
-      <strong>{{ contarReservasTotales() }}</strong>
-      <p>Reservas asociadas a clientes.</p>
-    </article>
-
-    <article class="summary-card">
-      <h3>Pagos pendientes</h3>
-      <strong>{{ contarClientesConPagosPendientes() }}</strong>
-      <p>Clientes con pagos por validar.</p>
-    </article>
+  <div class="kpi-row">
+    <div class="kpi-mini">
+      <span class="kpi-icon">👥</span>
+      <div><strong>{{ contarClientes() }}</strong><span>Clientes únicos</span></div>
+    </div>
+    <div class="kpi-mini success">
+      <span class="kpi-icon">📅</span>
+      <div><strong>{{ contarCitasTotales() }}</strong><span>Citas totales</span></div>
+    </div>
+    <div class="kpi-mini warning">
+      <span class="kpi-icon">💰</span>
+      <div><strong>{{ contarConPagosPendientes() }}</strong><span>Con pagos pendientes</span></div>
+    </div>
   </div>
 
   <div class="filters-card">
     <div class="filter-group">
       <label>Buscar cliente</label>
-
-      <input
-        type="text"
-        name="busqueda"
-        placeholder="Buscar por nombre, teléfono o servicio"
-        [(ngModel)]="busqueda"
-      />
+      <input type="text" name="busqueda" placeholder="Buscar por nombre, teléfono, correo o servicio" [(ngModel)]="busqueda"/>
     </div>
-
-    <button type="button" class="btn-clear" (click)="limpiarBusqueda()">
-      Limpiar búsqueda
-    </button>
+    <button type="button" class="btn-clear" (click)="limpiarBusqueda()">Limpiar</button>
   </div>
 
-  <div class="clients-card">
-    <h2>Listado de clientes</h2>
+  <div *ngIf="cargando" class="cargando">Cargando clientes...</div>
 
-    <p class="empty-message" *ngIf="clientes.length === 0">
-      Todavía no hay clientes registrados. Cuando se realicen reservas,
-      aparecerán en esta sección.
+  <div class="clients-card" *ngIf="!cargando">
+    <h2>Listado de clientes ({{ obtenerClientesFiltrados().length }})</h2>
+
+    <p class="empty-msg" *ngIf="clientes.length === 0">
+      No hay clientes registrados. Aparecerán automáticamente cuando se realicen reservas.
     </p>
-
-    <p
-      class="empty-message"
-      *ngIf="clientes.length > 0 && obtenerClientesFiltrados().length === 0"
-    >
+    <p class="empty-msg" *ngIf="clientes.length > 0 && obtenerClientesFiltrados().length === 0">
       No se encontraron clientes con la búsqueda ingresada.
     </p>
 
     <div class="clients-list" *ngIf="obtenerClientesFiltrados().length > 0">
-      <article
-        class="client-item"
-        *ngFor="let cliente of obtenerClientesFiltrados()"
-      >
+      <article class="client-item" *ngFor="let cliente of obtenerClientesFiltrados()">
         <div class="client-main">
-          <div class="client-avatar">
-            {{ cliente.nombre.charAt(0).toUpperCase() }}
-          </div>
+          <div class="client-avatar">{{ (cliente.nombre || '?').charAt(0).toUpperCase() }}</div>
 
           <div class="client-info">
             <h3>{{ cliente.nombre }}</h3>
-
-            <p>
-              <strong>Teléfono:</strong>
-              {{ cliente.telefono }}
-            </p>
-
-            <p>
-              <strong>Última cita:</strong>
-              {{ cliente.ultimaCita }}
-            </p>
-
-            <p>
-              <strong>Servicios solicitados:</strong>
-              {{ cliente.servicios.join(', ') }}
-            </p>
+            <p><span class="label">📱</span> {{ cliente.telefono || 'Sin teléfono' }}</p>
+            <p><span class="label">✉️</span> {{ cliente.correo || 'Sin correo' }}</p>
+            <p><span class="label">📅</span> Desde {{ formatearFecha(cliente.fecha_registro) }}</p>
+            <div class="servicios-tags">
+              <span class="tag" *ngFor="let s of cliente.servicios">{{ s }}</span>
+            </div>
           </div>
 
           <div class="client-stats">
-            <span>Total reservas: {{ cliente.totalReservas }}</span>
-            <span>Pendientes: {{ cliente.citasPendientes }}</span>
-            <span>Confirmadas: {{ cliente.citasConfirmadas }}</span>
-            <span>Completadas: {{ cliente.citasCompletadas }}</span>
-            <span>Canceladas: {{ cliente.citasCanceladas }}</span>
-            <span>Pagos pendientes: {{ cliente.pagosPendientes }}</span>
+            <div class="stat-mini"><strong>{{ cliente.totalCitas }}</strong><span>Citas</span></div>
+            <div class="stat-mini pending"><strong>{{ cliente.citasPendientes }}</strong><span>Pendientes</span></div>
+            <div class="stat-mini confirmed"><strong>{{ cliente.citasConfirmadas }}</strong><span>Confirmadas</span></div>
+            <div class="stat-mini completed"><strong>{{ cliente.citasCompletadas }}</strong><span>Completadas</span></div>
+            <div class="stat-mini pay" *ngIf="cliente.pagosPendientes > 0"><strong>{{ cliente.pagosPendientes }}</strong><span>Pagos pend.</span></div>
+          </div>
 
-            <button
-              type="button"
-              class="history-btn"
-              (click)="alternarHistorial(cliente.telefono)"
-            >
-              {{ historialVisible(cliente.telefono) ? 'Ocultar historial' : 'Ver historial' }}
+          <div class="client-actions">
+            <p class="ultima-cita" *ngIf="cliente.ultimaCita">Última cita: {{ formatearFecha(cliente.ultimaCita) }}</p>
+            <button type="button" class="btn-historial" (click)="alternarHistorial(cliente.id)">
+              {{ historialVisible(cliente.id) ? 'Ocultar historial' : 'Ver historial' }}
             </button>
           </div>
         </div>
 
-        <div class="client-history" *ngIf="historialVisible(cliente.telefono)">
-          <h4>Historial de reservas</h4>
-
-          <div
-            class="history-item"
-            *ngFor="let reserva of obtenerReservasCliente(cliente.telefono)"
-          >
-            <div>
-              <strong>{{ reserva.servicio }}</strong>
-              <p>{{ reserva.fecha }} - {{ reserva.hora }}</p>
-              <p>Método de pago: {{ reserva.metodoPago }}</p>
-              <p>Comentario: {{ reserva.comentarios || 'Sin comentarios' }}</p>
+        <div class="client-history" *ngIf="historialVisible(cliente.id) && cliente.historial?.length > 0">
+          <h4>Historial de citas</h4>
+          <div class="history-item" *ngFor="let cita of cliente.historial">
+            <div class="history-fecha">
+              <strong>{{ formatearFecha(cita.fecha) }}</strong>
+              <span>{{ formatearHora(cita.hora) }}</span>
             </div>
-
-            <div class="history-status">
-              <span
-                class="status"
-                [class.pending]="reserva.estado === 'Pendiente'"
-                [class.confirmed]="reserva.estado === 'Confirmada'"
-                [class.completed]="reserva.estado === 'Completada'"
-                [class.cancelled]="reserva.estado === 'Cancelada'"
-              >
-                Cita: {{ reserva.estado }}
+            <div class="history-info">
+              <strong>{{ cita.servicio }}</strong>
+              <span>{{ cita.metodoPago || 'Sin método' }}</span>
+            </div>
+            <div class="history-badges">
+              <span class="status" [class.pending]="cita.estado === 'pendiente'" [class.confirmed]="cita.estado === 'confirmada'" [class.completed]="cita.estado === 'completada'" [class.cancelled]="cita.estado === 'cancelada'">
+                {{ cap(cita.estado) }}
               </span>
-
-              <span
-                class="payment-status"
-                [class.payment-pending]="reserva.estadoPago !== 'Pagado'"
-                [class.payment-paid]="reserva.estadoPago === 'Pagado'"
-              >
-                Pago: {{ reserva.estadoPago || 'Pendiente' }}
+              <span class="payment-status" [class.payment-pending]="cita.estadoPago !== 'pagado'" [class.payment-paid]="cita.estadoPago === 'pagado'">
+                {{ cita.estadoPago === 'pagado' ? 'Pagado' : 'Pago pendiente' }}
               </span>
             </div>
           </div>
+        </div>
+
+        <div class="client-history" *ngIf="historialVisible(cliente.id) && (!cliente.historial || cliente.historial.length === 0)">
+          <p class="empty-msg">Este cliente no tiene citas registradas.</p>
         </div>
       </article>
     </div>
