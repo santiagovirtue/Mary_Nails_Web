@@ -1,129 +1,130 @@
 <section class="availability-page">
   <div class="availability-header">
     <div>
-      <span>Disponibilidad</span>
-      <h1>Gestión de horarios disponibles</h1>
-      <p>
-        En esta sección el administrador puede configurar los días y horarios
-        disponibles para que los clientes puedan solicitar sus citas.
-      </p>
+      <span class="etiqueta">Configuración</span>
+      <h1>Gestión de disponibilidad</h1>
+      <p class="subtitulo">Configura los días y horarios disponibles. Los cambios se reflejan en tiempo real para los clientes.</p>
     </div>
+    <a routerLink="/admin/cronograma" class="btn-main">Ver cronograma</a>
+  </div>
 
-    <a routerLink="/admin/cronograma" class="btn-main">
-      Ver cronograma
-    </a>
+  <div class="kpi-row">
+    <div class="kpi-mini">
+      <span class="kpi-icon">📅</span>
+      <div>
+        <strong>{{ horarios.length }}</strong>
+        <span>Horarios totales</span>
+      </div>
+    </div>
+    <div class="kpi-mini success">
+      <span class="kpi-icon">✅</span>
+      <div>
+        <strong>{{ contarDisponibles() }}</strong>
+        <span>Disponibles</span>
+      </div>
+    </div>
+    <div class="kpi-mini danger">
+      <span class="kpi-icon">🔴</span>
+      <div>
+        <strong>{{ contarOcupados() }}</strong>
+        <span>Ocupados</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="alerta" *ngIf="mensaje" [class.exito]="tipoMensaje==='exito'" [class.error]="tipoMensaje==='error'">
+    {{ mensaje }}
   </div>
 
   <div class="availability-layout">
     <div class="availability-form">
-      <h2>Agregar horario</h2>
+      <div class="form-title">
+        <h2>{{ editando ? 'Editar horario' : 'Agregar horario' }}</h2>
+        <button type="button" class="btn-cancelar" *ngIf="editando" (click)="cancelarEdicion()">Cancelar edición</button>
+      </div>
 
-      <form>
+      <div class="form-group">
+        <label>Día</label>
+        <select name="dia" [(ngModel)]="horario.dia">
+          <option value="">Selecciona un día</option>
+          <option value="Lunes">Lunes</option>
+          <option value="Martes">Martes</option>
+          <option value="Miércoles">Miércoles</option>
+          <option value="Jueves">Jueves</option>
+          <option value="Viernes">Viernes</option>
+          <option value="Sábado">Sábado</option>
+          <option value="Domingo">Domingo</option>
+        </select>
+      </div>
+
+      <div class="form-row">
         <div class="form-group">
-          <label>Día</label>
-          <select name="dia" [(ngModel)]="horario.dia">
-            <option value="">Selecciona un día</option>
-            <option value="Lunes">Lunes</option>
-            <option value="Martes">Martes</option>
-            <option value="Miércoles">Miércoles</option>
-            <option value="Jueves">Jueves</option>
-            <option value="Viernes">Viernes</option>
-            <option value="Sábado">Sábado</option>
-            <option value="Domingo">Domingo</option>
-          </select>
+          <label>Hora inicial</label>
+          <input type="time" name="horaInicio" [(ngModel)]="horario.horaInicio"/>
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Hora inicial</label>
-            <input
-              type="time"
-              name="horaInicio"
-              [(ngModel)]="horario.horaInicio"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Hora final</label>
-            <input
-              type="time"
-              name="horaFinal"
-              [(ngModel)]="horario.horaFinal"
-            />
-          </div>
-        </div>
-
         <div class="form-group">
-          <label>Estado</label>
-          <select name="estado" [(ngModel)]="horario.estado">
-            <option value="Disponible">Disponible</option>
-            <option value="Ocupado">Ocupado</option>
-          </select>
+          <label>Hora final</label>
+          <input type="time" name="horaFinal" [(ngModel)]="horario.horaFinal"/>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label>Observación</label>
-          <textarea
-            name="observacion"
-            placeholder="Ej: Horario reservado para citas especiales"
-            [(ngModel)]="horario.observacion"
-          ></textarea>
-        </div>
+      <div class="form-group">
+        <label>Estado inicial</label>
+        <select name="estado" [(ngModel)]="horario.estado">
+          <option value="Disponible">Disponible</option>
+          <option value="Ocupado">Ocupado</option>
+        </select>
+      </div>
 
-        <button type="button" class="btn-submit" (click)="agregarHorario()">
-          Guardar horario
-        </button>
+      <div class="form-group">
+        <label>Observación</label>
+        <textarea name="observacion" rows="3" placeholder="Ej: Horario de atención normal" [(ngModel)]="horario.observacion"></textarea>
+      </div>
 
-        <p class="success-message" *ngIf="mensaje">
-          {{ mensaje }}
-        </p>
-      </form>
+      <p class="error-msg" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+      <button type="button" class="btn-submit" (click)="agregarHorario()" [disabled]="guardando">
+        {{ guardando ? 'Guardando...' : (editando ? 'Actualizar horario' : 'Guardar horario') }}
+      </button>
+
+      <div class="nota-info">
+        <strong>💡 Nota:</strong> Los horarios marcados como "Disponible" aparecerán automáticamente en el formulario de reservas del cliente. Si un cliente reserva un horario, se marcará como "Ocupado" automáticamente.
+      </div>
     </div>
 
     <div class="availability-card">
       <h2>Horarios registrados</h2>
 
-      <p class="availability-text">
-        Control semanal de disponibilidad. Estos horarios se muestran también
-        en el formulario de reservas del cliente.
+      <div *ngIf="cargando" class="cargando">Cargando horarios...</div>
+
+      <p class="empty-msg" *ngIf="!cargando && horarios.length === 0">
+        No hay horarios registrados. Agrega el primero usando el formulario.
       </p>
 
-      <div class="schedule-list">
-        <div
-          class="schedule-item"
-          *ngFor="let item of horarios"
+      <div class="schedule-list" *ngIf="!cargando && horarios.length > 0">
+        <div class="schedule-item" *ngFor="let item of horarios"
           [class.available]="item.estado === 'Disponible'"
           [class.busy]="item.estado === 'Ocupado'"
-        >
-          <div>
+          [class.editing]="editando && horario.id === item.id">
+          <div class="item-barra"></div>
+          <div class="item-info">
             <strong>{{ item.dia }}</strong>
-            <span>
-              {{ formatearHora(item.horaInicio) }} -
-              {{ formatearHora(item.horaFinal) }}
-            </span>
+            <span class="horas">{{ formatearHora(item.horaInicio) }} — {{ formatearHora(item.horaFinal) }}</span>
             <small>{{ item.observacion }}</small>
           </div>
-
-          <p>{{ item.estado }}</p>
-
-          <div class="schedule-actions">
-            <button type="button" (click)="cambiarEstado(item.id)">
-              Cambiar estado
-            </button>
-
-            <button type="button" class="delete-btn" (click)="eliminarHorario(item.id)">
-              Eliminar
-            </button>
+          <div class="item-right">
+            <span class="badge" [class.badge-disponible]="item.estado === 'Disponible'" [class.badge-ocupado]="item.estado === 'Ocupado'">
+              {{ item.estado }}
+            </span>
+            <div class="item-actions">
+              <button type="button" class="btn-action btn-edit" (click)="editarHorario(item)" title="Editar">Editar</button>
+              <button type="button" class="btn-action btn-toggle" (click)="cambiarEstado(item.id)" title="Cambiar estado">
+                {{ item.estado === 'Disponible' ? 'Marcar ocupado' : 'Marcar disponible' }}
+              </button>
+              <button type="button" class="btn-action btn-delete" (click)="eliminarHorario(item.id)" title="Eliminar">Eliminar</button>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="admin-note">
-        <h3>Nota administrativa</h3>
-        <p>
-          Los horarios configurados aquí serán usados como base para que el cliente
-          consulte disponibilidad al momento de realizar una reserva.
-        </p>
       </div>
     </div>
   </div>

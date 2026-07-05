@@ -1,110 +1,206 @@
 <section class="cronograma-page">
   <div class="cronograma-header">
     <div>
-      <span>Panel administrativo</span>
+      <span class="etiqueta">Panel administrativo</span>
       <h1>Cronograma de citas</h1>
-      <p>Visualiza y gestiona todas las citas programadas.</p>
+      <p class="subtitulo">Visualiza y gestiona todas las citas programadas del negocio.</p>
     </div>
+    <button type="button" class="btn-nueva" (click)="abrirModal()">+ Nueva cita</button>
   </div>
 
-  <div class="stats-grid">
-    <article class="stat-card">
-      <h3>Total citas</h3>
-      <strong>{{ contarTotal() }}</strong>
-    </article>
-    <article class="stat-card pendiente">
-      <h3>Pendientes</h3>
-      <strong>{{ contarPendientes() }}</strong>
-    </article>
-    <article class="stat-card confirmada">
-      <h3>Confirmadas</h3>
-      <strong>{{ contarConfirmadas() }}</strong>
-    </article>
-    <article class="stat-card completada">
-      <h3>Completadas</h3>
-      <strong>{{ contarCompletadas() }}</strong>
-    </article>
-    <article class="stat-card cancelada">
-      <h3>Canceladas</h3>
-      <strong>{{ contarCanceladas() }}</strong>
-    </article>
-    <article class="stat-card pagada">
-      <h3>Pagadas</h3>
-      <strong>{{ contarPagadas() }}</strong>
-    </article>
-  </div>
+  <div *ngIf="cargando" class="cargando">Cargando citas...</div>
 
-  <div class="filters-card">
-    <div class="filter-group">
-      <label>Buscar</label>
-      <input type="text" name="busqueda" placeholder="Buscar por cliente, servicio, estado..." [(ngModel)]="busqueda" />
+  <div *ngIf="!cargando">
+    <div class="kpi-grid">
+      <article class="kpi-card kpi-primary">
+        <div class="kpi-icon">📋</div>
+        <div>
+          <span class="kpi-label">Total</span>
+          <strong>{{ contarTotal() }}</strong>
+        </div>
+      </article>
+      <article class="kpi-card kpi-warning">
+        <div class="kpi-icon">⏳</div>
+        <div>
+          <span class="kpi-label">Pendientes</span>
+          <strong>{{ contarPendientes() }}</strong>
+        </div>
+      </article>
+      <article class="kpi-card kpi-success">
+        <div class="kpi-icon">✅</div>
+        <div>
+          <span class="kpi-label">Confirmadas</span>
+          <strong>{{ contarConfirmadas() }}</strong>
+        </div>
+      </article>
+      <article class="kpi-card kpi-info">
+        <div class="kpi-icon">🎉</div>
+        <div>
+          <span class="kpi-label">Completadas</span>
+          <strong>{{ contarCompletadas() }}</strong>
+        </div>
+      </article>
+      <article class="kpi-card kpi-danger">
+        <div class="kpi-icon">❌</div>
+        <div>
+          <span class="kpi-label">Canceladas</span>
+          <strong>{{ contarCanceladas() }}</strong>
+        </div>
+      </article>
+      <article class="kpi-card kpi-money">
+        <div class="kpi-icon">💰</div>
+        <div>
+          <span class="kpi-label">Pagadas</span>
+          <strong>{{ contarPagadas() }}</strong>
+        </div>
+      </article>
     </div>
-    <div class="filter-group">
-      <label>Estado</label>
-      <select name="filtroEstado" [(ngModel)]="filtroEstado">
-        <option value="Todas">Todas</option>
-        <option value="Pendiente">Pendiente</option>
-        <option value="Confirmada">Confirmada</option>
-        <option value="Completada">Completada</option>
-        <option value="Cancelada">Cancelada</option>
-      </select>
+
+    <div class="filters-card">
+      <div class="filter-group">
+        <label>Buscar</label>
+        <input type="text" name="busqueda" placeholder="Buscar por cliente, servicio, teléfono..." [(ngModel)]="busqueda"/>
+      </div>
+      <div class="filter-group">
+        <label>Estado</label>
+        <select name="filtroEstado" [(ngModel)]="filtroEstado">
+          <option value="Todas">Todas</option>
+          <option value="Pendiente">Pendiente</option>
+          <option value="Confirmada">Confirmada</option>
+          <option value="Completada">Completada</option>
+          <option value="Cancelada">Cancelada</option>
+        </select>
+      </div>
+      <button type="button" class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
     </div>
-    <button type="button" class="btn-clear" (click)="limpiarFiltros()">Limpiar filtros</button>
-  </div>
 
-  <p class="mensaje-exito" *ngIf="mensaje">{{ mensaje }}</p>
+    <div class="alerta" *ngIf="mensaje" [class.exito]="tipoMensaje==='exito'" [class.error]="tipoMensaje==='error'">
+      {{ mensaje }}
+    </div>
 
-  <div class="table-card">
-    <p class="empty-message" *ngIf="obtenerReservasFiltradas().length === 0">
-      No hay citas registradas o no coinciden con los filtros aplicados.
-    </p>
+    <div class="table-card">
+      <p class="empty-message" *ngIf="obtenerReservasFiltradas().length === 0">
+        No hay citas registradas que coincidan con los filtros.
+      </p>
 
-    <div class="table-wrapper" *ngIf="obtenerReservasFiltradas().length > 0">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Cliente</th>
-            <th>Teléfono</th>
-            <th>Servicio</th>
-            <th>Método de pago</th>
-            <th>Estado cita</th>
-            <th>Estado pago</th>
-            <th>Comentarios</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let reserva of obtenerReservasFiltradas()">
-            <td>{{ reserva.fecha }}</td>
-            <td>{{ reserva.hora }}</td>
-            <td>{{ reserva.nombre }}</td>
-            <td>{{ reserva.telefono }}</td>
-            <td>{{ reserva.servicio }}</td>
-            <td>{{ reserva.metodoPago }}</td>
-            <td>
-              <span class="status" [class.pending]="reserva.estado === 'Pendiente'" [class.confirmed]="reserva.estado === 'Confirmada'" [class.completed]="reserva.estado === 'Completada'" [class.cancelled]="reserva.estado === 'Cancelada'">
-                {{ reserva.estado }}
-              </span>
-            </td>
-            <td>
-              <span class="payment-status" [class.payment-pending]="reserva.estadoPago !== 'Pagado'" [class.payment-paid]="reserva.estadoPago === 'Pagado'">
-                {{ reserva.estadoPago || 'Pendiente' }}
-              </span>
-            </td>
-            <td>{{ reserva.comentarios || 'Sin comentarios' }}</td>
-            <td>
-              <div class="actions">
-                <button type="button" class="action confirm" *ngIf="reserva.estado === 'Pendiente'" (click)="confirmarReserva(reserva.id)">Confirmar</button>
-                <button type="button" class="action complete" *ngIf="reserva.estado === 'Confirmada'" (click)="completarReserva(reserva.id)">Completar</button>
-                <button type="button" class="action cancel" *ngIf="reserva.estado === 'Pendiente' || reserva.estado === 'Confirmada'" (click)="cancelarReserva(reserva.id)">Cancelar</button>
-                <button type="button" class="action delete" (click)="eliminarReserva(reserva.id)">Eliminar</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-wrapper" *ngIf="obtenerReservasFiltradas().length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Teléfono</th>
+              <th>Servicio</th>
+              <th>Pago</th>
+              <th>Estado</th>
+              <th>Estado pago</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reserva of obtenerReservasFiltradas()">
+              <td>{{ formatearFecha(reserva.fecha) }}</td>
+              <td>{{ formatearHora(reserva.hora) }}</td>
+              <td><strong>{{ reserva.nombre }}</strong></td>
+              <td>{{ reserva.telefono }}</td>
+              <td>{{ reserva.servicio }}</td>
+              <td>{{ reserva.metodoPago || '-' }}</td>
+              <td>
+                <span class="status"
+                  [class.pending]="reserva.estado === 'Pendiente'"
+                  [class.confirmed]="reserva.estado === 'Confirmada'"
+                  [class.completed]="reserva.estado === 'Completada'"
+                  [class.cancelled]="reserva.estado === 'Cancelada'">
+                  {{ reserva.estado }}
+                </span>
+              </td>
+              <td>
+                <span class="payment-status"
+                  [class.payment-pending]="reserva.estadoPago !== 'Pagado'"
+                  [class.payment-paid]="reserva.estadoPago === 'Pagado'">
+                  {{ reserva.estadoPago || 'Pendiente' }}
+                </span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button type="button" class="action back" *ngIf="reserva.estado === 'Confirmada' || reserva.estado === 'Completada'" (click)="marcarPendiente(reserva.id)" title="Volver a Pendiente">↩</button>
+                  <button type="button" class="action confirm" *ngIf="reserva.estado === 'Pendiente'" (click)="confirmarReserva(reserva.id)" title="Confirmar">✓</button>
+                  <button type="button" class="action complete" *ngIf="reserva.estado === 'Confirmada'" (click)="completarReserva(reserva.id)" title="Completar">🏁</button>
+                  <button type="button" class="action reactivate" *ngIf="reserva.estado === 'Cancelada'" (click)="reactivarReserva(reserva.id)" title="Reactivar">🔄</button>
+                  <button type="button" class="action pay" [class.paid]="reserva.estadoPago === 'Pagado'" (click)="togglePago(reserva.id, reserva.estadoPago)" [title]="reserva.estadoPago === 'Pagado' ? 'Revertir pago' : 'Marcar pagado'">💰</button>
+                  <button type="button" class="action cancel" *ngIf="reserva.estado !== 'Cancelada'" (click)="cancelarReserva(reserva.id)" title="Cancelar">✕</button>
+                  <button type="button" class="action delete" (click)="eliminarReserva(reserva.id)" title="Eliminar">🗑</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </section>
+
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>+ Nueva cita (admin)</h2>
+      <button type="button" class="modal-close-btn" (click)="cerrarModal()">✕</button>
+    </div>
+    <p class="modal-desc">Crea una cita manualmente para un cliente que reservó por otro medio (llamada, WhatsApp, en local).</p>
+
+    <div class="form-group">
+      <label>Nombre completo del cliente</label>
+      <input type="text" placeholder="Ej: María González" [(ngModel)]="nuevaCita.nombre"/>
+    </div>
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input type="tel" placeholder="Ej: 3001234567" [(ngModel)]="nuevaCita.telefono"/>
+    </div>
+    <div class="form-group">
+      <label>Servicio</label>
+      <select [(ngModel)]="nuevaCita.servicio">
+        <option value="">Selecciona un servicio</option>
+        <option *ngFor="let s of serviciosActivos" [value]="s.nombre">{{ s.nombre }}</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" [(ngModel)]="nuevaCita.fecha"/>
+      </div>
+      <div class="form-group">
+        <label>Hora</label>
+        <select [(ngModel)]="nuevaCita.hora">
+          <option value="">Selecciona hora</option>
+          <option *ngFor="let h of horarios" [value]="formatearHora(h.horaInicio) + ' - ' + formatearHora(h.horaFinal)">
+            {{ h.dia }} - {{ formatearHora(h.horaInicio) }} a {{ formatearHora(h.horaFinal) }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Método de pago</label>
+      <select [(ngModel)]="nuevaCita.metodoPago">
+        <option value="">Selecciona método</option>
+        <option value="Efectivo">Efectivo</option>
+        <option value="Nequi">Nequi</option>
+        <option value="Daviplata">Daviplata</option>
+        <option value="Pago en local">Pago en local</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Comentarios</label>
+      <textarea rows="2" placeholder="Notas u observaciones internas" [(ngModel)]="nuevaCita.comentarios"></textarea>
+    </div>
+
+    <p class="modal-error" *ngIf="errorModal">{{ errorModal }}</p>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel-modal" (click)="cerrarModal()">Cancelar</button>
+      <button type="button" class="btn-save" (click)="crearCita()" [disabled]="guardando">
+        {{ guardando ? 'Guardando...' : 'Crear cita' }}
+      </button>
+    </div>
+  </div>
+</div>

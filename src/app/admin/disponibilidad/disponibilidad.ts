@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import {Horario,DisponibilidadService,} from '../../services/disponibilidad.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-disponibilidad',
@@ -11,174 +11,116 @@ import {Horario,DisponibilidadService,} from '../../services/disponibilidad.serv
   styleUrl: './disponibilidad.css',
 })
 export class Disponibilidad implements OnInit {
-  horarios: Horario[] = [];
+  horarios: any[] = [];
+  cargando = true;
+  guardando = false;
 
-  horario = {
-    id: 0,
-    dia: '',
-    horaInicio: '',
-    horaFinal: '',
-    estado: 'Disponible',
-    observacion: '',
-  };
-
+  horario = { id: 0, dia: '', horaInicio: '', horaFinal: '', estado: 'Disponible', observacion: '' };
   editando = false;
-  horarioEditandoId: number | null = null;
-
   mensaje = '';
+  tipoMensaje: 'exito' | 'error' | '' = '';
   mensajeError = '';
 
-  constructor(private disponibilidadService: DisponibilidadService) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
-  ngOnInit(): void {
-    this.cargarHorarios();
-  }
+  ngOnInit(): void { this.cargarHorarios(); }
 
   cargarHorarios(): void {
-    this.horarios = this.disponibilidadService.obtenerHorarios();
+    this.http.get<any[]>('/api/disponibilidad').subscribe({
+      next: (data) => {
+        this.zone.run(() => {
+          this.horarios = data || [];
+          this.cargando = false;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => { this.zone.run(() => { this.cargando = false; this.cdr.detectChanges(); }); },
+    });
   }
 
-  contarHorarios(): number {
-    return this.horarios.length;
-  }
+  contarDisponibles(): number { return this.horarios.filter(h => h.estado === 'Disponible').length; }
+  contarOcupados(): number { return this.horarios.filter(h => h.estado === 'Ocupado').length; }
 
-  contarDisponibles(): number {
-    return this.horarios.filter(
-      (horario) => horario.estado === 'Disponible'
-    ).length;
-  }
-
-  contarOcupados(): number {
-    return this.horarios.filter(
-      (horario) => horario.estado === 'Ocupado'
-    ).length;
-  }
-
-  guardarHorario(): void {
-    this.mensaje = '';
+  agregarHorario(): void {
     this.mensajeError = '';
+    if (!this.camposValidos()) { this.mensajeError = 'Completa todos los campos antes de guardar.'; return; }
+    if (this.horario.horaInicio >= this.horario.horaFinal) { this.mensajeError = 'La hora inicial debe ser menor que la hora final.'; return; }
 
-    if (!this.camposValidos()) {
-      this.mensajeError =
-        'Completa todos los campos antes de guardar el horario.';
-      return;
-    }
+    this.guardando = true;
 
-    if (this.horario.horaInicio >= this.horario.horaFinal) {
-      this.mensajeError =
-        'La hora inicial debe ser menor que la hora final.';
-      return;
-    }
-
-    if (this.editando) {
-      this.disponibilidadService.actualizarHorario({
-        id: this.horario.id,
-        dia: this.horario.dia,
-        horaInicio: this.horario.horaInicio,
-        horaFinal: this.horario.horaFinal,
-        estado: this.horario.estado,
-        observacion: this.horario.observacion.trim(),
+    if (this.editando && this.horario.id) {
+      this.http.put('/api/disponibilidad/' + this.horario.id, this.horario).subscribe({
+        next: () => {
+          this.zone.run(() => {
+            this.mostrarMensaje('Horario actualizado correctamente', 'exito');
+            this.limpiarFormulario();
+            this.cargarHorarios();
+            this.guardando = false;
+            this.cdr.detectChanges();
+          });
+        },
+        error: () => { this.zone.run(() => { this.mensajeError = 'Error al actualizar el horario'; this.guardando = false; this.cdr.detectChanges(); }); },
       });
-
-      this.mensaje = 'Horario actualizado correctamente.';
     } else {
-      this.disponibilidadService.agregarHorario({
-        dia: this.horario.dia,
-        horaInicio: this.horario.horaInicio,
-        horaFinal: this.horario.horaFinal,
-        estado: this.horario.estado,
-        observacion: this.horario.observacion,
+      this.http.post('/api/disponibilidad', this.horario).subscribe({
+        next: () => {
+          this.zone.run(() => {
+            this.mostrarMensaje('Horario agregado correctamente', 'exito');
+            this.limpiarFormulario();
+            this.cargarHorarios();
+            this.guardando = false;
+            this.cdr.detectChanges();
+          });
+        },
+        error: () => { this.zone.run(() => { this.mensajeError = 'Error al agregar el horario'; this.guardando = false; this.cdr.detectChanges(); }); },
       });
-
-      this.mensaje = 'Horario agregado correctamente.';
     }
-
-    this.cargarHorarios();
-    this.limpiarFormulario();
   }
 
-   agregarHorario(): void {
-  this.guardarHorario();
-}
-
-  editarHorario(horario: Horario): void {
-    this.horario = { ...horario };
+  editarHorario(h: any): void {
+    this.horario = { id: h.id, dia: h.dia, horaInicio: h.horaInicio, horaFinal: h.horaFinal, estado: h.estado, observacion: h.observacion };
     this.editando = true;
-    this.horarioEditandoId = horario.id;
-    this.mensaje = 'Editando horario seleccionado.';
     this.mensajeError = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  cancelarEdicion(): void {
-    this.limpiarFormulario();
-    this.mensaje = '';
-    this.mensajeError = '';
-  }
+  cancelarEdicion(): void { this.limpiarFormulario(); }
 
   cambiarEstado(id: number): void {
-    this.disponibilidadService.cambiarEstadoHorario(id);
-    this.cargarHorarios();
-    this.mensaje = 'Estado del horario actualizado correctamente.';
-    this.mensajeError = '';
-  }
-
-  cambiarEstadoHorario(id: number): void {
-    this.cambiarEstado(id);
+    this.http.patch('/api/disponibilidad/' + id + '/estado', {}).subscribe({
+      next: () => { this.mostrarMensaje('Estado actualizado correctamente', 'exito'); this.cargarHorarios(); },
+      error: () => { this.mostrarMensaje('Error al cambiar el estado', 'error'); },
+    });
   }
 
   eliminarHorario(id: number): void {
-    const confirmar = confirm(
-      '¿Seguro que deseas eliminar este horario? Esta acción no se puede deshacer.'
-    );
-
-    if (!confirmar) {
-      return;
-    }
-
-    this.disponibilidadService.eliminarHorario(id);
-    this.cargarHorarios();
-    this.mensaje = 'Horario eliminado correctamente.';
-    this.mensajeError = '';
-
-    if (this.horario.id === id) {
-      this.limpiarFormulario();
-    }
+    if (!confirm('¿Seguro que deseas eliminar este horario?')) return;
+    this.http.delete('/api/disponibilidad/' + id).subscribe({
+      next: () => { this.mostrarMensaje('Horario eliminado correctamente', 'exito'); this.cargarHorarios(); if (this.horario.id === id) this.limpiarFormulario(); },
+      error: () => { this.mostrarMensaje('Error al eliminar el horario', 'error'); },
+    });
   }
 
   limpiarFormulario(): void {
-    this.horario = {
-      id: 0,
-      dia: '',
-      horaInicio: '',
-      horaFinal: '',
-      estado: 'Disponible',
-      observacion: '',
-    };
-
+    this.horario = { id: 0, dia: '', horaInicio: '', horaFinal: '', estado: 'Disponible', observacion: '' };
     this.editando = false;
-    this.horarioEditandoId = null;
+    this.mensajeError = '';
   }
 
   camposValidos(): boolean {
-    return (
-      this.horario.dia.trim() !== '' &&
-      this.horario.horaInicio.trim() !== '' &&
-      this.horario.horaFinal.trim() !== '' &&
-      this.horario.estado.trim() !== '' &&
-      this.horario.observacion.trim() !== ''
-    );
+    return this.horario.dia.trim() !== '' && this.horario.horaInicio.trim() !== '' && this.horario.horaFinal.trim() !== '' && this.horario.estado.trim() !== '' && this.horario.observacion.trim() !== '';
   }
 
   formatearHora(hora: string): string {
-    if (!hora) {
-      return '';
-    }
+    if (!hora) return '';
+    const partes = hora.split(':');
+    const h = Number(partes[0]);
+    return (h % 12 || 12).toString().padStart(2,'0') + ':' + partes[1] + ' ' + (h >= 12 ? 'p.m.' : 'a.m.');
+  }
 
-    const [horas, minutos] = hora.split(':');
-    const horasNumero = Number(horas);
-    const periodo = horasNumero >= 12 ? 'p.m.' : 'a.m.';
-    const horaFormato12 = horasNumero % 12 || 12;
-
-    return `${horaFormato12.toString().padStart(2, '0')}:${minutos} ${periodo}`;
+  private mostrarMensaje(texto: string, tipo: 'exito' | 'error'): void {
+    this.mensaje = texto;
+    this.tipoMensaje = tipo;
+    setTimeout(() => { this.zone.run(() => { this.mensaje = ''; this.tipoMensaje = ''; this.cdr.detectChanges(); }); }, 3000);
   }
 }
