@@ -1,154 +1,192 @@
 <section class="dashboard-page">
   <div class="dashboard-header">
     <div>
-      <span>Panel administrativo</span>
-
-      <h1>Bienvenido al panel de Mary Nails</h1>
-
-      <p>
-        Desde este espacio puedes revisar citas, gestionar horarios, controlar
-        servicios, consultar clientes, revisar pagos, ver calificaciones y
-        administrar la disponibilidad del negocio.
-      </p>
+      <span class="etiqueta">Panel administrativo</span>
+      <h1>{{ saludo }}, administrador</h1>
+      <p class="fecha">{{ fechaActual }}</p>
     </div>
-
-    <a routerLink="/admin/cronograma" class="btn-main">
-      Ver cronograma
-    </a>
+    <a routerLink="/admin/cronograma" class="btn-main">Ver cronograma completo →</a>
   </div>
 
-  <div class="stats-grid">
-    <article class="stat-card">
-      <h3>Citas de hoy</h3>
-      <strong>{{ contarCitasHoy() }}</strong>
-      <p>Reservas programadas para el día actual.</p>
-    </article>
+  <div *ngIf="cargando" class="cargando">Cargando estadísticas...</div>
 
-    <article class="stat-card">
-      <h3>Clientes registrados</h3>
-      <strong>{{ contarClientes() }}</strong>
-      <p>Clientes únicos registrados por reservas.</p>
-    </article>
-
-    <article class="stat-card">
-      <h3>Servicios activos</h3>
-      <strong>{{ contarServiciosActivos() }}</strong>
-      <p>Servicios visibles para los clientes.</p>
-    </article>
-
-    <article class="stat-card">
-      <h3>Servicios inactivos</h3>
-      <strong>{{ contarServiciosInactivos() }}</strong>
-      <p>Servicios ocultos temporalmente.</p>
-    </article>
-
-    <article class="stat-card">
-      <h3>Pagos pendientes</h3>
-      <strong>{{ contarPagosPendientes() }}</strong>
-      <p>Reservas pendientes por validar pago.</p>
-    </article>
-
-    <article class="stat-card">
-      <h3>Calificaciones</h3>
-      <strong>{{ contarCalificaciones() }}</strong>
-      <p>Opiniones recibidas por los clientes.</p>
-    </article>
-
-    <article class="stat-card">
-      <h3>Promedio</h3>
-      <strong>{{ obtenerPromedioCalificaciones() }}</strong>
-      <p>Promedio general de satisfacción.</p>
-    </article>
-  </div>
-
-  <div class="dashboard-content">
-    <div class="dashboard-card">
-      <h2>Próximas citas</h2>
-
-      <p class="empty-message" *ngIf="obtenerProximasCitas().length === 0">
-        Todavía no hay citas registradas.
-      </p>
-
-      <div class="appointment-list" *ngIf="obtenerProximasCitas().length > 0">
-        <div
-          class="appointment-item"
-          *ngFor="let reserva of obtenerProximasCitas()"
-        >
-          <div>
-            <strong>{{ reserva.nombre }}</strong>
-            <p>{{ reserva.servicio }}</p>
-            <p>{{ reserva.fecha }} - {{ reserva.hora }}</p>
-          </div>
-
-          <span>{{ reserva.estado }}</span>
+  <div *ngIf="!cargando">
+    <div class="kpi-grid">
+      <article class="kpi-card kpi-primary">
+        <div class="kpi-icon">📅</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Citas de hoy</span>
+          <strong>{{ stats.citasHoy }}</strong>
+          <small>Reservas programadas</small>
         </div>
-      </div>
+      </article>
+
+      <article class="kpi-card kpi-secondary">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Clientes</span>
+          <strong>{{ stats.clientes }}</strong>
+          <small>Registrados en total</small>
+        </div>
+      </article>
+
+      <article class="kpi-card kpi-success">
+        <div class="kpi-icon">💅</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Servicios activos</span>
+          <strong>{{ stats.serviciosActivos }}</strong>
+          <small>{{ stats.serviciosInactivos }} inactivos</small>
+        </div>
+      </article>
+
+      <article class="kpi-card kpi-warning">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Pagos pendientes</span>
+          <strong>{{ stats.pagosPendientes }}</strong>
+          <small>Por validar</small>
+        </div>
+      </article>
+
+      <article class="kpi-card kpi-info">
+        <div class="kpi-icon">⭐</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Calificaciones</span>
+          <strong>{{ stats.totalCalificaciones }}</strong>
+          <small>Recibidas</small>
+        </div>
+      </article>
+
+      <article class="kpi-card kpi-star">
+        <div class="kpi-icon">🌟</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Promedio</span>
+          <strong>{{ stats.promedioCalificaciones }}</strong>
+          <small>Satisfacción general</small>
+        </div>
+      </article>
     </div>
 
-    <div class="dashboard-card">
-      <h2>Últimas calificaciones</h2>
-
-      <p
-        class="empty-message"
-        *ngIf="obtenerUltimasCalificaciones().length === 0"
-      >
-        Todavía no hay calificaciones registradas.
-      </p>
-
-      <div
-        class="rating-list"
-        *ngIf="obtenerUltimasCalificaciones().length > 0"
-      >
-        <div
-          class="rating-item"
-          *ngFor="let calificacion of obtenerUltimasCalificaciones()"
-        >
-          <div>
-            <strong>{{ calificacion.servicio }}</strong>
-            <p>{{ calificacion.comentario }}</p>
-            <small>{{ calificacion.fecha }}</small>
+    <div class="dashboard-content">
+      <div class="dashboard-card estados-card">
+        <h2>📊 Citas por estado</h2>
+        <div class="estados-lista">
+          <div class="estado-item">
+            <div class="estado-header">
+              <span>⏳ Pendientes</span>
+              <strong>{{ stats.citasPorEstado.pendiente || 0 }}</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress pendiente" [style.width.%]="porcentajeEstado('pendiente')"></div>
+            </div>
           </div>
-
-          <span>{{ calificacion.puntuacion }} ★</span>
+          <div class="estado-item">
+            <div class="estado-header">
+              <span>✅ Confirmadas</span>
+              <strong>{{ stats.citasPorEstado.confirmada || 0 }}</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress confirmada" [style.width.%]="porcentajeEstado('confirmada')"></div>
+            </div>
+          </div>
+          <div class="estado-item">
+            <div class="estado-header">
+              <span>🎉 Completadas</span>
+              <strong>{{ stats.citasPorEstado.completada || 0 }}</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress completada" [style.width.%]="porcentajeEstado('completada')"></div>
+            </div>
+          </div>
+          <div class="estado-item">
+            <div class="estado-header">
+              <span>❌ Canceladas</span>
+              <strong>{{ stats.citasPorEstado.cancelada || 0 }}</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress cancelada" [style.width.%]="porcentajeEstado('cancelada')"></div>
+            </div>
+          </div>
+        </div>
+        <div class="total-citas">
+          <span>Total de citas registradas</span>
+          <strong>{{ stats.totalCitas }}</strong>
         </div>
       </div>
-    </div>
 
-    <div class="dashboard-card">
-      <h2>Acciones rápidas</h2>
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2>📅 Próximas citas</h2>
+          <a routerLink="/admin/cronograma" class="ver-todo">Ver todo</a>
+        </div>
+        <p class="empty-message" *ngIf="proximasCitas.length === 0">No hay citas próximas registradas.</p>
+        <div class="citas-list" *ngIf="proximasCitas.length > 0">
+          <div class="cita-item" *ngFor="let cita of proximasCitas">
+            <div class="cita-fecha">
+              <strong>{{ formatearFecha(cita.fecha) }}</strong>
+              <span>{{ formatearHora(cita.hora) }}</span>
+            </div>
+            <div class="cita-info">
+              <strong>{{ cita.nombre }}</strong>
+              <span>{{ cita.servicio }}</span>
+            </div>
+            <span class="badge-estado"
+              [class.bg-pendiente]="cita.estado === 'pendiente'"
+              [class.bg-confirmada]="cita.estado === 'confirmada'"
+              [class.bg-completada]="cita.estado === 'completada'">
+              {{ capitalizar(cita.estado) }}
+            </span>
+          </div>
+        </div>
+      </div>
 
-      <div class="quick-actions">
-        <a routerLink="/admin/cronograma">
-          Gestionar cronograma
-        </a>
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2>💬 Últimas calificaciones</h2>
+          <a routerLink="/admin/calificaciones" class="ver-todo">Ver todo</a>
+        </div>
+        <p class="empty-message" *ngIf="ultimasCalificaciones.length === 0">Todavía no hay calificaciones.</p>
+        <div class="ratings-list" *ngIf="ultimasCalificaciones.length > 0">
+          <div class="rating-item" *ngFor="let cal of ultimasCalificaciones">
+            <div class="rating-header">
+              <strong>{{ cal.cliente || 'Cliente' }}</strong>
+              <span class="stars">{{ cal.puntuacion }} ★</span>
+            </div>
+            <p class="rating-service">{{ cal.servicio }}</p>
+            <p class="rating-comment" *ngIf="cal.comentario">"{{ cal.comentario }}"</p>
+            <small>{{ cal.fecha }}</small>
+          </div>
+        </div>
+      </div>
 
-        <a routerLink="/admin/disponibilidad">
-          Gestionar disponibilidad
-        </a>
-
-        <a routerLink="/admin/servicios">
-          Gestionar servicios
-        </a>
-
-        <a routerLink="/admin/clientes">
-          Ver clientes
-        </a>
-
-        <a routerLink="/admin/pagos">
-          Gestionar pagos
-        </a>
-
-        <a routerLink="/admin/calificaciones">
-          Ver calificaciones
-        </a>
-
-        <a routerLink="/servicios">
-          Ver servicios públicos
-        </a>
-
-        <a routerLink="/reservas">
-          Ver formulario de reserva
-        </a>
+      <div class="dashboard-card quick-card">
+        <h2>⚡ Acciones rápidas</h2>
+        <div class="quick-actions">
+          <a routerLink="/admin/cronograma" class="quick-action">
+            <span class="qa-icon">📋</span>
+            <span>Cronograma</span>
+          </a>
+          <a routerLink="/admin/disponibilidad" class="quick-action">
+            <span class="qa-icon">🕐</span>
+            <span>Disponibilidad</span>
+          </a>
+          <a routerLink="/admin/servicios" class="quick-action">
+            <span class="qa-icon">💅</span>
+            <span>Servicios</span>
+          </a>
+          <a routerLink="/admin/clientes" class="quick-action">
+            <span class="qa-icon">👥</span>
+            <span>Clientes</span>
+          </a>
+          <a routerLink="/admin/pagos" class="quick-action">
+            <span class="qa-icon">💰</span>
+            <span>Pagos</span>
+          </a>
+          <a routerLink="/admin/calificaciones" class="quick-action">
+            <span class="qa-icon">⭐</span>
+            <span>Calificaciones</span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
