@@ -1,42 +1,96 @@
 <section class="hero">
   <div class="hero-content">
-    <span class="tag">Belleza, estilo y cuidado</span>
-    <h1>Mary Nails Web</h1>
-    <p>
+    <span class="tag">✨ Belleza, estilo y cuidado</span>
+    <h1>Mary <span class="highlight">Nails</span></h1>
+    <p class="subtitle">
       Reserva tus citas de uñas de forma rápida, consulta nuestros servicios,
       revisa disponibilidad y comunícate fácilmente con nuestro equipo.
     </p>
-
     <div class="hero-buttons">
-      <a routerLink="/reservas" class="btn-primary">Reservar cita</a>
+      <a routerLink="/reservas" class="btn-primary">Reservar cita ahora</a>
       <a routerLink="/servicios" class="btn-secondary">Ver servicios</a>
     </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-number">500+</span>
+        <span class="stat-label">Clientes felices</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">4.6★</span>
+        <span class="stat-label">Calificación</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">4</span>
+        <span class="stat-label">Servicios</span>
+      </div>
+    </div>
   </div>
-
   <div class="hero-card">
+    <div class="card-badge">Popular</div>
     <h3>Servicios destacados</h3>
     <ul>
-      <li>Manicure profesional</li>
-      <li>Pedicure</li>
-      <li>Uñas acrílicas</li>
-      <li>Diseños personalizados</li>
+      <li><span class="service-icon">💅</span> Manicure profesional</li>
+      <li><span class="service-icon">🦶</span> Pedicure</li>
+      <li><span class="service-icon">💖</span> Uñas acrílicas</li>
+      <li><span class="service-icon">🎨</span> Diseños personalizados</li>
     </ul>
+    <a routerLink="/servicios" class="card-link">Ver todos los servicios →</a>
+  </div>
+</section>
+
+<section class="how-it-works">
+  <div class="section-header">
+    <span class="section-tag">Cómo funciona</span>
+    <h2>Reserva tu cita en 3 pasos</h2>
+    <p>Un proceso simple y rápido para conseguir la cita que necesitas</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">1</div>
+      <h3>Elige tu servicio</h3>
+      <p>Explora nuestra galería y descubre el diseño perfecto para ti.</p>
+    </div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <h3>Selecciona fecha y hora</h3>
+      <p>Consulta la disponibilidad en tiempo real y agenda cuando prefieras.</p>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <h3>¡Disfruta tu cita!</h3>
+      <p>Nosotros te confirmamos la reserva y te esperamos con todo listo.</p>
+    </div>
   </div>
 </section>
 
 <section class="features">
-  <div class="feature">
-    <h3>Reservas en línea</h3>
-    <p>El cliente puede consultar horarios disponibles y solicitar su cita.</p>
+  <div class="section-header">
+    <span class="section-tag">Ventajas</span>
+    <h2>¿Por qué elegirnos?</h2>
   </div>
-
-  <div class="feature">
-    <h3>Galería de trabajos</h3>
-    <p>Se muestran diseños y servicios realizados para atraer nuevos clientes.</p>
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-icon">📅</div>
+      <h3>Reservas en línea</h3>
+      <p>Consulta horarios disponibles y solicita tu cita en segundos, desde cualquier dispositivo.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🖼️</div>
+      <h3>Galería de trabajos</h3>
+      <p>Explora diseños únicos y servicios realizados para inspirarte antes de reservar.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⚙️</div>
+      <h3>Panel administrativo</h3>
+      <p>Gestión completa de citas, servicios, horarios, clientes y pagos en un solo lugar.</p>
+    </div>
   </div>
+</section>
 
-  <div class="feature">
-    <h3>Panel administrativo</h3>
-    <p>El administrador podrá gestionar citas, servicios, horarios y clientes.</p>
+<section class="cta">
+  <div class="cta-content">
+    <h2>¿Lista para lucir tus manos increíbles?</h2>
+    <p>Reserva tu cita hoy mismo y déjanos consentirte.</p>
+    <a routerLink="/reservas" class="btn-primary btn-large">Reservar mi cita →</a>
   </div>
 </section>
