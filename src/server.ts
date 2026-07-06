@@ -7,6 +7,8 @@ import { testConnection } from './backend/db';
 import { reservasRouter } from './backend/routes/reservas.routes';
 import { serviciosRouter } from './backend/routes/servicios.routes';
 import { disponibilidadRouter } from './backend/routes/disponibilidad.routes';
+import { authRouter } from './backend/routes/auth.routes';
+import { reportesRouter } from './backend/routes/reportes.routes';
 import { pagosRouter } from './backend/routes/pagos.routes';
 import { clientesRouter } from './backend/routes/clientes.routes';
 import { dashboardRouter } from './backend/routes/dashboard.routes';
@@ -31,6 +33,8 @@ app.use('/api/perfil', perfilRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/clientes', clientesRouter);
 app.use('/api/pagos', pagosRouter);
+app.use('/api/reportes', reportesRouter);
+app.use('/api/auth', authRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', mensaje: 'MaryNails API funcionando ✅' });

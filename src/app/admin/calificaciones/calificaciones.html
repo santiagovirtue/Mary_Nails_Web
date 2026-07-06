@@ -1,52 +1,43 @@
 <section class="ratings-admin-page">
   <div class="ratings-header">
     <div>
-      <span>Calificaciones</span>
-      <h1>Opiniones de clientes</h1>
-      <p>
-        En esta sección el administrador puede revisar las calificaciones enviadas
-        por los clientes después de completar una cita.
-      </p>
+      <span class="etiqueta">Gestión</span>
+      <h1>Calificaciones de clientes</h1>
+      <p class="subtitulo">Revisa las opiniones de los clientes después de cada servicio completado.</p>
     </div>
-
-    <a routerLink="/admin/dashboard" class="btn-main">
-      Volver al dashboard
-    </a>
+    <a routerLink="/admin/dashboard" class="btn-main">Volver al dashboard</a>
   </div>
 
-  <div class="summary-grid">
-    <article class="summary-card">
-      <h3>Total</h3>
-      <strong>{{ contarCalificaciones() }}</strong>
-      <p>Calificaciones recibidas</p>
-    </article>
+  <div class="kpi-row">
+    <div class="kpi-mini">
+      <span class="kpi-icon">⭐</span>
+      <div><strong>{{ contarTotal() }}</strong><span>Calificaciones</span></div>
+    </div>
+    <div class="kpi-mini star">
+      <span class="kpi-icon">🌟</span>
+      <div><strong>{{ obtenerPromedio() }}</strong><span>Promedio general</span></div>
+    </div>
+    <div class="kpi-mini success">
+      <span class="kpi-icon">🏆</span>
+      <div><strong>{{ contarPorPuntuacion(5) }}</strong><span>5 estrellas</span></div>
+    </div>
+    <div class="kpi-mini warning">
+      <span class="kpi-icon">👍</span>
+      <div><strong>{{ contarPorPuntuacion(4) }}</strong><span>4 estrellas</span></div>
+    </div>
+  </div>
 
-    <article class="summary-card">
-      <h3>Promedio</h3>
-      <strong>{{ obtenerPromedio() }}</strong>
-      <p>Promedio general</p>
-    </article>
-
-    <article class="summary-card">
-      <h3>5 estrellas</h3>
-      <strong>{{ contarPorPuntuacion(5) }}</strong>
-      <p>Clientes muy satisfechos</p>
-    </article>
+  <div class="alerta" *ngIf="mensaje" [class.exito]="tipoMensaje==='exito'" [class.error]="tipoMensaje==='error'">
+    {{ mensaje }}
   </div>
 
   <div class="filters-card">
     <div class="filter-group">
-      <label>Buscar opinión</label>
-      <input
-        type="text"
-        name="busqueda"
-        placeholder="Buscar por cliente, servicio o comentario"
-        [(ngModel)]="busqueda"
-      />
+      <label>Buscar</label>
+      <input type="text" name="busqueda" placeholder="Buscar por cliente, servicio o comentario" [(ngModel)]="busqueda"/>
     </div>
-
     <div class="filter-group">
-      <label>Filtrar por puntuación</label>
+      <label>Puntuación</label>
       <select name="filtroPuntuacion" [(ngModel)]="filtroPuntuacion">
         <option value="Todas">Todas</option>
         <option value="5">5 estrellas</option>
@@ -56,64 +47,37 @@
         <option value="1">1 estrella</option>
       </select>
     </div>
-
-    <button type="button" class="btn-clear" (click)="limpiarFiltros()">
-      Limpiar filtros
-    </button>
+    <button type="button" class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
   </div>
 
-  <div class="ratings-card">
-    <h2>Listado de calificaciones</h2>
+  <div *ngIf="cargando" class="cargando">Cargando calificaciones...</div>
 
-    <p class="empty-message" *ngIf="calificaciones.length === 0">
-      Todavía no hay calificaciones registradas.
-    </p>
+  <div class="ratings-card" *ngIf="!cargando">
+    <h2>Opiniones recibidas ({{ obtenerCalificacionesFiltradas().length }})</h2>
 
-    <p
-      class="empty-message"
-      *ngIf="calificaciones.length > 0 && obtenerCalificacionesFiltradas().length === 0"
-    >
-      No se encontraron calificaciones con los filtros seleccionados.
-    </p>
+    <p class="empty-msg" *ngIf="calificaciones.length === 0">Todavía no hay calificaciones registradas.</p>
+    <p class="empty-msg" *ngIf="calificaciones.length > 0 && obtenerCalificacionesFiltradas().length === 0">No se encontraron calificaciones con los filtros seleccionados.</p>
 
     <div class="ratings-list" *ngIf="obtenerCalificacionesFiltradas().length > 0">
-      <article
-        class="rating-item"
-        *ngFor="let calificacion of obtenerCalificacionesFiltradas()"
-      >
-        <div class="rating-info">
-          <h3>{{ calificacion.servicio }}</h3>
-
-          <p>
-            <strong>Cliente:</strong>
-            {{ calificacion.cliente || 'Cliente no registrado' }}
-          </p>
-
-          <p>
-            <strong>Cita:</strong>
-            {{ calificacion.fechaCita || 'Sin fecha de cita' }}
-            -
-            {{ calificacion.horaCita || 'Sin hora' }}
-          </p>
-
-          <p>
-            <strong>Comentario:</strong>
-            {{ calificacion.comentario }}
-          </p>
-
-          <small>Registrada el {{ calificacion.fecha }}</small>
+      <article class="rating-item" *ngFor="let cal of obtenerCalificacionesFiltradas()">
+        <div class="rating-left">
+          <div class="rating-avatar">{{ (cal.cliente || '?').charAt(0).toUpperCase() }}</div>
+          <div class="rating-stars">
+            <span class="stars">{{ estrellas(cal.puntuacion) }}</span>
+            <span class="score">{{ cal.puntuacion }}/5</span>
+          </div>
         </div>
-
+        <div class="rating-info">
+          <h3>{{ cal.cliente || 'Cliente' }}</h3>
+          <p class="rating-service">{{ cal.servicio }}</p>
+          <p class="rating-comment" *ngIf="cal.comentario">"{{ cal.comentario }}"</p>
+          <div class="rating-meta">
+            <span *ngIf="cal.fechaCita">Cita: {{ formatearFecha(cal.fechaCita) }}</span>
+            <span>Registrada: {{ formatearFecha(cal.fecha) }}</span>
+          </div>
+        </div>
         <div class="rating-actions">
-          <span>{{ calificacion.puntuacion }} ★</span>
-
-          <button
-            type="button"
-            class="delete-btn"
-            (click)="eliminarCalificacion(calificacion.id)"
-          >
-            Eliminar
-          </button>
+          <button type="button" class="btn-delete" (click)="eliminarCalificacion(cal.id)">Eliminar</button>
         </div>
       </article>
     </div>
