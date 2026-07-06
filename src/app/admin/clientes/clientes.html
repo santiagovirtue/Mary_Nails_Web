@@ -10,15 +10,15 @@
 
   <div class="kpi-row">
     <div class="kpi-mini">
-      <span class="kpi-icon">👥</span>
+      <span class="kpi-icon"><span class="mi">group</span></span>
       <div><strong>{{ contarClientes() }}</strong><span>Clientes únicos</span></div>
     </div>
     <div class="kpi-mini success">
-      <span class="kpi-icon">📅</span>
+      <span class="kpi-icon"><span class="mi">today</span></span>
       <div><strong>{{ contarCitasTotales() }}</strong><span>Citas totales</span></div>
     </div>
     <div class="kpi-mini warning">
-      <span class="kpi-icon">💰</span>
+      <span class="kpi-icon"><span class="mi">payments</span></span>
       <div><strong>{{ contarConPagosPendientes() }}</strong><span>Con pagos pendientes</span></div>
     </div>
   </div>
@@ -52,7 +52,7 @@
             <h3>{{ cliente.nombre }}</h3>
             <p><span class="label">📱</span> {{ cliente.telefono || 'Sin teléfono' }}</p>
             <p><span class="label">✉️</span> {{ cliente.correo || 'Sin correo' }}</p>
-            <p><span class="label">📅</span> Desde {{ formatearFecha(cliente.fecha_registro) }}</p>
+            <p><span class="label"><span class="mi">today</span></span> Desde {{ formatearFecha(cliente.fecha_registro) }}</p>
             <div class="servicios-tags">
               <span class="tag" *ngFor="let s of cliente.servicios">{{ s }}</span>
             </div>

@@ -10,15 +10,15 @@
 
   <div class="kpi-row">
     <div class="kpi-mini">
-      <span class="kpi-icon">💅</span>
+      <span class="kpi-icon"><span class="mi">spa</span></span>
       <div><strong>{{ servicios.length }}</strong><span>Total</span></div>
     </div>
     <div class="kpi-mini success">
-      <span class="kpi-icon">✅</span>
+      <span class="kpi-icon"><span class="mi">check_circle</span></span>
       <div><strong>{{ contarServiciosActivos() }}</strong><span>Activos</span></div>
     </div>
     <div class="kpi-mini warning">
-      <span class="kpi-icon">⏸️</span>
+      <span class="kpi-icon"><span class="mi">pause_circle</span></span>
       <div><strong>{{ contarServiciosInactivos() }}</strong><span>Inactivos</span></div>
     </div>
   </div>
@@ -78,7 +78,7 @@
 
       <div class="services-list" *ngIf="!cargando && servicios.length > 0">
         <article class="service-item" *ngFor="let item of servicios" [class.inactive-item]="item.estado === 'Inactivo'" [class.editing-item]="editando && servicio.id === (item.id_servicio || item.id)">
-          <div class="service-icon-box">💅</div>
+          <div class="service-icon-box"><span class="mi">spa</span></div>
           <div class="service-info">
             <h3>{{ item.nombre }}</h3>
             <p>{{ item.descripcion }}</p>

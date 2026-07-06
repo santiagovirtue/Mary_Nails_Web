@@ -142,3 +142,13 @@ html, body {
   size: A4 portrait;
   margin: 12mm;
 }
+/* Material Icons helpers */
+.mi {
+  font-family: 'Material Icons Round';
+  font-size: 24px;
+  vertical-align: middle;
+  line-height: 1;
+}
+.mi-sm { font-size: 18px; }
+.mi-lg { font-size: 32px; }
+.mi-xl { font-size: 40px; }

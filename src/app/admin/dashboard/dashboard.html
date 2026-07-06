@@ -13,52 +13,47 @@
   <div *ngIf="!cargando">
     <div class="kpi-grid">
       <article class="kpi-card kpi-primary">
-        <div class="kpi-icon">📅</div>
+        <div class="kpi-icon"><span class="mi mi-xl">today</span></div>
         <div class="kpi-info">
           <span class="kpi-label">Citas de hoy</span>
           <strong>{{ stats.citasHoy }}</strong>
           <small>Reservas programadas</small>
         </div>
       </article>
-
       <article class="kpi-card kpi-secondary">
-        <div class="kpi-icon">👥</div>
+        <div class="kpi-icon"><span class="mi mi-xl">group</span></div>
         <div class="kpi-info">
           <span class="kpi-label">Clientes</span>
           <strong>{{ stats.clientes }}</strong>
           <small>Registrados en total</small>
         </div>
       </article>
-
       <article class="kpi-card kpi-success">
-        <div class="kpi-icon">💅</div>
+        <div class="kpi-icon"><span class="mi mi-xl">spa</span></div>
         <div class="kpi-info">
           <span class="kpi-label">Servicios activos</span>
           <strong>{{ stats.serviciosActivos }}</strong>
           <small>{{ stats.serviciosInactivos }} inactivos</small>
         </div>
       </article>
-
       <article class="kpi-card kpi-warning">
-        <div class="kpi-icon">💰</div>
+        <div class="kpi-icon"><span class="mi mi-xl">payments</span></div>
         <div class="kpi-info">
           <span class="kpi-label">Pagos pendientes</span>
           <strong>{{ stats.pagosPendientes }}</strong>
           <small>Por validar</small>
         </div>
       </article>
-
       <article class="kpi-card kpi-info">
-        <div class="kpi-icon">⭐</div>
+        <div class="kpi-icon"><span class="mi mi-xl">star</span></div>
         <div class="kpi-info">
           <span class="kpi-label">Calificaciones</span>
           <strong>{{ stats.totalCalificaciones }}</strong>
           <small>Recibidas</small>
         </div>
       </article>
-
       <article class="kpi-card kpi-star">
-        <div class="kpi-icon">🌟</div>
+        <div class="kpi-icon"><span class="mi mi-xl">grade</span></div>
         <div class="kpi-info">
           <span class="kpi-label">Promedio</span>
           <strong>{{ stats.promedioCalificaciones }}</strong>
@@ -69,43 +64,23 @@
 
     <div class="dashboard-content">
       <div class="dashboard-card estados-card">
-        <h2>📊 Citas por estado</h2>
+        <h2><span class="mi">bar_chart</span> Citas por estado</h2>
         <div class="estados-lista">
           <div class="estado-item">
-            <div class="estado-header">
-              <span>⏳ Pendientes</span>
-              <strong>{{ stats.citasPorEstado.pendiente || 0 }}</strong>
-            </div>
-            <div class="progress-bar">
-              <div class="progress pendiente" [style.width.%]="porcentajeEstado('pendiente')"></div>
-            </div>
+            <div class="estado-header"><span><span class="mi mi-sm">hourglass_top</span> Pendientes</span><strong>{{ stats.citasPorEstado.pendiente || 0 }}</strong></div>
+            <div class="progress-bar"><div class="progress pendiente" [style.width.%]="porcentajeEstado('pendiente')"></div></div>
           </div>
           <div class="estado-item">
-            <div class="estado-header">
-              <span>✅ Confirmadas</span>
-              <strong>{{ stats.citasPorEstado.confirmada || 0 }}</strong>
-            </div>
-            <div class="progress-bar">
-              <div class="progress confirmada" [style.width.%]="porcentajeEstado('confirmada')"></div>
-            </div>
+            <div class="estado-header"><span><span class="mi mi-sm">check_circle</span> Confirmadas</span><strong>{{ stats.citasPorEstado.confirmada || 0 }}</strong></div>
+            <div class="progress-bar"><div class="progress confirmada" [style.width.%]="porcentajeEstado('confirmada')"></div></div>
           </div>
           <div class="estado-item">
-            <div class="estado-header">
-              <span>🎉 Completadas</span>
-              <strong>{{ stats.citasPorEstado.completada || 0 }}</strong>
-            </div>
-            <div class="progress-bar">
-              <div class="progress completada" [style.width.%]="porcentajeEstado('completada')"></div>
-            </div>
+            <div class="estado-header"><span><span class="mi mi-sm">celebration</span> Completadas</span><strong>{{ stats.citasPorEstado.completada || 0 }}</strong></div>
+            <div class="progress-bar"><div class="progress completada" [style.width.%]="porcentajeEstado('completada')"></div></div>
           </div>
           <div class="estado-item">
-            <div class="estado-header">
-              <span>❌ Canceladas</span>
-              <strong>{{ stats.citasPorEstado.cancelada || 0 }}</strong>
-            </div>
-            <div class="progress-bar">
-              <div class="progress cancelada" [style.width.%]="porcentajeEstado('cancelada')"></div>
-            </div>
+            <div class="estado-header"><span><span class="mi mi-sm">cancel</span> Canceladas</span><strong>{{ stats.citasPorEstado.cancelada || 0 }}</strong></div>
+            <div class="progress-bar"><div class="progress cancelada" [style.width.%]="porcentajeEstado('cancelada')"></div></div>
           </div>
         </div>
         <div class="total-citas">
@@ -116,7 +91,7 @@
 
       <div class="dashboard-card">
         <div class="card-header">
-          <h2>📅 Próximas citas</h2>
+          <h2><span class="mi">event</span> Próximas citas</h2>
           <a routerLink="/admin/cronograma" class="ver-todo">Ver todo</a>
         </div>
         <p class="empty-message" *ngIf="proximasCitas.length === 0">No hay citas próximas registradas.</p>
@@ -142,7 +117,7 @@
 
       <div class="dashboard-card">
         <div class="card-header">
-          <h2>💬 Últimas calificaciones</h2>
+          <h2><span class="mi">chat</span> Últimas calificaciones</h2>
           <a routerLink="/admin/calificaciones" class="ver-todo">Ver todo</a>
         </div>
         <p class="empty-message" *ngIf="ultimasCalificaciones.length === 0">Todavía no hay calificaciones.</p>
@@ -160,30 +135,30 @@
       </div>
 
       <div class="dashboard-card quick-card">
-        <h2>⚡ Acciones rápidas</h2>
+        <h2><span class="mi">bolt</span> Acciones rápidas</h2>
         <div class="quick-actions">
           <a routerLink="/admin/cronograma" class="quick-action">
-            <span class="qa-icon">📋</span>
+            <span class="mi mi-lg">calendar_month</span>
             <span>Cronograma</span>
           </a>
           <a routerLink="/admin/disponibilidad" class="quick-action">
-            <span class="qa-icon">🕐</span>
+            <span class="mi mi-lg">schedule</span>
             <span>Disponibilidad</span>
           </a>
           <a routerLink="/admin/servicios" class="quick-action">
-            <span class="qa-icon">💅</span>
+            <span class="mi mi-lg">spa</span>
             <span>Servicios</span>
           </a>
           <a routerLink="/admin/clientes" class="quick-action">
-            <span class="qa-icon">👥</span>
+            <span class="mi mi-lg">group</span>
             <span>Clientes</span>
           </a>
           <a routerLink="/admin/pagos" class="quick-action">
-            <span class="qa-icon">💰</span>
+            <span class="mi mi-lg">payments</span>
             <span>Pagos</span>
           </a>
           <a routerLink="/admin/calificaciones" class="quick-action">
-            <span class="qa-icon">⭐</span>
+            <span class="mi mi-lg">star</span>
             <span>Calificaciones</span>
           </a>
         </div>

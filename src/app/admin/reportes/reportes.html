@@ -33,27 +33,27 @@
   <div *ngIf="!cargando">
     <div class="kpi-grid">
       <div class="kpi-card kpi-primary">
-        <div class="kpi-icon">📋</div>
+        <div class="kpi-icon"><span class="mi">list_alt</span></div>
         <div><span class="kpi-label">Total reservas</span><strong>{{ datos.totalReservas || 0 }}</strong></div>
       </div>
       <div class="kpi-card kpi-secondary">
-        <div class="kpi-icon">👥</div>
+        <div class="kpi-icon"><span class="mi">group</span></div>
         <div><span class="kpi-label">Clientes</span><strong>{{ datos.clientesUnicos || 0 }}</strong></div>
       </div>
       <div class="kpi-card kpi-success">
-        <div class="kpi-icon">✅</div>
+        <div class="kpi-icon"><span class="mi">check_circle</span></div>
         <div><span class="kpi-label">Pagos realizados</span><strong>{{ datos.pagosRealizados || 0 }}</strong></div>
       </div>
       <div class="kpi-card kpi-warning">
-        <div class="kpi-icon">⏳</div>
+        <div class="kpi-icon"><span class="mi">hourglass_top</span></div>
         <div><span class="kpi-label">Pagos pendientes</span><strong>{{ datos.pagosPendientes || 0 }}</strong></div>
       </div>
       <div class="kpi-card kpi-money">
-        <div class="kpi-icon">💵</div>
+        <div class="kpi-icon"><span class="mi">attach_money</span></div>
         <div><span class="kpi-label">Total facturado</span><strong>{{ formatearPrecio(datos.totalFacturado) }}</strong></div>
       </div>
       <div class="kpi-card kpi-paid">
-        <div class="kpi-icon">💰</div>
+        <div class="kpi-icon"><span class="mi">payments</span></div>
         <div><span class="kpi-label">Total cobrado</span><strong>{{ formatearPrecio(datos.totalCobrado) }}</strong></div>
       </div>
     </div>
@@ -63,11 +63,11 @@
         <h2>Estado de reservas</h2>
         <div class="estado-lista">
           <div class="estado-item">
-            <div class="estado-header"><span>⏳ Pendientes</span><strong>{{ datos.pendientes || 0 }}</strong></div>
+            <div class="estado-header"><span><span class="mi">hourglass_top</span> Pendientes</span><strong>{{ datos.pendientes || 0 }}</strong></div>
             <div class="progress-bar"><div class="progress pendiente" [style.width.%]="porcentaje(datos.pendientes, datos.totalReservas)"></div></div>
           </div>
           <div class="estado-item">
-            <div class="estado-header"><span>✅ Confirmadas</span><strong>{{ datos.confirmadas || 0 }}</strong></div>
+            <div class="estado-header"><span><span class="mi">check_circle</span> Confirmadas</span><strong>{{ datos.confirmadas || 0 }}</strong></div>
             <div class="progress-bar"><div class="progress confirmada" [style.width.%]="porcentaje(datos.confirmadas, datos.totalReservas)"></div></div>
           </div>
           <div class="estado-item">
@@ -108,22 +108,22 @@
         <h2>Calificaciones y satisfacción</h2>
         <div class="satisfaction-grid">
           <div class="sat-item">
-            <span class="sat-icon">⭐</span>
+            <span class="sat-icon"><span class="mi">star</span></span>
             <strong>{{ datos.totalCalificaciones || 0 }}</strong>
             <span>Opiniones</span>
           </div>
           <div class="sat-item">
-            <span class="sat-icon">🌟</span>
+            <span class="sat-icon"><span class="mi">grade</span></span>
             <strong>{{ datos.promedioCalificaciones || '0.0' }}</strong>
             <span>Promedio</span>
           </div>
           <div class="sat-item">
-            <span class="sat-icon">💅</span>
+            <span class="sat-icon"><span class="mi">spa</span></span>
             <strong>{{ datos.serviciosActivos || 0 }}</strong>
             <span>Serv. activos</span>
           </div>
           <div class="sat-item">
-            <span class="sat-icon">⏸️</span>
+            <span class="sat-icon"><span class="mi">pause_circle</span></span>
             <strong>{{ datos.serviciosInactivos || 0 }}</strong>
             <span>Serv. inactivos</span>
           </div>

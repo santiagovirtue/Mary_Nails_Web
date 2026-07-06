@@ -13,42 +13,42 @@
   <div *ngIf="!cargando">
     <div class="kpi-grid">
       <article class="kpi-card kpi-primary">
-        <div class="kpi-icon">📋</div>
+        <div class="kpi-icon"><span class="mi mi-lg">list_alt</span></div>
         <div>
           <span class="kpi-label">Total</span>
           <strong>{{ contarTotal() }}</strong>
         </div>
       </article>
       <article class="kpi-card kpi-warning">
-        <div class="kpi-icon">⏳</div>
+        <div class="kpi-icon"><span class="mi mi-lg">hourglass_top</span></div>
         <div>
           <span class="kpi-label">Pendientes</span>
           <strong>{{ contarPendientes() }}</strong>
         </div>
       </article>
       <article class="kpi-card kpi-success">
-        <div class="kpi-icon">✅</div>
+        <div class="kpi-icon"><span class="mi mi-lg">check_circle</span></div>
         <div>
           <span class="kpi-label">Confirmadas</span>
           <strong>{{ contarConfirmadas() }}</strong>
         </div>
       </article>
       <article class="kpi-card kpi-info">
-        <div class="kpi-icon">🎉</div>
+        <div class="kpi-icon"><span class="mi mi-lg">celebration</span></div>
         <div>
           <span class="kpi-label">Completadas</span>
           <strong>{{ contarCompletadas() }}</strong>
         </div>
       </article>
       <article class="kpi-card kpi-danger">
-        <div class="kpi-icon">❌</div>
+        <div class="kpi-icon"><span class="mi mi-lg">cancel</span></div>
         <div>
           <span class="kpi-label">Canceladas</span>
           <strong>{{ contarCanceladas() }}</strong>
         </div>
       </article>
       <article class="kpi-card kpi-money">
-        <div class="kpi-icon">💰</div>
+        <div class="kpi-icon"><span class="mi mi-lg">payments</span></div>
         <div>
           <span class="kpi-label">Pagadas</span>
           <strong>{{ contarPagadas() }}</strong>
@@ -124,13 +124,13 @@
               </td>
               <td>
                 <div class="actions">
-                  <button type="button" class="action back" *ngIf="reserva.estado === 'Confirmada' || reserva.estado === 'Completada'" (click)="marcarPendiente(reserva.id)" title="Volver a Pendiente">↩</button>
-                  <button type="button" class="action confirm" *ngIf="reserva.estado === 'Pendiente'" (click)="confirmarReserva(reserva.id)" title="Confirmar">✓</button>
-                  <button type="button" class="action complete" *ngIf="reserva.estado === 'Confirmada'" (click)="completarReserva(reserva.id)" title="Completar">🏁</button>
-                  <button type="button" class="action reactivate" *ngIf="reserva.estado === 'Cancelada'" (click)="reactivarReserva(reserva.id)" title="Reactivar">🔄</button>
-                  <button type="button" class="action pay" [class.paid]="reserva.estadoPago === 'Pagado'" (click)="togglePago(reserva.id, reserva.estadoPago)" [title]="reserva.estadoPago === 'Pagado' ? 'Revertir pago' : 'Marcar pagado'">💰</button>
-                  <button type="button" class="action cancel" *ngIf="reserva.estado !== 'Cancelada'" (click)="cancelarReserva(reserva.id)" title="Cancelar">✕</button>
-                  <button type="button" class="action delete" (click)="eliminarReserva(reserva.id)" title="Eliminar">🗑</button>
+                  <button type="button" class="action back" *ngIf="reserva.estado === 'Confirmada' || reserva.estado === 'Completada'" (click)="marcarPendiente(reserva.id)" title="Volver a Pendiente" title="Volver a Pendiente"><span class="mi mi-sm">undo</span></button>
+                  <button type="button" class="action confirm" *ngIf="reserva.estado === 'Pendiente'" (click)="confirmarReserva(reserva.id)" title="Confirmar" title="Confirmar"><span class="mi mi-sm">check</span></button>
+                  <button type="button" class="action complete" *ngIf="reserva.estado === 'Confirmada'" (click)="completarReserva(reserva.id)" title="Completar" title="Completar"><span class="mi mi-sm">done_all</span></button>
+                  <button type="button" class="action reactivate" *ngIf="reserva.estado === 'Cancelada'" (click)="reactivarReserva(reserva.id)" title="Reactivar" title="Reactivar"><span class="mi mi-sm">refresh</span></button>
+                  <button type="button" class="action pay" [class.paid]="reserva.estadoPago === 'Pagado'" (click)="togglePago(reserva.id, reserva.estadoPago)" [title]="reserva.estadoPago === 'Pagado' ? 'Revertir pago' : 'Marcar pagado'"><span class="mi mi-sm">payments</span></button>
+                  <button type="button" class="action cancel" *ngIf="reserva.estado !== 'Cancelada'" (click)="cancelarReserva(reserva.id)" title="Cancelar" title="Cancelar"><span class="mi mi-sm">close</span></button>
+                  <button type="button" class="action delete" (click)="eliminarReserva(reserva.id)" title="Eliminar" title="Eliminar"><span class="mi mi-sm">delete</span></button>
                 </div>
               </td>
             </tr>
@@ -145,7 +145,7 @@
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>+ Nueva cita (admin)</h2>
-      <button type="button" class="modal-close-btn" (click)="cerrarModal()">✕</button>
+      <button type="button" class="modal-close-btn" (click)="cerrarModal()" title="Cancelar"><span class="mi mi-sm">close</span></button>
     </div>
     <p class="modal-desc">Crea una cita manualmente para un cliente que reservó por otro medio (llamada, WhatsApp, en local).</p>
 

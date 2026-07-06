@@ -4,10 +4,10 @@
       <h3>Mi Cuenta</h3>
     </div>
     <nav class="sidebar-nav">
-      <a routerLink="/cliente/perfil" class="nav-item">👤 Perfil</a>
-      <a routerLink="/cliente/mis-citas" class="nav-item activo">📅 Mis citas</a>
-      <a class="nav-item deshabilitado" title="Próximamente">⭐ Favoritos</a>
-      <a class="nav-item deshabilitado" title="Próximamente">⚙️ Preferencias</a>
+      <a routerLink="/cliente/perfil" class="nav-item"><span class="mi mi-sm">person</span> Perfil</a>
+      <a routerLink="/cliente/mis-citas" class="nav-item activo"><span class="mi mi-sm">event</span> Mis citas</a>
+      <a class="nav-item deshabilitado" title="Próximamente"><span class="mi mi-sm">favorite</span> Favoritos</a>
+      <a class="nav-item deshabilitado" title="Próximamente"><span class="mi mi-sm">settings</span> Preferencias</a>
     </nav>
     <div class="sidebar-footer">
       <a routerLink="/" class="btn-cerrar-sesion">Cerrar sesión</a>
@@ -35,28 +35,28 @@
 
       <div class="stats-grid">
         <article class="stat-card activas">
-          <div class="stat-icon">📌</div>
+          <div class="stat-icon"><span class="mi">push_pin</span></div>
           <div>
             <strong>{{ contarActivas() }}</strong>
             <span>Activas</span>
           </div>
         </article>
         <article class="stat-card completadas">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon"><span class="mi">check_circle</span></div>
           <div>
             <strong>{{ contarCompletadas() }}</strong>
             <span>Completadas</span>
           </div>
         </article>
         <article class="stat-card pendientes">
-          <div class="stat-icon">⏳</div>
+          <div class="stat-icon"><span class="mi">hourglass_top</span></div>
           <div>
             <strong>{{ contarPendientes() }}</strong>
             <span>Pendientes</span>
           </div>
         </article>
         <article class="stat-card pagadas">
-          <div class="stat-icon">💰</div>
+          <div class="stat-icon"><span class="mi">payments</span></div>
           <div>
             <strong>{{ contarPagadas() }}</strong>
             <span>Pagadas</span>
@@ -109,7 +109,7 @@
                   {{ reserva.estado }}
                 </span>
                 <span class="payment-status" [class.payment-pending]="reserva.estadoPago !== 'Pagado'" [class.payment-paid]="reserva.estadoPago === 'Pagado'">
-                  {{ reserva.estadoPago === 'Pagado' ? '💰 Pagado' : '⏳ Pago pendiente' }}
+                  {{ reserva.estadoPago === 'Pagado' ? 'Pagado' : 'Pago pendiente' }}
                 </span>
               </div>
             </div>
