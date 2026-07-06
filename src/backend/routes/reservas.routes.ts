@@ -31,17 +31,30 @@ reservasRouter.get('/cliente', async (req: Request, res: Response) => {
 });
 
 reservasRouter.post('/', async (req: Request, res: Response) => {
-  const { nombre, telefono, servicio, fecha, hora, metodoPago, comentarios } = req.body;
+  const { nombre, telefono, servicio, fecha, hora, metodoPago, comentarios, correo } = req.body;
   const horaFormato = convertirHora(hora);
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
-    let [usuarios]: any = await connection.query('SELECT id_usuario FROM usuarios WHERE telefono = ?', [telefono]);
     let id_usuario: number;
-    if (usuarios.length === 0) {
-      const [result]: any = await connection.query('INSERT INTO usuarios (nombre, telefono, correo, password, rol) VALUES (?, ?, ?, ?, ?)', [nombre, telefono, telefono + '@marynails.com', 'sin_password', 'cliente']);
-      id_usuario = result.insertId;
-    } else { id_usuario = usuarios[0].id_usuario; }
+    if (correo) {
+      let [usuariosPorCorreo]: any = await connection.query('SELECT id_usuario FROM usuarios WHERE correo = ?', [correo]);
+      if (usuariosPorCorreo.length > 0) {
+        id_usuario = usuariosPorCorreo[0].id_usuario;
+        if (telefono) {
+          await connection.query('UPDATE usuarios SET telefono = ? WHERE id_usuario = ? AND (telefono IS NULL OR telefono = \'\')', [telefono, id_usuario]);
+        }
+      } else {
+        const [result]: any = await connection.query('INSERT INTO usuarios (nombre, telefono, correo, password, rol) VALUES (?, ?, ?, ?, ?)', [nombre, telefono, correo, 'sin_password', 'cliente']);
+        id_usuario = result.insertId;
+      }
+    } else {
+      let [usuarios]: any = await connection.query('SELECT id_usuario FROM usuarios WHERE telefono = ?', [telefono]);
+      if (usuarios.length === 0) {
+        const [result]: any = await connection.query('INSERT INTO usuarios (nombre, telefono, correo, password, rol) VALUES (?, ?, ?, ?, ?)', [nombre, telefono, telefono + '@marynails.com', 'sin_password', 'cliente']);
+        id_usuario = result.insertId;
+      } else { id_usuario = usuarios[0].id_usuario; }
+    }
     const [servicios]: any = await connection.query('SELECT id_servicio, precio FROM servicios WHERE nombre = ?', [servicio]);
     if (servicios.length === 0) { await connection.rollback(); res.status(400).json({ error: 'Servicio no encontrado' }); return; }
     const { id_servicio, precio } = servicios[0];

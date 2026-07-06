@@ -110,7 +110,11 @@ export class Reservas implements OnInit {
     if (!this.fechaCoincideConDiaSeleccionado()) { this.mensajeError = 'La fecha no corresponde al día ' + this.obtenerDiaHorarioSeleccionado() + '.'; return; }
     if (this.reservasService.existeReserva(this.reserva.fecha, this.reserva.hora)) { this.mensajeError = 'Ya existe una reserva para esa fecha y hora.'; return; }
     this.guardando = true;
-    const reservaGuardar = Object.assign({}, this.reserva);
+    const reservaGuardar: any = Object.assign({}, this.reserva);
+    if (typeof window !== 'undefined') {
+      const correoSesion = localStorage.getItem('maryNailsClienteUsuario') || '';
+      if (correoSesion) reservaGuardar.correo = correoSesion;
+    }
     this.reservasService.agregarReserva(reservaGuardar);
     this.zone.run(() => {
       this.reservaConfirmada = reservaGuardar;

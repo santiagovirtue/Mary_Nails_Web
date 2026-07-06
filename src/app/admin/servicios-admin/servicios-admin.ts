@@ -14,7 +14,7 @@ export class ServiciosAdmin implements OnInit {
   servicios: any[] = [];
   cargando = true;
   guardando = false;
-  servicio = { id: 0, nombre: '', descripcion: '', duracion: 0, precio: 0, estado: 'Activo' };
+  servicio = { id: 0, nombre: '', descripcion: '', duracion: 0, precio: 0, estado: 'Activo', imagen: '' };
   editando = false;
   mensaje = '';
   tipoMensaje: 'exito' | 'error' | '' = '';
@@ -65,6 +65,7 @@ export class ServiciosAdmin implements OnInit {
       duracion: this.servicio.duracion,
       precio: this.servicio.precio,
       estado: this.servicio.estado,
+      imagen: this.servicio.imagen,
     };
     if (this.editando && this.servicio.id) {
       this.http.put('/api/servicios/' + this.servicio.id, payload).subscribe({
@@ -87,6 +88,7 @@ export class ServiciosAdmin implements OnInit {
       duracion: Number(s.duracion_minutos || s.duracion || 0),
       precio: Number(s.precio || 0),
       estado: s.estado,
+      imagen: s.imagen || '',
     };
     this.editando = true;
     this.mensajeError = '';
@@ -111,7 +113,7 @@ export class ServiciosAdmin implements OnInit {
   }
 
   limpiarFormulario(): void {
-    this.servicio = { id: 0, nombre: '', descripcion: '', duracion: 0, precio: 0, estado: 'Activo' };
+    this.servicio = { id: 0, nombre: '', descripcion: '', duracion: 0, precio: 0, estado: 'Activo', imagen: '' };
     this.editando = false;
     this.mensajeError = '';
   }
@@ -120,5 +122,13 @@ export class ServiciosAdmin implements OnInit {
     this.mensaje = texto;
     this.tipoMensaje = tipo;
     setTimeout(() => { this.zone.run(() => { this.mensaje = ''; this.tipoMensaje = ''; this.cdr.detectChanges(); }); }, 3000);
+  }
+
+  subirImagen(event: any): void {
+    const archivo = event.target.files[0];
+    if (!archivo) return;
+    const lector = new FileReader();
+    lector.onload = () => { this.servicio.imagen = lector.result as string; };
+    lector.readAsDataURL(archivo);
   }
 }

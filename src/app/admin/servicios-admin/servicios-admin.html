@@ -53,6 +53,16 @@
         </div>
       </div>
       <div class="form-group">
+        <label>Imagen del servicio</label>
+        <div class="imagen-upload">
+          <img *ngIf="servicio.imagen" [src]="servicio.imagen" alt="Vista previa" class="imagen-preview"/>
+          <label class="btn-subir">
+            <span class="mi mi-sm">upload</span> {{ servicio.imagen ? 'Cambiar imagen' : 'Subir imagen' }}
+            <input type="file" accept="image/*" (change)="subirImagen($event)" hidden/>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
         <label>Estado</label>
         <select name="estado" [(ngModel)]="servicio.estado">
           <option value="Activo">Activo (visible para clientes)</option>

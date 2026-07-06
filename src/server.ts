@@ -22,8 +22,8 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 app.use(cors({ origin: '*', credentials: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use('/api/reservas', reservasRouter);
 app.use('/api/servicios', serviciosRouter);
