@@ -12,7 +12,11 @@
 
   <div class="services-grid" *ngIf="!cargando && servicios.length > 0">
     <article class="service-card" *ngFor="let servicio of servicios; let i = index">
-      <div class="card-top">
+      <div class="card-image" *ngIf="servicio.imagen">
+        <img [src]="servicio.imagen" [alt]="servicio.nombre" loading="lazy"/>
+        <span class="badge-activo">Disponible</span>
+      </div>
+      <div class="card-top" *ngIf="!servicio.imagen">
         <div class="service-icon">{{ obtenerIcono(i) }}</div>
         <span class="badge-activo">Disponible</span>
       </div>

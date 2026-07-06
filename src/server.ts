@@ -40,6 +40,12 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', mensaje: 'MaryNails API funcionando ✅' });
 });
 
+app.get('/img/:filename', (req, res) => {
+  const filepath = join(process.cwd(), 'public', 'img', req.params.filename);
+  res.sendFile(filepath, (err) => {
+    if (err) res.status(404).json({ error: 'No encontrada', path: filepath });
+  });
+});
 app.use(express.static(browserDistFolder, { maxAge: '1y', index: false, redirect: false }));
 
 app.use((req, res, next) => {
