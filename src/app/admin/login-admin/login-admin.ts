@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ export class LoginAdmin {
   mensajeError = '';
   cargando = false;
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
   iniciarSesion(): void {
     this.mensajeError = '';
@@ -27,20 +27,27 @@ export class LoginAdmin {
     this.cargando = true;
     this.http.post<any>('/api/auth/login', { usuario: this.usuario, password: this.password }).subscribe({
       next: (data) => {
-        this.cargando = false;
-        if (data.rol !== 'administrador') {
-          this.mensajeError = 'Esta cuenta no tiene permisos de administrador.';
-          return;
-        }
-        localStorage.removeItem('maryNailsClienteSesion');
-        localStorage.removeItem('maryNailsClienteUsuario');
-        localStorage.setItem('maryNailsAdminSesion', 'true');
-        localStorage.setItem('maryNailsAdminUsuario', data.correo);
-        this.router.navigate(['/admin/dashboard']);
+        this.zone.run(() => {
+          this.cargando = false;
+          if (data.rol !== 'administrador') {
+            this.mensajeError = 'Esta cuenta no tiene permisos de administrador.';
+            this.cdr.detectChanges();
+            return;
+          }
+          localStorage.removeItem('maryNailsClienteSesion');
+          localStorage.removeItem('maryNailsClienteUsuario');
+          localStorage.setItem('maryNailsAdminSesion', 'true');
+          localStorage.setItem('maryNailsAdminUsuario', data.correo);
+          this.router.navigate(['/admin/dashboard']);
+          this.cdr.detectChanges();
+        });
       },
       error: () => {
-        this.cargando = false;
-        this.mensajeError = 'Usuario o contraseña incorrectos.';
+        this.zone.run(() => {
+          this.cargando = false;
+          this.mensajeError = 'Usuario o contraseña incorrectos.';
+          this.cdr.detectChanges();
+        });
       },
     });
   }

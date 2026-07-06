@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -23,7 +23,7 @@ export class Login {
   regTelefono = '';
   regPassword = '';
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
   iniciarSesion(): void {
     this.mensajeError = '';
@@ -34,24 +34,30 @@ export class Login {
     this.cargando = true;
     this.http.post<any>('/api/auth/login', { usuario: this.usuario, password: this.password }).subscribe({
       next: (data) => {
-        this.cargando = false;
-        if (data.rol === 'administrador') {
-          localStorage.setItem('maryNailsAdminSesion', 'true');
-          localStorage.setItem('maryNailsAdminUsuario', data.correo);
-          localStorage.removeItem('maryNailsClienteSesion');
-          localStorage.removeItem('maryNailsClienteUsuario');
-          this.router.navigate(['/admin/dashboard']);
-        } else {
-          localStorage.setItem('maryNailsClienteSesion', 'true');
-          localStorage.setItem('maryNailsClienteUsuario', data.correo);
-          localStorage.removeItem('maryNailsAdminSesion');
-          localStorage.removeItem('maryNailsAdminUsuario');
-          this.router.navigate(['/cliente/mis-citas']);
-        }
+        this.zone.run(() => {
+          this.cargando = false;
+          if (data.rol === 'administrador') {
+            localStorage.setItem('maryNailsAdminSesion', 'true');
+            localStorage.setItem('maryNailsAdminUsuario', data.correo);
+            localStorage.removeItem('maryNailsClienteSesion');
+            localStorage.removeItem('maryNailsClienteUsuario');
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            localStorage.setItem('maryNailsClienteSesion', 'true');
+            localStorage.setItem('maryNailsClienteUsuario', data.correo);
+            localStorage.removeItem('maryNailsAdminSesion');
+            localStorage.removeItem('maryNailsAdminUsuario');
+            this.router.navigate(['/cliente/mis-citas']);
+          }
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
-        this.cargando = false;
-        this.mensajeError = err.error?.error || 'Credenciales incorrectas. Verifica tus datos.';
+        this.zone.run(() => {
+          this.cargando = false;
+          this.mensajeError = err.error?.error || 'Credenciales incorrectas. Verifica tus datos.';
+          this.cdr.detectChanges();
+        });
       },
     });
   }
@@ -69,15 +75,21 @@ export class Login {
       telefono: this.regTelefono, password: this.regPassword,
     }).subscribe({
       next: () => {
-        this.cargando = false;
-        this.mensajeExito = 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.';
-        this.modoRegistro = false;
-        this.usuario = this.regCorreo;
-        this.regNombre = ''; this.regCorreo = ''; this.regTelefono = ''; this.regPassword = '';
+        this.zone.run(() => {
+          this.cargando = false;
+          this.mensajeExito = 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.';
+          this.modoRegistro = false;
+          this.usuario = this.regCorreo;
+          this.regNombre = ''; this.regCorreo = ''; this.regTelefono = ''; this.regPassword = '';
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
-        this.cargando = false;
-        this.mensajeError = err.error?.error || 'Error al crear la cuenta.';
+        this.zone.run(() => {
+          this.cargando = false;
+          this.mensajeError = err.error?.error || 'Error al crear la cuenta.';
+          this.cdr.detectChanges();
+        });
       },
     });
   }
